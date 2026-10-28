@@ -7,7 +7,7 @@ load_dotenv(ROOT / ".env")
 
 LLM_BASE_URL = os.getenv("EVA_LLM_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/")
 LLM_API_KEY = os.getenv("EVA_LLM_API_KEY", "")
-LLM_MODEL = os.getenv("EVA_LLM_MODEL", "gemini-2.5-flash")
+LLM_MODEL = os.getenv("EVA_LLM_MODEL", "gemini-3.8-flash")
 USER_NAME = os.getenv("EVA_USER_NAME", "Gabriel")
 MAX_STEPS = int(os.getenv("EVA_MAX_STEPS", "15"))
 BROWSER_HEADLESS = os.getenv("EVA_BROWSER_HEADLESS", "false").lower() == "true"
