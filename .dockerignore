@@ -3,4 +3,7 @@
 data
 workspace_eva
 __pycache__
+*.pyc
 *.zip
+.pytest_cache
+tests/__pycache__

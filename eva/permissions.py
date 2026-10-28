@@ -1,7 +1,14 @@
-"""Permissões por ação: 'permitir' | 'perguntar' | 'bloquear'. Ferramenta desconhecida = perguntar."""
+"""Permissões por ferramenta: 'permitir' | 'perguntar' | 'bloquear'.
+
+- Ferramenta desconhecida = perguntar.
+- Algumas ferramentas 'permitidas' viram 'perguntar' sozinhas em situações sensíveis
+  (ex.: clicar em "Finalizar compra" ou digitar em campo de senha/cartão) — ver tools/__init__.py (sensivel).
+- No banco ficam só as escolhas do Gabriel que diferem do padrão.
+"""
 import json
-from .db import db
+
 from . import audit
+from .db import db
 
 PADRAO = {
     "hora_atual": "permitir",
@@ -16,33 +23,58 @@ PADRAO = {
     "executar_comando": "perguntar",
     "navegador_abrir": "permitir",
     "navegador_ler": "permitir",
+    "navegador_elementos": "permitir",
+    "navegador_clicar": "permitir",     # vira 'perguntar' sozinho em botão de compra/pagamento
+    "navegador_digitar": "permitir",    # vira 'perguntar' sozinho em senha/cartão/checkout
+    "navegador_rolar": "permitir",
+    "navegador_voltar": "permitir",
     "navegador_screenshot": "permitir",
-    "navegador_clicar": "perguntar",
-    "navegador_digitar": "perguntar",
+    "navegador_fechar": "permitir",
+    "agendar_lembrete": "permitir",
+    "listar_lembretes": "permitir",
+    "cancelar_lembrete": "permitir",
+    "perguntar_ao_gabriel": "permitir",
 }
-VALIDOS = {"permitir", "perguntar", "bloquear"}
+VALIDOS = ("permitir", "perguntar", "bloquear")
 
 
 class Permissions:
     def __init__(self):
-        self.rules = dict(PADRAO)
+        self.overrides: dict[str, str] = {}
+        self.carregar()
+
+    def carregar(self):
+        self.overrides = {}
         try:
-            self.rules.update(json.loads(db.get("permissoes", "{}")))
-        except Exception:
+            salvo = json.loads(db.get("permissoes", "{}") or "{}")
+            if isinstance(salvo, dict):
+                self.overrides = {k: v for k, v in salvo.items() if v in VALIDOS and PADRAO.get(k) != v}
+        except Exception:  # noqa: BLE001
             pass
 
     def _save(self):
-        db.set("permissoes", json.dumps(self.rules, ensure_ascii=False))
+        db.set("permissoes", json.dumps(self.overrides, ensure_ascii=False))
 
     def get(self, tool: str) -> str:
-        return self.rules.get(tool, "perguntar")
+        return self.overrides.get(tool) or PADRAO.get(tool, "perguntar")
+
+    def padrao(self, tool: str) -> str:
+        return PADRAO.get(tool, "perguntar")
 
     def set(self, tool: str, value: str):
         if value not in VALIDOS:
             raise ValueError(f"valor inválido: {value}")
-        self.rules[tool] = value
+        if PADRAO.get(tool, "perguntar") == value:
+            self.overrides.pop(tool, None)
+        else:
+            self.overrides[tool] = value
         self._save()
         audit.log("permissao_alterada", ferramenta=tool, valor=value)
+
+    def restaurar(self):
+        self.overrides = {}
+        self._save()
+        audit.log("permissoes_restauradas")
 
 
 permissions = Permissions()

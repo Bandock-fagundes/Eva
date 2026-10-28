@@ -3,3 +3,4 @@
 __pycache__/
 data/
 workspace_eva/
+.pytest_cache/
