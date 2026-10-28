@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: eva
+    runtime: docker
+    plan: free
+    envVars:
+      - key: EVA_LLM_BASE_URL
+        value: https://generativelanguage.googleapis.com/v1beta/openai/
+      - key: EVA_LLM_MODEL
+        value: gemini-2.5-flash
+      - key: EVA_LLM_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: EVA_SENHA
+        sync: false
+      - key: EVA_USER_NAME
+        value: Gabriel

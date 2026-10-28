@@ -1,0 +1,6 @@
+.env
+.venv
+data
+workspace_eva
+__pycache__
+*.zip
