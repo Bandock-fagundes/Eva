@@ -127,16 +127,29 @@ async def test_retry_em_429_respeita_retry_after(fake):
     assert esperas == [2.0]
 
 
-async def test_retry_em_503_com_backoff(fake):
+async def test_503_sobrecarga_pula_para_proximo_modelo(fake):
     esperas = []
 
     async def dormir(s):
         esperas.append(s)
     cerebro._sleep = dormir
-    fake.adicionar({"erro": 503, "msg": "The model is overloaded"}, {"erro": 500}, {"texto": "voltou"})
+    fake.adicionar({"erro": 503, "msg": "The model is overloaded"}, {"texto": "no outro"})
+    r = await cerebro.chat(MSGS)
+    assert r.texto == "no outro" and r.modelo == "gemini-3.6-flash"
+    assert esperas == []  # não perde tempo insistindo no modelo lotado
+    assert {c["modelo"]: c["status"] for c in cerebro.estado()["cadeia"]}["gemini-3.8-flash"] == "limite"
+
+
+async def test_500_tenta_uma_vez_de_novo(fake):
+    esperas = []
+
+    async def dormir(s):
+        esperas.append(s)
+    cerebro._sleep = dormir
+    fake.adicionar({"erro": 500}, {"texto": "voltou"})
     r = await cerebro.chat(MSGS)
     assert r.texto == "voltou" and r.modelo == "gemini-3.8-flash"
-    assert len(esperas) == 2 and esperas[1] > esperas[0] * 1.2  # exponencial
+    assert len(esperas) == 1
 
 
 async def test_429_persistente_cai_para_modelo_mais_leve(fake):

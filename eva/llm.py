@@ -32,6 +32,7 @@ EMBED_DIMENSOES = 768  # gemini-embedding-001 é Matryoshka: dá pra cortar o ve
 
 INDISPONIVEL_POR = 3600.0   # segundos que um modelo "não encontrado" fica fora da cadeia
 COOLDOWN_LIMITE = 60.0      # segundos que um modelo com 429 persistente fica de molho
+COOLDOWN_SOBRECARGA = 300.0  # segundos que um modelo "lotado" (503) fica de molho
 
 AMIGAVEL = {
     "sem_chave": "Falta configurar a chave da API do cérebro (EVA_LLM_API_KEY). Sem ela eu não consigo pensar.",
@@ -355,6 +356,14 @@ class LLM:
                             break  # vai para o próximo modelo (mais leve)
                         await self._dormir(espera, prazo)
                         continue
+                    if tipo == "transitorio":
+                        tl = tecnico.lower()
+                        sobrecarga = any(k in tl for k in ("high demand", "overloaded", "unavailable", "503"))
+                        if sobrecarga or tentativa >= 1:
+                            # modelo lotado: não insiste (cada tentativa custa vários segundos);
+                            # deixa ele de molho por um tempo e passa direto para o próximo
+                            self.cooldown[modelo] = time.time() + COOLDOWN_SOBRECARGA
+                            break
                     if tipo == "timeout" and tentativa >= 1:
                         break  # timeout repetido: tenta outro modelo em vez de esperar mais 90s
                     if tentativa < self.tentativas - 1:

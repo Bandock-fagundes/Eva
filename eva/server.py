@@ -248,6 +248,12 @@ async def historico(n: int = 80):
     return memory.history(max(1, min(500, n)))
 
 
+@app.delete("/api/historico")
+async def limpar_historico():
+    memory.limpar_conversa()
+    return {"ok": True}
+
+
 class ChatIn(BaseModel):
     texto: str = Field(min_length=1, max_length=20000)
     aprovar: Literal["negar", "permitir"] = "negar"

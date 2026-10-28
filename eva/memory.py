@@ -131,6 +131,12 @@ class Memory:
         rows = db.all("SELECT id, ts, papel, conteudo FROM conversa ORDER BY id DESC LIMIT ?", (int(n),))
         return rows[::-1]
 
+    def limpar_conversa(self) -> None:
+        """Apaga o histórico da conversa e os resumos (as memórias de longo prazo ficam)."""
+        db.run("DELETE FROM conversa")
+        db.run("DELETE FROM resumos")
+        audit.log("conversa_limpa")
+
     def mensagens_apos(self, ate_id: int, limite: int = 400) -> list[dict]:
         rows = db.all("SELECT id, ts, papel, conteudo FROM conversa WHERE id > ? ORDER BY id DESC LIMIT ?",
                       (int(ate_id), int(limite)))

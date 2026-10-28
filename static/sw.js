@@ -1,5 +1,5 @@
 // Service worker da E.V.A. — deixa instalável (Android/Windows), mostra notificações e nunca prende versão velha.
-const VERSAO = 'eva-v1.0.0';
+const VERSAO = 'eva-v1.0.1';
 const CASCA = ['/', '/static/app.css?v=1.0.0', '/static/app.js?v=1.0.0', '/static/md.js?v=1.0.0', '/icon-192.png', '/manifest.json'];
 
 self.addEventListener('install', e => {

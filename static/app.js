@@ -470,3 +470,10 @@ conectar();
 estado();
 if (matchMedia('(min-width:861px)').matches) carregarTela();
 setInterval(() => { if (!document.hidden) estado(); }, 30000);
+
+$('#limparConversa').onclick = async () => {
+  if (!confirm('Apagar o histórico da conversa? As memórias da Eva continuam guardadas.')) return;
+  await api('/api/historico', { method: 'DELETE' });
+  msgs.innerHTML = ''; E.bolha = null; E.acoes = {}; E.cards = {}; E.ultimaEva = '';
+  toast('Conversa limpa.');
+};
