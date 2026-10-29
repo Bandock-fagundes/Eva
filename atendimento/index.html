@@ -92,6 +92,15 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
 .overlay{position:fixed;inset:0;background:rgba(16,24,40,.45);display:none;align-items:center;justify-content:center;z-index:8}.overlay.on{display:flex}
 .modal{width:min(520px,92vw)}
 /* ===== v7 ===== */
+.chathead{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--card);flex-wrap:wrap}.chathead small{color:var(--mut);font-size:12px}
+.tgl{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--mut);margin:0;cursor:pointer}.tgl input{width:auto;margin:0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px 0;background:var(--card)}.chips button{all:unset;cursor:pointer;font-size:12.5px;padding:6px 11px;border:1px solid var(--line);border-radius:99px;color:var(--tx);background:var(--card2)}.chips button:hover{border-color:var(--pri);color:var(--pri)}
+.acts{display:flex;flex-direction:column;gap:6px;margin-top:8px}.act{font-size:12.5px;padding:7px 10px;border-radius:8px;background:var(--card2);border:1px dashed var(--line);display:flex;gap:8px;align-items:center}.act span{flex:1}.act button{all:unset;cursor:pointer;color:var(--pri);font-weight:600;font-size:12px}
+.bub .when{display:block;font-size:10.5px;opacity:.55;margin-top:4px}
+.segs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}.segs button{all:unset;cursor:pointer;font-size:12.5px;padding:6px 11px;border-radius:8px;border:1px solid var(--line);color:var(--mut)}.segs button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.mtag{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--card2);border:1px solid var(--line);color:var(--mut)}
+.previt{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}.previt input{width:auto;margin-top:3px}
+
 .splash{position:fixed;inset:0;z-index:45;background:#0b1514;display:flex;align-items:center;justify-content:center;color:#d7f3ef;transition:opacity .5s}
 .splash.off{display:none}.splash.fade{opacity:0}
 .splin{width:min(480px,90vw);text-align:center}
@@ -222,8 +231,8 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
   <button class="nav" data-v="fichas"><i>📒</i><span>Fichas e métricas<em>Suas anotações, na ordem que você põe</em></span></button>
   <button class="nav" data-v="material"><i>🗂️</i><span>Arquivos<em>Auxílio, planilhas e slides organizados</em></span></button>
   <div class="navh">E.V.A.</div>
-  <button class="nav" data-v="chat"><i>💬</i><span>Conversar com a E.V.A.<em>Pergunte sobre material e métricas</em></span></button>
-  <button class="nav" data-v="aprender"><i>🧠</i><span>Memória<em>Ensine regras que ela deve lembrar</em></span></button>
+  <button class="nav" data-v="chat"><i>💬</i><span>Conversar com a E.V.A.<em>Papo livre, dúvidas e comandos</em></span></button>
+  <button class="nav" data-v="aprender"><i>🧠</i><span>Memória<em>O que ela lembra e textos para ensinar</em></span></button>
   <div class="navh">Sistema</div>
   <button class="nav" data-v="privacidade"><i>🛡️</i><span>Privacidade e LGPD<em>Como seus dados ficam protegidos</em></span></button>
   <button class="nav" data-v="config"><i>⚙️</i><span>Configurações<em>Chave da IA, horários e senha</em></span></button>
@@ -302,11 +311,14 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
 </section>
 
 <section class="view" id="v-chat">
-  <div class="ph"><div class="phi">💬</div><div><h2>Conversar com a E.V.A.</h2><p class="sub">Pergunte sobre procedimentos, peça ideias ou ensine algo novo. Ela consulta o material e a memória.</p></div></div>
-  <div class="howto"><span><b>1</b> Pergunte</span><span><b>2</b> Ela consulta arquivos, fichas e memória</span><span><b>3</b> Responde com a fonte</span></div>
+  <div class="ph"><div class="phi">💬</div><div><h2>Conversar com a E.V.A.</h2><p class="sub">Fale de qualquer assunto, tire dúvidas do trabalho ou dê ordens: “guarda isso”, “anota na colinha”, “cria uma ficha”, “esquece aquilo”. Ela lembra das conversas.</p></div></div>
   <div class="card chat">
+    <div class="chathead"><span class="dot ok"></span><b>E.V.A.</b><small id="chatSub">online</small><span style="flex:1"></span>
+      <label class="tgl" title="Ela decide sozinha o que vale guardar"><input type="checkbox" id="autoMem" checked> Memória automática</label>
+      <button class="btn ghost sm" id="btnPuxar">💡 Puxar assunto</button><button class="btn ghost sm" id="btnChatClear">Nova conversa</button></div>
     <div class="chatlog" id="chatlog"></div>
-    <div class="chatbar"><textarea id="chatIn" rows="2" style="flex:1" placeholder="Converse com a E.V.A. para testar ou tirar dúvidas... (Enter envia)"></textarea><button class="btn" id="btnChat">Enviar</button><button class="btn ghost" id="btnChatClear">Limpar</button></div>
+    <div class="chips" id="chatChips"></div>
+    <div class="chatbar"><textarea id="chatIn" rows="2" style="flex:1" placeholder="Escreva qualquer coisa… (Enter envia, Shift+Enter quebra linha)"></textarea><button class="btn" id="btnChat">Enviar</button></div>
   </div>
 </section>
 
@@ -359,16 +371,26 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
 </section>
 
 <section class="view" id="v-aprender">
-  <div class="ph"><div class="phi">🧠</div><div><h2>Memória da E.V.A.</h2><p class="sub">Quando ela não encontrar algo, confirme com a supervisão e ensine aqui. Na próxima situação parecida, ela já sabe.</p></div></div>
-  <div class="howto"><span><b>1</b> Escreva a situação</span><span><b>2</b> O que fazer</span><span><b>3</b> Guardar</span></div>
+  <div class="ph"><div class="phi">🧠</div><div><h2>Memória da E.V.A.</h2><p class="sub">Tudo o que ela lembra: anotações, regras de atendimento e o que ela guardou sozinha nas conversas. Ela consulta isso antes de responder.</p></div></div>
+  <div class="howto"><span><b>1</b> Cole textos ou mensagens</span><span><b>2</b> Ela organiza em memórias</span><span><b>3</b> Você confere e guarda</span></div>
   <div class="grid2">
-    <div class="card"><h3>➕ Ensinar algo novo</h3>
-      <label>Situação / pergunta</label><textarea id="memQ" rows="3" placeholder="Ex.: Cliente quer segunda via do boleto vencido há mais de 60 dias"></textarea>
-      <label>O que fazer / resposta correta (confirmada)</label><textarea id="memA" rows="5" placeholder="Ex.: Orientar a... conforme supervisor Fulano em 29/10"></textarea>
+    <div>
+    <div class="card"><h3>📥 Colar textos e mensagens</h3><p class="hint">Cole qualquer coisa: recados da supervisão, mensagens do grupo, anotações soltas. A E.V.A. separa o que importa.</p>
+      <textarea id="memBulk" rows="8" placeholder="Cole aqui (Ctrl+V)..."></textarea>
+      <div class="row"><button class="btn" id="btnMemOrg">✨ Organizar com a E.V.A.</button><button class="btn ghost" id="btnMemRaw">Guardar como está</button><label class="btn ghost sm" style="margin:0">📄 .txt<input type="file" id="memTxt" accept=".txt,text/plain" hidden></label></div>
+      <div id="memPrev"></div>
+    </div>
+    <div class="card"><h3>➕ Ensinar uma coisa</h3>
+      <label>Tipo</label><select id="memTipo"><option value="nota">Anotação (fato, informação, preferência)</option><option value="regra">Regra de atendimento (situação → o que fazer)</option></select>
+      <label id="memQl">Assunto</label><textarea id="memQ" rows="2" placeholder="Ex.: Horário da supervisão"></textarea>
+      <label id="memAl">O que lembrar</label><textarea id="memA" rows="4" placeholder="Ex.: A supervisora Ana fica até 20h; depois disso, falar com o líder do turno."></textarea>
       <div class="row"><button class="btn" id="btnMemAdd">Guardar na memória</button></div>
       <div class="row"><button class="btn ghost sm" id="btnExport">⬇️ Exportar backup</button><label class="btn ghost sm" style="margin:0">⬆️ Importar backup<input type="file" id="impFile" accept=".json" hidden></label></div>
     </div>
-    <div class="card"><h3>🧠 O que ela já aprendeu</h3><input id="memSearch" placeholder="Buscar na memória..."><div class="list" id="memList"></div></div>
+    </div>
+    <div class="card"><h3>🧠 O que ela lembra <span class="pill" id="memCount">0</span></h3>
+      <div class="segs" id="memSeg"><button class="on" data-mf="">Tudo</button><button data-mf="nota">Anotações</button><button data-mf="regra">Regras</button><button data-mf="auto">Guardadas por ela</button></div>
+      <input id="memSearch" placeholder="Buscar na memória..."><div class="list" id="memList"></div></div>
   </div>
 </section>
 
@@ -477,11 +499,12 @@ const DEFAULT_MODEL='gemini-3.6-flash';
 let CFG={key:'',model:DEFAULT_MODEL,name:'',style:''},DOCS=[],MEM=[],INDEX=null;
 
 // ---------- search (BM25) ----------
+const memLine=m=>m.tipo==='nota'?`[Anotação${m.orig==='auto'?' guardada pela E.V.A.':''} • ${new Date(m.id).toLocaleDateString('pt-BR')}] ${m.q}: ${m.a}`:`[Regra] Situação: ${m.q} → O que fazer: ${m.a}`;
 const STOP=new Set('a o e de da do das dos em no na nos nas um uma uns umas para por com sem que se ou ao aos as os é ser foi sao são como mais mas ja já nao não sim eu voce você ele ela isso esse essa este esta pelo pela pelos pelas me te lhe seu sua seus suas meu minha nosso nossa tem ter vai vou pode posso qual quais quando onde muito bem tudo todo toda la lá aqui ai aí ok obrigado obrigada oi ola olá bom dia tarde noite'.split(' '));
 const norm=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 const toks=s=>norm(s).split(/[^a-z0-9]+/).filter(w=>w.length>2&&!STOP.has(w)).map(w=>w.length>5?w.replace(/(coes|cao|mente|ados|adas|ado|ada|ores|ar|er|ir|es|s)$/,''):w);
 function chunk(text,size=1100,ov=180){text=text.replace(/\r/g,'').replace(/\n{3,}/g,'\n\n').trim();const out=[];let i=0;while(i<text.length){let end=Math.min(text.length,i+size);if(end<text.length){const p=text.lastIndexOf('\n',end);if(p>i+size*.5)end=p;else{const q=text.lastIndexOf('. ',end);if(q>i+size*.5)end=q+1;else{const w=text.lastIndexOf(' ',end);if(w>i+size*.5)end=w}}}out.push(text.slice(i,end).trim());if(end>=text.length)break;let ni=Math.max(end-ov,i+1);const sp=text.indexOf(' ',ni);if(sp>0&&sp<end)ni=sp+1;i=ni}return out.filter(Boolean)}
-function buildIndex(){const items=[];DOCS.forEach(d=>d.chunks.forEach((c,j)=>items.push({kind:'doc',name:d.name,text:c,j})));(typeof FICHAS!=='undefined'?FICHAS:[]).forEach(f=>items.push({kind:'ficha',name:'Ficha: '+f.t,text:f.cat+' - '+f.t+'\n'+f.x,id:f.id}));MEM.forEach(m=>items.push({kind:'mem',name:'Memória',text:'Situação: '+m.q+'\nO que fazer: '+m.a,id:m.id}));
+function buildIndex(){const items=[];DOCS.forEach(d=>d.chunks.forEach((c,j)=>items.push({kind:'doc',name:d.name,text:c,j})));(typeof FICHAS!=='undefined'?FICHAS:[]).forEach(f=>items.push({kind:'ficha',name:'Ficha: '+f.t,text:f.cat+' - '+f.t+'\n'+f.x,id:f.id}));MEM.forEach(m=>items.push({kind:'mem',name:'Memória',text:memLine(m),id:m.id}));
 const df={},tf=[];let tot=0;items.forEach((it,i)=>{const t=toks(it.name+' '+it.text);tot+=t.length;const f={};t.forEach(w=>f[w]=(f[w]||0)+1);tf[i]={f,len:t.length};Object.keys(f).forEach(w=>df[w]=(df[w]||0)+1)});INDEX={items,df,tf,avg:tot/Math.max(1,items.length),N:items.length};renderStatus()}
 function search(q,k=10){if(!INDEX||!INDEX.N)return[];const qt=[...new Set(toks(q))];const {items,df,tf,avg,N}=INDEX;const sc=[];items.forEach((it,i)=>{let s=0;const {f,len}=tf[i];qt.forEach(w=>{if(!f[w])return;const idf=Math.log(1+(N-df[w]+.5)/(df[w]+.5));s+=idf*f[w]*2.2/(f[w]+1.2*(.25+.75*len/avg))});if(s>0&&qt.length>1){const nt=norm(it.text);const qw=norm(q).split(/[^a-z0-9]+/).filter(w=>w.length>2);for(let a=0;a<qw.length-1;a++){if(nt.includes(qw[a]+' '+qw[a+1]))s*=1.15}}if(it.kind==='mem')s*=1.35;if(s>0)sc.push({s,it})});return sc.sort((a,b)=>b.s-a.s).slice(0,k).map(x=>x.it)}
 function totalChars(){return DOCS.reduce((a,d)=>a+d.text.length,0)}
@@ -493,9 +516,9 @@ function context(query){const full=totalChars()<24000;let docPart='';let src=[];
  if(full&&DOCS.length){docPart=DOCS.map(d=>`=== DOCUMENTO: ${d.name} ===\n${d.text}`).join('\n\n');src=DOCS.map(d=>d.name);
   const top=[];if(top.length)docPart=`<TRECHOS_MAIS_RELEVANTES (confira primeiro)>\n${top.map(t=>`[${t.name} • trecho ${t.j+1}]\n${t.text}`).join('\n\n')}\n</TRECHOS_MAIS_RELEVANTES>\n\n`+docPart}
  else if(DOCS.length){let hits=retrieve(query,8);const mh=retrieve(query+' métrica protocolo motivo',24).filter(h=>/m[eé]tric|protocol|motivo|classifica/i.test(h.name)&&!hits.some(x=>x.name===h.name&&x.j===h.j)).slice(0,6);hits=[...hits,...mh];let acc=0;hits=hits.filter(h=>(acc+=h.text.length)<26000);docPart=hits.map(h=>`=== ${h.name} (trecho ${h.j+1}) ===\n${h.text}`).join('\n\n');src=[...new Set(hits.map(h=>h.name))]}
- const mem=(MEM.length<=80?MEM:search(query,15).filter(h=>h.kind==='mem').map(h=>MEM.find(m=>m.id===h.id)).filter(Boolean));
- const memPart=mem.map(m=>`- Situação: ${m.q}\n  O que fazer: ${m.a}`).join('\n');
- return {text:`<MATERIAL_AUXILIO>\n${docPart||'(nenhum material carregado ainda — avise o atendente que não há material para consultar)'}\n</MATERIAL_AUXILIO>\n\n<MEMORIA_APRENDIDA (confirmada pela supervisão, tem prioridade sobre o material)>\n${memPart||'(vazia)'}\n</MEMORIA_APRENDIDA>`+fichasCtx(query)+colinhaCtx(query)+`\n\n<HORARIOS_DO_ATENDENTE>Agora: ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}. Turno ${TURNO.ent}-${TURNO.sai}, escala ${TURNO.esc}. Pausa 10 (1): ${TURNO.p1}-${TURNO.p1f}. Lanche/Almoço: ${TURNO.l}-${TURNO.lf}. Pausa 10 (2): ${TURNO.p2}-${TURNO.p2f}.</HORARIOS_DO_ATENDENTE>`,src:[...src,...(mem.length?['Memória']:[])]}}
+ const mem=(MEM.length<=120?MEM:search(query,15).filter(h=>h.kind==='mem').map(h=>MEM.find(m=>m.id===h.id)).filter(Boolean));
+ const memPart=mem.map(m=>'- '+memLine(m)).join('\n');
+ return {text:`<MATERIAL_AUXILIO>\n${docPart||'(nenhum material carregado ainda — avise o atendente que não há material para consultar)'}\n</MATERIAL_AUXILIO>\n\n<MEMORIA (regras confirmadas têm prioridade sobre o material; anotações são fatos e preferências que o atendente te contou)>\n${memPart||'(vazia)'}\n</MEMORIA_APRENDIDA>`+fichasCtx(query)+colinhaCtx(query)+`\n\n<HORARIOS_DO_ATENDENTE>Agora: ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}. Turno ${TURNO.ent}-${TURNO.sai}, escala ${TURNO.esc}. Pausa 10 (1): ${TURNO.p1}-${TURNO.p1f}. Lanche/Almoço: ${TURNO.l}-${TURNO.lf}. Pausa 10 (2): ${TURNO.p2}-${TURNO.p2f}.</HORARIOS_DO_ATENDENTE>`,src:[...src,...(mem.length?['Memória']:[])]}}
 
 // ---------- Gemini ----------
 const SYS=()=>`Você é a E.V.A. Atendimento, assistente pessoal e "supervisora de bolso" de ${CFG.name||'um atendente'} do SAC por chat de um plano de saúde (Unimed). Você nunca fala com o cliente: você orienta o atendente, que envia as mensagens.
@@ -540,10 +563,10 @@ function unmask(t,map){return String(t).replace(/\[(EMAIL|CPF|TELEFONE|NUMERO|NO
 let PLOG=[];async function logSend(dest,text,masked){PLOG.unshift({t:Date.now(),dest,chars:text.length,masked,sample:text.slice(-6000)});PLOG=PLOG.slice(0,30);try{await DB.put('kv',PLOG,'plog')}catch(e){}if($('#v-privacidade').classList.contains('on'))renderPriv()}
 const COOL={};let NOTHINK=JSON.parse(localStorage.getItem('eva-nothink')||'{}');
 function retryAfter(t){const m=String(t).match(/retry(?:Delay)?["\s:]*["']?(\d+(?:\.\d+)?)s/i)||String(t).match(/in (\d+(?:\.\d+)?)s/i);return m?Math.min(90,parseFloat(m[1])+1)*1000:60000}
-async function gemini(prompt,onText0,history=[]){const MAP={fwd:{},rev:{},c:{}};const doMask=CFG.mask!==false;const onText=t=>onText0(doMask?unmask(t,MAP):t);if(doMask)prompt=maskPII(prompt,MAP);const R=x=>doMask?unmask(x,MAP):x;
- if(!CFG.key&&CFG.groq){busy(1);try{logSend('Groq',prompt,Object.keys(MAP.fwd).length);const g=await groq(SYS(),prompt,onText);if(g.ok)return R(g.ok);if(g.ok)return g.ok;throw new Error(friendly(g.err,g.text))}finally{busy(-1)}}if(!CFG.key){openOv();throw new Error('Configure a chave da API em Configurações.')}
+async function gemini(prompt,onText0,history=[],sysFn=null){const SYSX=sysFn||SYS;const MAP={fwd:{},rev:{},c:{}};const doMask=CFG.mask!==false;const onText=t=>onText0(doMask?unmask(t,MAP):t);if(doMask)prompt=maskPII(prompt,MAP);const R=x=>doMask?unmask(x,MAP):x;
+ if(!CFG.key&&CFG.groq){busy(1);try{logSend('Groq',prompt,Object.keys(MAP.fwd).length);const g=await groq(SYSX(),prompt,onText);if(g.ok)return R(g.ok);if(g.ok)return g.ok;throw new Error(friendly(g.err,g.text))}finally{busy(-1)}}if(!CFG.key){openOv();throw new Error('Configure a chave da API em Configurações.')}
  busy(1);let histTxt=history.length?'<HISTORICO_DO_CHAT>\n'+history.map(h=>(h.role==='user'?'Atendente: ':'E.V.A.: ')+h.parts[0].text.slice(0,1500)).join('\n')+'\n</HISTORICO_DO_CHAT>\n\n':'';if(doMask)histTxt=maskPII(histTxt,MAP);let logged=false;
- const base={systemInstruction:{parts:[{text:SYS()}]},contents:[{role:'user',parts:[{text:histTxt+prompt}]}]};
+ const base={systemInstruction:{parts:[{text:SYSX()}]},contents:[{role:'user',parts:[{text:histTxt+prompt}]}]};
  try{const keys=[CFG.key,...(CFG.keys||[])].filter(Boolean);const ms=await availableModels();const models=[CFG.model,...ms.filter(m=>m!==CFG.model)].slice(0,6);
   const combos=[];models.forEach(m=>keys.forEach(k=>combos.push([m,k])));let last=null,tries=0,saw429=false;
   for(let round=0;round<2;round++){
@@ -557,7 +580,7 @@ async function gemini(prompt,onText0,history=[]){const MAP={fwd:{},rev:{},c:{}};
     if(r.err===429||/RESOURCE_EXHAUSTED|quota/i.test(r.text)){saw429=true;COOL[id]=Date.now()+retryAfter(r.text);continue}
     if(r.err===404||/no longer available|not found|not supported/i.test(r.text)){COOL['dead|'+m]=1;continue}
     if(r.err===400){console.warn('EVA 400',m,r.text);COOL['dead|'+m]=1;continue}COOL[id]=Date.now()+20000}
-   if(CFG.groq){logSend('Groq',base.contents[0].parts[0].text,Object.keys(MAP.fwd).length);const g=await groq(SYS(),base.contents[0].parts[0].text,onText);if(g.ok)return R(g.ok);last=g}
+   if(CFG.groq){logSend('Groq',base.contents[0].parts[0].text,Object.keys(MAP.fwd).length);const g=await groq(SYSX(),base.contents[0].parts[0].text,onText);if(g.ok)return R(g.ok);last=g}
    const wait=Math.min(...Object.values(COOL).filter(v=>v>Date.now()&&v<Date.now()+864e5).map(v=>v-Date.now()),Infinity);
    if(round===0&&isFinite(wait)&&wait<=35000){onText('<alerta>Muita demanda agora, tentando de novo em '+Math.ceil(wait/1000)+'s…</alerta>');await new Promise(r=>setTimeout(r,wait));tries=0}else break}
   if(saw429&&last&&last.err!==429)last={err:429,text:''};
@@ -583,10 +606,67 @@ async function analisar(){const conv=$('#conv').value.trim();if(!conv)return toa
 async function melhorar(){const d=$('#draft').value.trim();if(!d)return toast('Escreva o rascunho');const out=$('#outMelhorar');out.innerHTML=typing;const c=context(d+' '+$('#draftCtx').value);
  const p=`${c.text}\n\n${$('#draftCtx').value?'<CONTEXTO>\n'+$('#draftCtx').value+'\n</CONTEXTO>\n':''}Rascunho do atendente:\n"""${d}"""\n\nReescreva como mensagem final ao cliente: acolhedora, educada, clara, mantendo o sentido. Se algo do rascunho contradizer o material, avise em <alerta>. Responda só com:\n<msg>versão principal</msg>\n<msg>versão mais curta</msg>`;
  try{await gemini(p,t=>out.innerHTML=md(t))}catch(e){out.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}}
-let HIST=[];
-function addBub(cls,html){const b=document.createElement('div');b.className='bub '+cls;b.innerHTML=html;$('#chatlog').append(b);$('#chatlog').scrollTop=1e9;return b}
-async function chat(){const q=$('#chatIn').value.trim();if(!q)return;$('#chatIn').value='';addBub('me',esc(q));const b=addBub('eva',typing);const c=context(q+' '+HIST.slice(-2).map(h=>h.parts[0].text).join(' '));
- try{const a=await gemini(`${c.text}\n\nPergunta do atendente: ${q}\n(Responda de forma direta. Se ele estiver te ensinando algo, confirme e sugira guardar na Memória.)`,t=>{b.innerHTML=md(t);$('#chatlog').scrollTop=1e9},HIST);HIST.push({role:'user',parts:[{text:q}]},{role:'model',parts:[{text:a}]});HIST=HIST.slice(-12)}catch(e){b.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}}
+let HIST=[],CHATLOG=[];
+const CHAT_SYS=()=>`Você é a E.V.A., colega de trabalho e assistente pessoal de ${CFG.name||'um atendente'}, que trabalha no SAC por chat de um plano de saúde (Unimed). Esta é a aba de conversa livre: aqui você NÃO está falando com cliente, está conversando com ele.
+PERSONALIDADE: inteligente, simpática, bem-humorada na medida, curiosa e natural, como uma colega esperta. Converse sobre qualquer assunto (o dia, a pausa, curiosidades, filmes, música, jogos, estudos, ideias, desabafo leve). Respostas curtas e humanas (2 a 5 frases), português do Brasil informal e educado. Faça perguntas de volta quando fizer sentido, lembre do que ele já contou e use isso. Não fique repetindo que é uma IA. Se ele estiver estressado, acolha primeiro.
+TRABALHO: quando a conversa for sobre atendimento, procedimentos, métricas ou protocolos, use SOMENTE o MATERIAL_AUXILIO, as FICHAS e a MEMORIA, cite a fonte e nunca invente; se não achar, diga. Mensagens prontas para cliente vão entre <msg></msg>.
+AÇÕES: você consegue fazer coisas no sistema. Para isso, escreva no FINAL da resposta um ou mais blocos <acao>{json}</acao> (JSON válido, uma ação por bloco):
+- {"tipo":"lembrar","titulo":"assunto curto","texto":"o que guardar, completo e claro"} → anotação na memória (fatos, preferências, informações do trabalho, combinados).
+- {"tipo":"regra","situacao":"quando acontecer...","fazer":"o que fazer"} → regra de atendimento.
+- {"tipo":"ficha","categoria":"Métrica|Protocolo|Regra|Prazo|Contato|Outro","titulo":"...","texto":"..."} → ficha na aba Fichas.
+- {"tipo":"colinha","titulo":"título curto","texto":"..."} → bloco pronto na Colinha.
+- {"tipo":"esquecer","busca":"palavras que identificam a memória"} → apaga memória.
+- {"tipo":"atualizar","busca":"palavras da memória antiga","texto":"novo conteúdo"} → corrige uma memória.
+Quando ele pedir para guardar, anotar, lembrar, criar, apagar ou corrigir algo, SEMPRE use a ação certa e confirme em uma frase curta. ${CFG.automem!==false?'MEMÓRIA AUTOMÁTICA LIGADA: por conta própria, guarde com "lembrar" o que for útil depois (gostos, rotina, fatos sobre ele e o trabalho, nomes de colegas, combinados, metas). Não guarde papo passageiro nem o que já está na MEMORIA. Quando guardar sozinha, avise de leve no fim ("anotei aqui que…").':'Só guarde algo quando ele pedir.'}
+Nunca guarde CPF, telefone, e-mail ou dados de clientes. Não explique o JSON nem mostre as tags.
+${CFG.style?'Preferências dele: '+CFG.style:''}`;
+const fmtH=t=>new Date(t).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+const stripAct=t=>t.replace(/<acao>[\s\S]*?(<\/acao>|$)/g,'').trim();
+function addBub(cls,html,t){const b=document.createElement('div');b.className='bub '+cls;b.innerHTML=html+(t?`<span class="when">${fmtH(t)}</span>`:'');$('#chatlog').append(b);$('#chatlog').scrollTop=1e9;return b}
+function actHtml(acts){return acts&&acts.length?`<div class="acts">${acts.map(a=>`<div class="act"><span>${esc(a.label)}</span>${a.undo?`<button data-undo='${esc(JSON.stringify(a.undo))}'>Desfazer</button>`:''}</div>`).join('')}</div>`:''}
+async function saveChat(){CHATLOG=CHATLOG.slice(-300);try{await DB.put('kv',CHATLOG,'chatlog')}catch(e){}}
+function renderChat(){const L=$('#chatlog');L.innerHTML='';
+ if(!CHATLOG.length)addBub('eva',md(`${greet()}, ${firstName()}! Aqui é o nosso cantinho. Pode falar de qualquer coisa: do dia, de uma dúvida do trabalho, ou me pedir pra guardar algo ("lembra que…", "anota na colinha…"). Eu lembro das nossas conversas.`));
+ CHATLOG.forEach(m=>addBub(m.r,m.r==='me'?esc(m.t):md(stripAct(m.t))+actHtml(m.acts),m.at));renderChips()}
+function renderChips(){const h=new Date().getHours();const base=['O que você lembra de mim?','Me conta uma curiosidade rápida','Tô cansado, me anima aí',h<12?'Me ajuda a planejar o turno':'Como tá meu dia até agora?','Anota na memória: '];
+ $('#chatChips').innerHTML=base.map(t=>`<button data-chip="${esc(t)}">${esc(t)}</button>`).join('')}
+function findMem(q){const w=toks(q);let best=null,bs=0;MEM.forEach(m=>{const t=toks(m.q+' '+m.a);const sc=w.filter(x=>t.includes(x)).length/Math.max(1,w.length);if(sc>bs){bs=sc;best=m}});return bs>=.5?best:null}
+async function runActs(text){const out=[];const re=/<acao>([\s\S]*?)<\/acao>/g;let m;
+ while((m=re.exec(text))){let a;try{a=JSON.parse(m[1].trim().replace(/^```(json)?|```$/g,''))}catch(e){continue}
+  try{const id=Date.now()+Math.floor(Math.random()*999);
+  if(a.tipo==='lembrar'&&a.texto){await DB.put('mem',{id,tipo:'nota',q:a.titulo||'Anotação',a:a.texto,orig:'chat'});out.push({label:'🧠 Guardei na memória: '+(a.titulo||a.texto.slice(0,60)),undo:{k:'mem',id}})}
+  else if(a.tipo==='regra'&&a.situacao&&a.fazer){await DB.put('mem',{id,tipo:'regra',q:a.situacao,a:a.fazer,orig:'chat'});out.push({label:'📘 Nova regra: '+a.situacao.slice(0,70),undo:{k:'mem',id}})}
+  else if(a.tipo==='ficha'&&a.texto){FICHAS.push({id,cat:a.categoria||'Outro',t:a.titulo||'Ficha',x:a.texto});await DB.put('kv',FICHAS,'fichas');renderF();out.push({label:'📒 Ficha criada: '+(a.titulo||''),undo:{k:'ficha',id}})}
+  else if(a.tipo==='colinha'&&a.texto){COL.push({id,t:a.titulo||(typeof autoTitle==='function'?autoTitle(a.texto):a.texto.slice(0,40)),x:a.texto,img:'',g:''});await saveCol();out.push({label:'📌 Adicionado à Colinha',undo:{k:'col',id}})}
+  else if(a.tipo==='esquecer'&&a.busca){const f=findMem(a.busca);if(f){await DB.del('mem',f.id);out.push({label:'🗑️ Esqueci: '+f.q.slice(0,60),undo:{k:'restore',m:f}})}else out.push({label:'Não achei essa memória para apagar'})}
+  else if(a.tipo==='atualizar'&&a.busca&&a.texto){const f=findMem(a.busca);if(f){const old={...f};await DB.put('mem',{...f,a:a.texto});out.push({label:'✏️ Memória corrigida: '+f.q.slice(0,60),undo:{k:'restore',m:old}})}else{await DB.put('mem',{id,tipo:'nota',q:a.busca,a:a.texto,orig:'chat'});out.push({label:'🧠 Guardei na memória: '+a.busca,undo:{k:'mem',id}})}}
+  }catch(e){console.warn(e)}}
+ if(out.length){await refresh();buildIndex()}return out}
+document.addEventListener('click',async e=>{const u=e.target.dataset&&e.target.dataset.undo;if(u){const a=JSON.parse(u);
+  if(a.k==='mem')await DB.del('mem',a.id);else if(a.k==='restore')await DB.put('mem',a.m);else if(a.k==='ficha'){FICHAS=FICHAS.filter(f=>f.id!==a.id);await DB.put('kv',FICHAS,'fichas');renderF()}else if(a.k==='col'){COL=COL.filter(c=>c.id!==a.id);await saveCol()}
+  await refresh();e.target.textContent='Desfeito ✓';e.target.disabled=true;e.target.removeAttribute('data-undo');toast('Desfeito')}
+ const c=e.target.dataset&&e.target.dataset.chip;if(c){const i=$('#chatIn');i.value=c;i.focus();if(!c.endsWith(': '))chat()}});
+async function chat(hidden){const q=hidden||$('#chatIn').value.trim();if(!q)return;if(!hidden){$('#chatIn').value='';const now=Date.now();addBub('me',esc(q),now);CHATLOG.push({r:'me',t:q,at:now});saveChat()}
+ const b=addBub('eva',typing);$('#chatSub').textContent='digitando…';const recent=CHATLOG.slice(-6).map(m=>m.t).join(' ');const c=context(q+' '+recent);
+ const hist=CHATLOG.slice(hidden?-16:-17,hidden?undefined:-1).map(m=>({role:m.r==='me'?'user':'model',parts:[{text:stripAct(m.t)}]}));
+ const p=`${c.text}\n\n<AGORA>${new Date().toLocaleString('pt-BR',{weekday:'long',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'})}. Próxima pausa: ${nextPause()}.</AGORA>\n\n${hidden?'[Instrução interna, não mostre]: '+hidden:'Mensagem dele: '+q}`;
+ try{const a=await gemini(p,t=>{b.innerHTML=md(stripAct(t));$('#chatlog').scrollTop=1e9},hist,CHAT_SYS);const acts=await runActs(a);const at=Date.now();
+  b.innerHTML=md(stripAct(a))+actHtml(acts)+`<span class="when">${fmtH(at)}</span>`;CHATLOG.push({r:'eva',t:a,at,acts});saveChat();$('#chatlog').scrollTop=1e9}
+ catch(e){b.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}finally{$('#chatSub').textContent='online'}}
+
+// ---------- memória: colar textos ----------
+let MEMF='',MEMPREV=[];
+async function memOrganize(){const t=$('#memBulk').value.trim();if(!t)return toast('Cole um texto primeiro');const P=$('#memPrev');P.innerHTML=typing;
+ const sys=()=>'Você organiza anotações para a memória de uma assistente de atendimento. Responda SOMENTE com JSON válido, sem comentários.';
+ const p=`Leia o texto abaixo (pode ser recado, mensagens de grupo, anotações) e extraia as informações úteis para lembrar depois. Junte o que for do mesmo assunto, descarte cumprimentos e conversa sem conteúdo. Não inclua CPF, telefone ou dados de clientes.\nFormato: [{"tipo":"nota","titulo":"assunto curto","texto":"informação completa"}] ou, para procedimentos de atendimento, {"tipo":"regra","titulo":"quando acontecer...","texto":"o que fazer"}.\n\nTEXTO:\n"""${t.slice(0,30000)}"""`;
+ try{const r=await gemini(p,()=>{},[],sys);const j=JSON.parse(r.slice(r.indexOf('['),r.lastIndexOf(']')+1));MEMPREV=j.filter(x=>x&&x.texto);
+  P.innerHTML=MEMPREV.length?`<h4 style="margin:14px 0 4px">Encontrei ${MEMPREV.length} item(ns). Desmarque o que não quiser:</h4>`+MEMPREV.map((x,i)=>`<label class="previt"><input type="checkbox" checked data-pv="${i}"><div><span class="mtag">${x.tipo==='regra'?'Regra':'Anotação'}</span> <b>${esc(x.titulo||'')}</b><br>${esc(x.texto)}</div></label>`).join('')+`<div class="row"><button class="btn" id="btnPrevSave">Guardar selecionados</button><button class="btn ghost" id="btnPrevCancel">Cancelar</button></div>`:'<div class="empty">Não encontrei nada que valha guardar.</div>'}
+ catch(e){P.innerHTML=`<div class="alert">Não consegui organizar: ${esc(e.message)}. Use "Guardar como está".</div>`}}
+document.addEventListener('click',async e=>{if(e.target.id==='btnPrevSave'){const sel=[...document.querySelectorAll('[data-pv]')].filter(c=>c.checked).map(c=>MEMPREV[+c.dataset.pv]);let n=0;
+  for(const x of sel){await DB.put('mem',{id:Date.now()+n++,tipo:x.tipo==='regra'?'regra':'nota',q:x.titulo||'Anotação',a:x.texto,orig:'texto'})}
+  $('#memPrev').innerHTML='';$('#memBulk').value='';await refresh();toast(n+' memória(s) guardada(s) ✓')}
+ if(e.target.id==='btnPrevCancel')$('#memPrev').innerHTML='';
+ const f=e.target.dataset&&e.target.dataset.mf;if(f!==undefined&&e.target.closest('#memSeg')){MEMF=f;document.querySelectorAll('#memSeg button').forEach(b=>b.classList.toggle('on',b===e.target));renderMem()}});
 
 // ---------- material ----------
 function decodeText(buf){const b=new Uint8Array(buf);
@@ -669,14 +749,16 @@ $('#btnLink').onclick=async()=>{const u=$('#linkIn').value.trim();if(!/^https?:\
   const res=await parseAny(fname,await r.arrayBuffer(),ct);if(!res.text.trim())throw new Error('vazio');let nm=prompt('Nome para este arquivo:',fname.replace(/\.[^.]+$/,''))||fname;await saveDoc(nm,res.text,{kind:res.kind,sheets:res.sheets,slides:res.slides,src:u});$('#linkIn').value=''}
  catch(e){toast('Não consegui abrir o link ('+e.message+'). Deixe como "qualquer pessoa com o link" ou baixe o arquivo e envie.')}};
 
-function renderMem(){const q=norm($('#memSearch').value);const L=$('#memList');const items=MEM.filter(m=>!q||norm(m.q+' '+m.a).includes(q)).sort((a,b)=>b.id-a.id);
- L.innerHTML=items.length?items.map(m=>`<div class="item"><b>Situação:</b> ${esc(m.q)}<br><b>O que fazer:</b> ${esc(m.a)}<div class="row"><span class="pill">${new Date(m.id).toLocaleDateString('pt-BR')}</span><button class="btn ghost sm" data-editmem="${m.id}">Editar</button><button class="btn danger sm" data-delmem="${m.id}">Apagar</button></div></div>`).join(''):'<div class="empty">A memória cresce conforme você ensina.</div>'}
+function renderMem(){const q=norm($('#memSearch').value);const L=$('#memList');$('#memCount').textContent=MEM.length;
+ const items=MEM.filter(m=>(!MEMF||(MEMF==='auto'?m.orig==='chat':(m.tipo||'regra')===MEMF))&&(!q||norm(m.q+' '+m.a).includes(q))).sort((a,b)=>b.id-a.id);
+ const org={chat:'guardada pela E.V.A.',texto:'de texto colado'};
+ L.innerHTML=items.length?items.map(m=>`<div class="item">${m.tipo==='nota'?`<b>${esc(m.q)}</b><br>${esc(m.a)}`:`<b>Situação:</b> ${esc(m.q)}<br><b>O que fazer:</b> ${esc(m.a)}`}<div class="row"><span class="mtag">${m.tipo==='nota'?'Anotação':'Regra'}</span>${org[m.orig]?`<span class="mtag">${org[m.orig]}</span>`:''}<span class="pill">${new Date(m.id).toLocaleDateString('pt-BR')}</span><button class="btn ghost sm" data-editmem="${m.id}">Editar</button><button class="btn danger sm" data-delmem="${m.id}">Apagar</button></div></div>`).join(''):'<div class="empty">Nada aqui ainda. Converse com ela ou cole um texto.</div>'}
 function renderStatus(){$('#status').innerHTML=`<div><span class="dot ${CFG.key?'ok':''}"></span>${CFG.key?'IA conectada':'Sem chave da IA'}</div><div><span class="dot ${DOCS.length?'ok':''}"></span>${DOCS.length} doc(s) no material</div><div><span class="dot ${MEM.length?'ok':''}"></span>${MEM.length} aprendizado(s)</div><div><span class="dot ${Object.values(PROTOS).some(p=>p.ex.length)?'ok':''}"></span>${Object.values(PROTOS).reduce((a,p)=>a+p.ex.length,0)} exemplo(s) de protocolo</div><div class="kbd" style="margin-top:6px">${esc(CFG.model)}</div>`}
 async function refresh(){DOCS=await DB.all('docs');MEM=await DB.all('mem');buildIndex();renderDocs();renderMem();renderStatus()}
 document.addEventListener('click',async e=>{const t=e.target;
  if(t.dataset.deldoc&&sure(t)){await DB.del('docs',t.dataset.deldoc);refresh()}
  if(t.dataset.delmem&&sure(t)){await DB.del('mem',+t.dataset.delmem);refresh()}
- if(t.dataset.editmem){const m=MEM.find(x=>x.id==t.dataset.editmem);$('#memQ').value=m.q;$('#memA').value=m.a;await DB.del('mem',m.id);refresh();toast('Edite e guarde de novo')}});
+ if(t.dataset.editmem){const m=MEM.find(x=>x.id==t.dataset.editmem);$('#memTipo').value=m.tipo||'regra';memTipoUI();$('#memQ').value=m.q;$('#memA').value=m.a;await DB.del('mem',m.id);refresh();toast('Edite e guarde de novo')}});
 
 // ---------- config ----------
 let MODELS=[];
@@ -865,13 +947,21 @@ $('#themeBtn').onclick=()=>{const t=document.documentElement.dataset.theme==='da
 // ---------- wire ----------
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)document.querySelector('.nav[data-v="'+g.dataset.go+'"]').click()});
 document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$('#v-'+b.dataset.v).classList.add('on');if(b.dataset.v==='privacidade')renderPriv();if(b.dataset.v==='inicio')renderHome();document.querySelector('main').scrollTop=0});
-$('#btnAnalisar').onclick=analisar;$('#btnMelhorar').onclick=melhorar;$('#btnChat').onclick=chat;
+$('#btnAnalisar').onclick=analisar;$('#btnMelhorar').onclick=melhorar;$('#btnChat').onclick=()=>chat();
 $('#btnNovo').onclick=()=>{$('#conv').value='';$('#convNote').value='';$('#outAtend').innerHTML='<div class="empty"><div class="orb"></div>Pronta para o próximo atendimento.</div>';$('#conv').focus()};
-$('#btnChatClear').onclick=()=>{HIST=[];$('#chatlog').innerHTML=''};
+$('#btnChatClear').onclick=async()=>{if(!sure($('#btnChatClear'),'Apagar o histórico?'))return;CHATLOG=[];await saveChat();renderChat()};
+$('#btnPuxar').onclick=()=>chat('Puxe um assunto leve e interessante comigo agora, como uma colega puxaria. Considere a hora, minha próxima pausa e o que você lembra de mim. Seja breve e termine com uma pergunta.');
+$('#autoMem').onchange=async e=>{CFG.automem=e.target.checked;await DB.put('kv',CFG,'cfg');toast(CFG.automem?'Ela vai guardar sozinha o que achar importante':'Ela só guarda quando você pedir')};
+function memTipoUI(){const n=$('#memTipo').value==='nota';$('#memQl').textContent=n?'Assunto':'Situação / pergunta';$('#memAl').textContent=n?'O que lembrar':'O que fazer (confirmado)';$('#memQ').placeholder=n?'Ex.: Horário da supervisão':'Ex.: Cliente quer segunda via do boleto vencido';$('#memA').placeholder=n?'Ex.: A supervisora fica até 20h; depois, falar com o líder do turno.':'Ex.: Orientar a... conforme supervisão em 29/10'}
+$('#memTipo').onchange=memTipoUI;
+$('#btnMemOrg').onclick=memOrganize;
+$('#btnMemRaw').onclick=async()=>{const t=$('#memBulk').value.trim();if(!t)return toast('Cole um texto primeiro');await DB.put('mem',{id:Date.now(),tipo:'nota',q:t.split('\n')[0].slice(0,60),a:t,orig:'texto'});$('#memBulk').value='';await refresh();toast('Guardado ✓')};
+$('#memTxt').onchange=async e=>{const f=e.target.files[0];if(f){$('#memBulk').value=decodeText(await f.arrayBuffer());toast('Texto carregado. Clique em Organizar.')}e.target.value=''};
 const ctrlEnter2=(el,fn)=>el.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();fn()}});
 ['#conv','#convNote'].forEach(s=>ctrlEnter($(s),analisar));['#draft','#draftCtx'].forEach(s=>ctrlEnter($(s),melhorar));
 $('#chatIn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();chat()}});
-$('#btnMemAdd').onclick=async()=>{const q=$('#memQ').value.trim(),a=$('#memA').value.trim();if(!q||!a)return toast('Preencha situação e resposta');await DB.put('mem',{id:Date.now(),q,a});$('#memQ').value='';$('#memA').value='';await refresh();toast('Aprendido ✓')};
+$('#memSearch').addEventListener('input',renderMem);
+$('#btnMemAdd').onclick=async()=>{const q=$('#memQ').value.trim(),a=$('#memA').value.trim();if(!q||!a)return toast('Preencha os dois campos');await DB.put('mem',{id:Date.now(),q,a,tipo:$('#memTipo').value,orig:'manual'});$('#memQ').value='';$('#memA').value='';await refresh();toast('Aprendido ✓')};
 $('#memSearch').oninput=renderMem;$('#docSearch').oninput=renderDocs;
 $('#btnPaste').onclick=async()=>{const t=$('#pasteTxt').value.trim();if(!t)return toast('Cole o texto');await saveDoc($('#pasteName').value||'Texto colado',t);$('#pasteTxt').value=''};
 const drop=$('#drop');drop.onclick=()=>$('#fileIn').click();$('#fileIn').onchange=e=>handleFiles(e.target.files);
@@ -882,11 +972,11 @@ $('#btnSaveCfg').onclick=()=>{CFG.key=$('#cfgKey').value.trim();CFG.groq=$('#cfg
 $('#btnSaveCfg2').onclick=async()=>{CFG.name=$('#cfgName').value.trim();CFG.style=$('#cfgStyle').value.trim();await DB.put('kv',CFG,'cfg');toast('Salvo ✓')};
 $('#cfgModel').onchange=()=>{CFG.model=$('#cfgModel').value;saveCfg(false);toast('Modelo: '+CFG.model)};
 $('#btnModels').onclick=async()=>{toast('Verificando modelos...');if(await listModels(true))toast('Modelo em uso: '+CFG.model)};
-$('#btnWipe').onclick=async()=>{if(!sure($('#btnWipe'),'Tem certeza? Clique de novo para apagar tudo'))return;localStorage.removeItem('eva-theme');await DB.clear('docs');await DB.clear('mem');await DB.clear('kv');location.reload()};
+$('#btnWipe').onclick=async()=>{if(!sure($('#btnWipe'),'Tem certeza? Clique de novo para apagar tudo'))return;localStorage.removeItem('eva-theme');await DB.clear('docs');await DB.clear('mem');CHATLOG=[];try{await DB.put('kv',[],'chatlog')}catch(e){}await DB.clear('kv');location.reload()};
 $('#ovSave').addEventListener('click',()=>setTimeout(maybeSplash,300));$('#ovSave').onclick=async()=>{CFG.key=$('#ovKey').value.trim();if(!CFG.key)return;$('#ov').classList.remove('on');$('#cfgKey').value=CFG.key;await saveCfg()};
 (async()=>{await DB.open();const c=await DB.get('kv','cfg');if(c)CFG={...CFG,...c};if(/gemini-(1|2)\.|gemini-3\.8|argon|omni/.test(CFG.model))CFG.model=DEFAULT_MODEL;$('#cfgKey').value=CFG.key;$('#cfgKeys').value=(CFG.keys||[]).join('\n');$('#cfgGroq').value=CFG.groq||'';$('#cfgName').value=CFG.name;$('#cfgStyle').value=CFG.style;fillModels([]);const pr=await DB.get('kv','protos');if(pr)Object.keys(PROTOS).forEach(k=>{if(pr[k])PROTOS[k]=pr[k]});renderProtos();await refresh();
  COL=(await DB.get('kv','colinha'))||[];renderCol();const tu=await DB.get('kv','turno');if(tu)TURNO={...TURNO,...tu};fillTurno();tick();
- FICHAS=(await DB.get('kv','fichas'))||[];renderF();buildIndex();renderHome();setInterval(()=>{if($('#v-inicio').classList.contains('on'))renderHome()},30000);if(sessionStorage.getItem('eva-ok')==='1'&&(CFG.key||CFG.groq))maybeSplash();
+ FICHAS=(await DB.get('kv','fichas'))||[];renderF();CHATLOG=(await DB.get('kv','chatlog'))||[];$('#autoMem').checked=CFG.automem!==false;renderChat();buildIndex();renderHome();setInterval(()=>{if($('#v-inicio').classList.contains('on'))renderHome()},30000);if(sessionStorage.getItem('eva-ok')==='1'&&(CFG.key||CFG.groq))maybeSplash();
  PLOG=(await DB.get('kv','plog'))||[];$('#cfgMask').checked=CFG.mask!==false;clockTick();if(CFG.name)$('#termName').textContent=CFG.name;
  if(!CFG.key&&!CFG.groq){if(sessionStorage.getItem('eva-ok')==='1')openOv()}else availableModels().then(ms=>fillModels(ms));
  addBub('eva',md(`Oi${CFG.name?', '+CFG.name:''}! Eu sou a **E.V.A.** 💙\nCole um atendimento na aba Atendimento, ou me pergunte qualquer coisa do material.`))})();
