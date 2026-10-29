@@ -92,6 +92,25 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
 .overlay{position:fixed;inset:0;background:rgba(16,24,40,.45);display:none;align-items:center;justify-content:center;z-index:8}.overlay.on{display:flex}
 .modal{width:min(520px,92vw)}
 /* ===== v7 ===== */
+.splash{position:fixed;inset:0;z-index:45;background:radial-gradient(ellipse at 50% 40%,#0d3b37 0%,#061a19 55%,#020807 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;color:#e6fffb;transition:opacity .6s}
+.splash.off{display:none}.splash.fade{opacity:0}
+#splCv{position:absolute;inset:0;width:100%;height:100%}
+.splin{position:relative;text-align:center;width:min(520px,90vw)}
+.core{position:relative;width:200px;height:200px;margin:0 auto 26px;perspective:700px;transform-style:preserve-3d}
+.ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(94,234,212,.55);box-shadow:0 0 22px rgba(45,212,191,.35),inset 0 0 22px rgba(45,212,191,.2)}
+.r1{animation:rA 4.5s linear infinite}.r2{inset:16px;border-color:rgba(153,246,228,.45);animation:rB 6s linear infinite}.r3{inset:32px;border-color:rgba(20,184,166,.6);animation:rC 3.4s linear infinite}
+@keyframes rA{from{transform:rotateX(70deg) rotateZ(0)}to{transform:rotateX(70deg) rotateZ(360deg)}}
+@keyframes rB{from{transform:rotateY(65deg) rotateZ(0)}to{transform:rotateY(65deg) rotateZ(-360deg)}}
+@keyframes rC{from{transform:rotateX(35deg) rotateY(35deg) rotateZ(0)}to{transform:rotateX(35deg) rotateY(35deg) rotateZ(360deg)}}
+.nucleus{position:absolute;inset:62px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#99f6e4,#14b8a6 45%,#0f766e 75%,#064e3b);display:flex;align-items:center;justify-content:center;font:700 18px Inter;letter-spacing:2px;color:#03221f;box-shadow:0 0 50px rgba(45,212,191,.7),0 0 110px rgba(20,184,166,.35);animation:pulseN 2.2s ease-in-out infinite}
+@keyframes pulseN{50%{box-shadow:0 0 70px rgba(45,212,191,.95),0 0 150px rgba(20,184,166,.5);transform:scale(1.04)}}
+.splbrand{font:700 30px Inter;letter-spacing:8px;margin-bottom:26px;text-shadow:0 0 24px rgba(45,212,191,.6)}.splbrand span{display:block;font-size:12px;letter-spacing:9px;font-weight:500;color:#5eead4;margin-top:6px}
+.splbar{height:4px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}.splbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#14b8a6,#99f6e4);box-shadow:0 0 14px #2dd4bf;border-radius:99px}
+.splst{display:flex;justify-content:space-between;font-size:13px;color:#99f6e4;margin-top:10px;font-variant-numeric:tabular-nums}
+#splDone{animation:fade .7s ease}#splDone h2{font:600 30px Inter;color:#fff;margin:0}#splDone .tm{color:#5eead4;font-size:14px;margin:6px 0 14px;text-transform:capitalize}
+#splDone p{color:#ccfbf1;font-size:15px;line-height:1.6;margin:0 0 22px}
+.splgo{all:unset;cursor:pointer;padding:14px 30px;border-radius:12px;font-weight:700;font-size:15.5px;color:#03221f;background:linear-gradient(135deg,#5eead4,#14b8a6);box-shadow:0 10px 30px rgba(20,184,166,.45);transition:transform .15s}.splgo:hover{transform:translateY(-2px)}
+
 .app{grid-template-columns:276px 1fr}
 .nav{align-items:flex-start;padding:9px 12px}.nav span{display:flex;flex-direction:column;line-height:1.25}
 .nav span em{font-style:normal;font-size:11.5px;font-weight:400;color:var(--mut);margin-top:2px}
@@ -107,14 +126,6 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
 .hcard .phi{width:38px;height:38px;font-size:18px}.hcard b{display:block;font-size:14.5px;margin-bottom:3px}.hcard small{color:var(--mut);font-size:12.8px;line-height:1.45}
 .howto{display:flex;gap:8px;flex-wrap:wrap;margin:-8px 0 18px}.howto span{font-size:12.5px;background:var(--card2);border:1px solid var(--line);border-radius:99px;padding:5px 11px;color:var(--mut)}
 .howto b{color:var(--pri2)}
-.splash{position:fixed;inset:0;z-index:40;background:rgba(10,30,28,.55);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
-.splash.off{display:none}
-.splc{background:var(--card);color:var(--tx);border-radius:18px;width:min(460px,92vw);padding:30px;text-align:center;box-shadow:0 30px 70px rgba(0,0,0,.35)}
-.splc .orb{width:58px;height:58px;margin:0 auto 14px;font-size:16px}
-.splc h2{font-size:22px;margin:0}.splc .tm{color:var(--mut);font-size:13.5px;margin:4px 0 14px}
-.splc p{font-size:14.5px;line-height:1.55;margin:0 0 14px}
-.sstep{display:flex;justify-content:space-between;font-size:13.5px;padding:7px 2px;border-bottom:1px solid var(--line);opacity:.35;transition:opacity .3s}
-.sstep.ok{opacity:1}.sstep.ok b{color:var(--ok)}
 .fx{display:flex;flex-direction:column;gap:10px;margin-top:14px}
 .fch{border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden}
 .fchh{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card2);border-bottom:1px solid var(--line)}
@@ -445,10 +456,15 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
 </div>
 <div class="lock" id="lock"><div class="lockc"><div class="orb"></div><h3>E.V.A. Atendimento</h3><p>Digite sua senha para entrar</p><input id="lockIn" type="password" inputmode="numeric" autocomplete="off" autofocus><button class="btn" id="lockBtn">Entrar</button><div id="lockErr"></div></div></div>
 <script>if(sessionStorage.getItem('eva-ok')==='1')document.getElementById('lock').classList.add('off')</script>
-<div class="splash off" id="splash"><div class="splc"><div class="orb busy" id="splOrb"></div><h2 id="splG">Olá!</h2><div class="tm" id="splT"></div>
- <p id="splP">Conectando ao seu sistema de atendimento…</p>
- <div id="splSteps"><div class="sstep"><span>Carregando sua memória</span><b>✓</b></div><div class="sstep"><span>Lendo arquivos e fichas</span><b>✓</b></div><div class="sstep"><span>Preparando a colinha</span><b>✓</b></div><div class="sstep"><span>Conferindo seus horários</span><b>✓</b></div></div>
- <button class="btn" id="splGo" style="margin-top:18px;width:100%;justify-content:center;box-sizing:border-box;visibility:hidden">Vamos começar</button></div></div>
+<div class="splash off" id="splash">
+ <canvas id="splCv"></canvas>
+ <div class="splin">
+  <div class="core"><div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="nucleus">EVA</div></div>
+  <div class="splbrand">E.V.A. <span>ATENDIMENTO</span></div>
+  <div id="splLoad"><div class="splbar"><i id="splBar"></i></div><div class="splst"><span id="splStep">Iniciando sistema…</span><b id="splPct">0%</b></div></div>
+  <div id="splDone" style="display:none"><h2 id="splG">Olá!</h2><div class="tm" id="splT"></div><p id="splP"></p><button class="splgo" id="splGo">Começar a atender →</button></div>
+ </div>
+</div>
 <div class="overlay" id="ov"><div class="card modal"><h3>Bem-vindo à E.V.A. Atendimento</h3><p class="sub" style="margin:0 0 6px">Para começar, cole sua chave da API Gemini. Depois envie o Auxílio em "Arquivos e métricas".</p><input id="ovKey" type="password" placeholder="AIza..."><div class="row"><button class="btn" id="ovSave">Começar</button><a class="kbd" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Pegar chave grátis ↗</a></div></div></div>
 <div class="toast" id="toast"></div>
 
@@ -817,13 +833,20 @@ function nextPause(){const d=new Date(),now=d.getHours()*60+d.getMinutes(),T=TUR
 function renderHome(){const d=new Date();$('#hGreet').textContent=`${greet()}, ${firstName()}!`;
  $('#hSub').textContent=`${d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})} · ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}. Estou conectada ao seu sistema de atendimento para te auxiliar no trabalho.`;
  $('#hKpis').innerHTML=[`🗂️ ${DOCS.length} arquivo(s)`,`📒 ${FICHAS.length} ficha(s)`,`📌 ${COL.length} bloco(s) na colinha`,`🧠 ${MEM.length} memória(s)`,`☕ Próxima: ${nextPause()}`,CFG.key||CFG.groq?'🟢 IA conectada':'🔴 IA sem chave'].map(x=>`<span>${x}</span>`).join('')}
-function maybeSplash(){const today=new Date().toDateString();if(localStorage.getItem('eva-greet')===today)return;localStorage.setItem('eva-greet',today);
- const d=new Date();$('#splG').textContent=`${greet()}, ${firstName()}!`;$('#splT').textContent=d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})+' · '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
- $('#splP').textContent='Conectando ao seu novo sistema de atendimento…';$('#splGo').style.visibility='hidden';$('#splOrb').classList.add('busy');
- const st=[...document.querySelectorAll('#splSteps .sstep')];st.forEach(x=>x.classList.remove('ok'));$('#splash').classList.remove('off');
- st.forEach((x,i)=>setTimeout(()=>x.classList.add('ok'),450*(i+1)));
- setTimeout(()=>{$('#splOrb').classList.remove('busy');$('#splP').textContent=`Pronto! Já estou conectada ao seu sistema de atendimento para te auxiliar no trabalho. ${DOCS.length} arquivo(s), ${FICHAS.length} ficha(s) e ${COL.length} bloco(s) da colinha carregados. Próxima: ${nextPause()}.`;$('#splGo').style.visibility='visible'},450*st.length+300)}
-$('#splGo').onclick=()=>$('#splash').classList.add('off');
+let SPLRAF=0;
+function splParticles(){const cv=$('#splCv'),c=cv.getContext('2d');const dpr=devicePixelRatio||1;const fit=()=>{cv.width=innerWidth*dpr;cv.height=innerHeight*dpr};fit();addEventListener('resize',fit);
+ const P=[];for(let i=0;i<520;i++){const u=Math.random()*2-1,t=Math.random()*Math.PI*2,r=Math.sqrt(1-u*u);P.push([r*Math.cos(t),u,r*Math.sin(t)])}
+ const st=[];for(let i=0;i<140;i++)st.push([Math.random(),Math.random(),Math.random()*1.5+.3]);let a=0;
+ const draw=()=>{const W=cv.width,H=cv.height;c.clearRect(0,0,W,H);st.forEach(s=>{c.fillStyle='rgba(153,246,228,'+(.15+.25*Math.sin(a*2+s[0]*9)**2)+')';c.fillRect(s[0]*W,s[1]*H,s[2]*dpr,s[2]*dpr)});
+  a+=.006;const R=Math.min(W,H)*.34,cx=W/2,cy=H*.40;const ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(.35),sb=Math.sin(.35);
+  P.forEach(p=>{let x=p[0]*ca-p[2]*sa,z=p[0]*sa+p[2]*ca,y=p[1];const y2=y*cb-z*sb,z2=y*sb+z*cb;const k=2.4/(2.4+z2);const al=(1-z2)/2;c.fillStyle='rgba(94,234,212,'+(.08+.5*al)+')';c.beginPath();c.arc(cx+x*R*k,cy+y2*R*k,(1+1.6*al)*dpr,0,7);c.fill()});
+  SPLRAF=requestAnimationFrame(draw)};draw()}
+function maybeSplash(){const sp=$('#splash');if(!sp.classList.contains('off')||sessionStorage.getItem('eva-spl')==='1')return;sessionStorage.setItem('eva-spl','1');sp.classList.remove('off','fade');$('#splLoad').style.display='';$('#splDone').style.display='none';splParticles();
+ const steps=['Iniciando sistema…','Conectando ao sistema de atendimento…','Carregando memória…','Lendo arquivos e fichas…','Preparando a colinha…','Conferindo horários e pausas…','Tudo pronto'];const t0=performance.now(),D=5000;
+ const tickS=()=>{const p=Math.min(1,(performance.now()-t0)/D);const e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;$('#splBar').style.width=(e*100)+'%';$('#splPct').textContent=Math.round(e*100)+'%';$('#splStep').textContent=steps[Math.min(steps.length-1,Math.floor(p*(steps.length-1)))];
+  if(p<1)requestAnimationFrame(tickS);else{const d=new Date();$('#splG').textContent=`${greet()}, ${firstName()}!`;$('#splT').textContent=d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})+' · '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+   $('#splP').textContent=`Já estou conectada ao seu sistema de atendimento para te auxiliar no trabalho. ${DOCS.length} arquivo(s), ${FICHAS.length} ficha(s) e ${COL.length} bloco(s) da colinha carregados. Próxima: ${nextPause()}.`;$('#splLoad').style.display='none';$('#splDone').style.display=''}};requestAnimationFrame(tickS)}
+$('#splGo').onclick=()=>{const sp=$('#splash');sp.classList.add('fade');setTimeout(()=>{sp.classList.add('off');cancelAnimationFrame(SPLRAF)},600);renderHome()};
 // ---------- privacidade ----------
 async function renderPriv(){let used='';try{const e=await navigator.storage.estimate();used=(e.usage/1048576).toFixed(1)+' MB'}catch(x){}
  const last=PLOG[0];const ck=(ok,t,d)=>`<div class="ck ${ok?'':'warn'}"><i>${ok?'✓':'!'}</i><div><b>${t}</b>${d}</div></div>`;
@@ -842,7 +865,7 @@ const pwHash=()=>localStorage.getItem('eva-pw')||PW_DEFAULT;
 async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 async function tryUnlock(){const v=$('#lockIn').value.trim();if(!v)return;if(await sha(v)===pwHash()){sessionStorage.setItem('eva-ok','1');$('#lock').classList.add('off');$('#lockIn').value='';$('#lockErr').textContent='';if(!CFG.key&&!CFG.groq)openOv();else maybeSplash()}else{$('#lockErr').textContent='Senha incorreta.';$('#lockIn').select()}}
 $('#lockBtn').onclick=tryUnlock;$('#lockIn').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock()});
-$('#tLock').onclick=()=>{sessionStorage.removeItem('eva-ok');$('#lock').classList.remove('off');setTimeout(()=>$('#lockIn').focus(),50)};
+$('#tLock').onclick=()=>{sessionStorage.removeItem('eva-ok');sessionStorage.removeItem('eva-spl');$('#lock').classList.remove('off');setTimeout(()=>$('#lockIn').focus(),50)};
 $('#btnPw').onclick=async()=>{const v=$('#pwNew').value.trim();if(v.length<4)return toast('Use pelo menos 4 dígitos');localStorage.setItem('eva-pw',await sha(v));$('#pwNew').value='';toast('Senha alterada ✓')};
 $('#cfgMask').onchange=async()=>{CFG.mask=$('#cfgMask').checked;await DB.put('kv',CFG,'cfg');toast(CFG.mask?'Proteção ativada ✓':'Proteção desativada')};
 function clockTick(){const d=new Date();$('#tClock').textContent=d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})+' · '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});$('#tTurn').textContent='Turno '+TURNO.ent+'–'+TURNO.sai}
