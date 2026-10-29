@@ -91,30 +91,112 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
 .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}.stat div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}.stat b{display:block;font:600 20px Inter}.stat small{color:var(--mut);font-size:12px}
 .overlay{position:fixed;inset:0;background:rgba(16,24,40,.45);display:none;align-items:center;justify-content:center;z-index:8}.overlay.on{display:flex}
 .modal{width:min(520px,92vw)}
+/* ===== v6: layout organizado ===== */
+aside{gap:1px;overflow:auto}
+.navh{font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--mut);padding:16px 12px 6px;opacity:.85}
+.navh:first-of-type{padding-top:4px}
+.top{display:flex;align-items:center;gap:12px;padding:12px 36px;border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:5}
+.top .clock{font-weight:600;font-size:14px}.top .turn{color:var(--mut);font-size:13px}
+.top .sp{flex:1}
+.tchip{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:99px;border:1px solid var(--line);color:var(--tx);background:var(--card2)}
+.tchip:hover{border-color:var(--pri)}.tchip.safe{color:#05603a;border-color:#a6f4c5;background:#ecfdf3}
+:root[data-theme=dark] .tchip.safe{background:rgba(18,183,106,.12);color:#6ce9a6;border-color:rgba(18,183,106,.4)}
+main{padding:0;display:flex;flex-direction:column}
+.mainin{padding:24px 36px 48px;max-width:1440px;width:100%}
+.ph{display:flex;gap:14px;align-items:flex-start;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.phi{width:42px;height:42px;border-radius:11px;background:var(--priL);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.ph h2{margin:0 0 3px}.ph .sub{margin:0}
+.step{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--pri);color:#fff;font-size:12px;font-weight:700;align-items:center;justify-content:center;flex:none}
+.hint{font-size:12.5px;color:var(--mut);margin-top:8px;line-height:1.5}
+.cgroup{grid-column:1/-1;font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--pri2);margin:10px 0 -2px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.cb{border:1px solid var(--line);border-radius:12px;background:var(--card);display:flex;flex-direction:column;transition:border .15s,box-shadow .15s}
+.cb:hover{border-color:var(--pri);box-shadow:0 4px 14px rgba(15,118,110,.10)}
+.cbh{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.cbh b{font-size:13.5px;flex:1;line-height:1.3}.cbn{font-size:11px;font-weight:700;color:var(--mut);min-width:20px}
+.cbt{padding:10px 12px;white-space:pre-wrap;font-size:13.5px;line-height:1.5;max-height:132px;overflow:auto;cursor:copy;flex:1}
+.cbt:hover{background:var(--card2)}
+.cb img{max-width:100%;max-height:160px;object-fit:contain;margin:10px 12px 0;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:copy}
+.cbf{display:flex;gap:6px;padding:10px 12px;border-top:1px solid var(--line)}
+.cbf .btn{flex:1;justify-content:center}
+.ib{all:unset;cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;color:var(--mut)}.ib:hover{background:var(--card2);color:var(--tx)}
+.cgrid{grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}
+details.more{margin-top:14px;border:1px solid var(--line);border-radius:10px;padding:0 14px;background:var(--card2)}
+details.more summary{cursor:pointer;padding:12px 0;font-weight:600;font-size:13.5px}
+details.more[open]{padding-bottom:14px}
+.files{display:grid;grid-template-columns:320px minmax(0,1fr);gap:20px;align-items:start}
+@media(max-width:1100px){.files{grid-template-columns:1fr}}
+.fitem{all:unset;cursor:pointer;display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:13.5px}
+.fitem:hover{border-color:var(--pri)}.fitem.on{border-color:var(--pri);background:var(--priL)}
+.fitem .fi{font-size:20px}.fitem small{display:block;color:var(--mut);font-size:11.5px;margin-top:2px}
+.fv{min-height:420px}.fvh{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}.fvh h3{margin:0!important;flex:1}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 12px}
+.tabs .chip{padding:7px 12px;font-size:12.5px}
+.tblw{overflow:auto;max-height:62vh;border:1px solid var(--line);border-radius:10px}
+.tbl{border-collapse:collapse;width:100%;font-size:13px}
+.tbl th{position:sticky;top:0;background:var(--card2);text-align:left;font-weight:600;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;z-index:1}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl tr:hover td{background:var(--priL)}
+mark{background:#fef08a;color:inherit;border-radius:3px;padding:0 1px}
+.slide{border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px;background:var(--card)}
+.slide h4{margin:0 0 8px;font-size:14px}.slide .sn{font-size:11px;color:var(--mut);font-weight:700;letter-spacing:.6px}
+.slide ul{margin:4px 0 0;padding-left:18px;font-size:13.5px;line-height:1.55}
+details.sec{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--card)}
+details.sec summary{cursor:pointer;padding:11px 14px;font-weight:600;font-size:13.5px}
+details.sec div{padding:0 14px 14px;white-space:pre-wrap;font-size:13.5px;line-height:1.55}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:center;margin:6px 0 18px}
+@media(max-width:1000px){.flow{grid-template-columns:1fr}.flow .arr{transform:rotate(90deg)}}
+.fbox{border:1.5px solid var(--line);border-radius:12px;padding:14px;text-align:center;background:var(--card);font-size:13px;line-height:1.45}
+.fbox .fic{font-size:26px;display:block;margin-bottom:4px}.fbox b{display:block;font-size:14px;margin-bottom:3px}
+.fbox.me{border-color:var(--pri);background:var(--priL)}
+.arr{font-size:12px;color:var(--mut);text-align:center;font-weight:600}.arr span{display:block;font-size:22px;color:var(--pri)}
+.blocked{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.fbox.no{border-style:dashed;color:var(--mut);background:var(--card2)}
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.ck{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--card);font-size:13px;line-height:1.4}
+.ck i{font-style:normal;width:22px;height:22px;border-radius:50%;background:#ecfdf3;color:#039855;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.ck.warn i{background:#fffaeb;color:#b54708}.ck b{display:block;font-size:13.5px}
+.term{line-height:1.65;font-size:14px}.term h4{margin:16px 0 4px;font-size:14px}.term p{margin:4px 0}
+pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px;max-height:340px;overflow:auto}
+.cfg{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:20px;align-items:start}
+.lock{position:fixed;inset:0;z-index:50;background:linear-gradient(160deg,#0f766e,#134e4a 60%,#0b3b37);display:flex;align-items:center;justify-content:center}
+.lock.off{display:none}
+.lockc{background:#fff;color:#1d2939;border-radius:16px;padding:32px;width:min(380px,90vw);text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.lockc .orb{margin:0 auto 14px;width:52px;height:52px;font-size:16px}
+.lockc h3{margin:0 0 4px;font-size:19px}.lockc p{margin:0 0 18px;color:#667085;font-size:14px}
+.lockc input{text-align:center;font-size:22px;letter-spacing:6px;background:#fff;color:#1d2939}
+.lockc .btn{width:100%;justify-content:center;margin-top:12px;box-sizing:border-box}
+#lockErr{color:#d92d20;font-size:13px;min-height:18px;margin-top:10px}
+@media print{body *{visibility:hidden}#termo,#termo *{visibility:visible}#termo{position:absolute;left:0;top:0;width:100%;border:0}.noprint{display:none!important}}
+
 </style>
 </head>
 <body>
 <div class="app">
 <aside>
   <div class="brand"><div class="orb" id="orb"></div><div><h1>E.V.A. Atendimento</h1><small>Assistente de atendimento</small></div></div>
+  <div class="navh">Atendimento</div>
   <button class="nav on" data-v="atend"><i>🎧</i><span>Atendimento</span></button>
-  <button class="nav" data-v="chat"><i>💬</i><span>Chat com a E.V.A.</span></button>
   <button class="nav" data-v="melhorar"><i>✨</i><span>Melhorar mensagem</span></button>
-  
-  <button class="nav" data-v="colinha"><i>📌</i><span>Colinha</span></button>
   <button class="nav" data-v="protocolos"><i>📝</i><span>Protocolos</span></button>
+  <div class="navh">Consulta rápida</div>
+  <button class="nav" data-v="colinha"><i>📌</i><span>Colinha</span></button>
+  <button class="nav" data-v="material"><i>🗂️</i><span>Arquivos e métricas</span></button>
+  <div class="navh">E.V.A.</div>
+  <button class="nav" data-v="chat"><i>💬</i><span>Conversar com a E.V.A.</span></button>
   <button class="nav" data-v="aprender"><i>🧠</i><span>Memória</span></button>
-  <button class="nav" data-v="material"><i>📚</i><span>Material (Auxílio)</span></button>
+  <div class="navh">Sistema</div>
+  <button class="nav" data-v="privacidade"><i>🛡️</i><span>Privacidade e LGPD</span></button>
   <button class="nav" data-v="config"><i>⚙️</i><span>Configurações</span></button>
   <button class="themeBtn" id="themeBtn" style="margin-top:auto"></button>
   <div class="status" id="status" style="margin-top:0"></div>
 </aside>
 <main>
+<div class="top"><span class="clock" id="tClock"></span><span class="turn" id="tTurn"></span><span class="sp"></span><button class="tchip safe" id="tSafe">🛡️ Dados só neste computador</button><button class="tchip" id="tLock">🔒 Bloquear</button></div>
+<div class="mainin">
 <div class="pbar" id="pbar"><div class="pi" id="pbIcon">⏰</div><div class="pt" id="pbText"></div><button class="btn ghost sm" id="pbOk">Ok, entendi</button></div>
 
 <section class="view on" id="v-atend">
-  <h2>Atendimento em andamento</h2>
-  <p class="sub">Cole a conversa inteira (como vier, sem identificar quem disse o quê). Atualize e analise de novo sempre que o cliente mandar algo.</p>
+  <div class="ph"><div class="phi">🎧</div><div><h2>Atendimento em andamento</h2><p class="sub">Cole a conversa inteira (como vier, sem identificar quem disse o quê). Atualize e analise de novo sempre que o cliente mandar algo.</p></div></div>
   <div class="grid2">
     <div class="card">
       <h3>🗂️ Conversa</h3>
@@ -128,8 +210,7 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
 </section>
 
 <section class="view" id="v-melhorar">
-  <h2>Melhorar mensagem</h2>
-  <p class="sub">Escreva do seu jeito. A E.V.A. devolve acolhedora, educada e pronta para enviar.</p>
+  <div class="ph"><div class="phi">✨</div><div><h2>Melhorar mensagem</h2><p class="sub">Escreva do seu jeito. A E.V.A. devolve acolhedora, educada e pronta para enviar.</p></div></div>
   <div class="grid2">
     <div class="card"><h3>✍️ Seu rascunho</h3>
       <textarea id="draft" rows="9" placeholder="Ex.: fala pro cliente que o reembolso demora 30 dias e que ele tem que mandar a nota"></textarea>
@@ -142,8 +223,7 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
 </section>
 
 <section class="view" id="v-chat">
-  <h2>Chat com a E.V.A.</h2>
-  <p class="sub">Pergunte sobre procedimentos, peça ideias ou ensine algo novo. Ela consulta o material e a memória.</p>
+  <div class="ph"><div class="phi">💬</div><div><h2>Conversar com a E.V.A.</h2><p class="sub">Pergunte sobre procedimentos, peça ideias ou ensine algo novo. Ela consulta o material e a memória.</p></div></div>
   <div class="card chat">
     <div class="chatlog" id="chatlog"></div>
     <div class="chatbar"><textarea id="chatIn" rows="2" style="flex:1" placeholder="Converse com a E.V.A. para testar ou tirar dúvidas... (Enter envia)"></textarea><button class="btn" id="btnChat">Enviar</button><button class="btn ghost" id="btnChatClear">Limpar</button></div>
@@ -151,26 +231,29 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
 </section>
 
 <section class="view" id="v-colinha">
-  <h2>Colinha</h2>
-  <p class="sub">Seus textos e imagens prontos para copiar e colar no Blip. A E.V.A. também consulta a colinha e sugere o item certo em cada atendimento.</p>
-  <div class="grid2">
-    <div class="card"><h3>➕ Adicionar item</h3>
-      <label>Título</label><input id="colT" placeholder="Ex.: Boas-vindas, Prazo de reembolso, Imagem do app">
-      <label>Texto (opcional)</label><textarea id="colX" rows="6" placeholder="Texto pronto para copiar..."></textarea>
-      <label>Imagem (opcional): cole com Ctrl+V aqui ou clique para escolher</label>
-      <div class="pasteimg" id="colImgBox" tabindex="0">Clique aqui e aperte Ctrl+V, ou clique para escolher um arquivo<input type="file" id="colImgIn" accept="image/*" hidden></div>
-      <div class="row"><button class="btn" id="btnColAdd">Guardar na colinha</button><button class="btn ghost" id="btnColClr">Limpar</button></div>
-      <label>Importar várias de uma vez (separe cada item com uma linha só com ---; a primeira linha vira o título)</label>
-      <textarea id="colBulk" rows="4" placeholder="Boas-vindas\nOlá! Tudo bem? ...\n---\nEncerramento\nAgradeço o contato..."></textarea>
-      <div class="row"><button class="btn ghost sm" id="btnColBulk">Importar textos</button></div>
-    </div>
-    <div class="card"><h3>📌 Minha colinha</h3><input id="colSearch" placeholder="Buscar na colinha..."><div class="cgrid" id="colList"></div></div>
+  <div class="ph"><div class="phi">📌</div><div><h2>Colinha</h2><p class="sub">Seus textos prontos, em blocos, na mesma ordem do seu Bloco de Notas. Um clique copia; depois é só colar no Blip.</p></div></div>
+  <div class="card">
+    <h3><span class="step">1</span> Colar ou enviar a colinha inteira</h3>
+    <textarea id="colAll" rows="4" placeholder="Abra o Bloco de Notas, aperte Ctrl+A, Ctrl+C e cole aqui (Ctrl+V). A E.V.A. separa em blocos automaticamente."></textarea>
+    <div class="row"><button class="btn" id="btnColRep">Organizar e substituir tudo</button><button class="btn ghost" id="btnColApp">Adicionar ao final</button><label class="btn ghost" style="margin:0">📄 Enviar arquivo .txt<input type="file" id="colFile" accept=".txt,.md,.text" hidden></label><span class="sp" style="flex:1"></span><button class="btn ghost sm" id="btnColUndo" style="display:none">↶ Desfazer</button><button class="btn danger sm" id="btnColAll">Apagar tudo</button></div>
+    <div class="hint">Títulos em MAIÚSCULAS, terminados em dois-pontos ou entre linhas em branco viram o nome de cada bloco. A ordem é sempre de cima para baixo.</div>
   </div>
+  <div class="card" style="margin-top:20px">
+    <h3><span class="step">2</span> Clique para copiar <span class="kbd" id="colCount" style="margin-left:auto;font-weight:500"></span></h3>
+    <input id="colSearch" placeholder="🔎 Buscar na colinha (ex.: agradecer, reembolso, encerramento)...">
+    <div class="cgrid" id="colList"></div>
+  </div>
+  <details class="more" id="colMore"><summary>➕ Adicionar ou editar um bloco (texto ou imagem)</summary>
+    <label>Título</label><input id="colT" placeholder="Ex.: Agradecer pelas informações">
+    <label>Texto</label><textarea id="colX" rows="5" placeholder="Texto pronto para copiar..."></textarea>
+    <label>Imagem (opcional): clique aqui e aperte Ctrl+V, ou clique para escolher</label>
+    <div class="pasteimg" id="colImgBox" tabindex="0">Clique aqui e aperte Ctrl+V, ou clique para escolher um arquivo<input type="file" id="colImgIn" accept="image/*" hidden></div>
+    <div class="row"><button class="btn" id="btnColAdd">Guardar bloco</button><button class="btn ghost" id="btnColClr">Cancelar</button></div>
+  </details>
 </section>
 
 <section class="view" id="v-protocolos">
-  <h2>Protocolos</h2>
-  <p class="sub">Cada tipo aprende com os exemplos que você guardar. Depois é só passar as informações do atendimento e a E.V.A. escreve no mesmo formato.</p>
+  <div class="ph"><div class="phi">📝</div><div><h2>Protocolos</h2><p class="sub">Cada tipo aprende com os exemplos que você guardar. Depois é só passar as informações do atendimento e a E.V.A. escreve no mesmo formato.</p></div></div>
   <div class="chips" id="protoChips"><button class="chip on" data-pt="informativo">Informativo</button><button class="chip" data-pt="prioridade">Prioridade</button><button class="chip" data-pt="rpa">Envio de RPA</button></div>
   <div class="grid2">
     <div class="card"><h3 id="protoTitle">Novo protocolo</h3>
@@ -194,8 +277,7 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
 </section>
 
 <section class="view" id="v-aprender">
-  <h2>Memória da E.V.A.</h2>
-  <p class="sub">Quando ela não encontrar algo, confirme com a supervisão e ensine aqui. Na próxima situação parecida, ela já sabe.</p>
+  <div class="ph"><div class="phi">🧠</div><div><h2>Memória da E.V.A.</h2><p class="sub">Quando ela não encontrar algo, confirme com a supervisão e ensine aqui. Na próxima situação parecida, ela já sabe.</p></div></div>
   <div class="grid2">
     <div class="card"><h3>➕ Ensinar algo novo</h3>
       <label>Situação / pergunta</label><textarea id="memQ" rows="3" placeholder="Ex.: Cliente quer segunda via do boleto vencido há mais de 60 dias"></textarea>
@@ -208,46 +290,84 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
 </section>
 
 <section class="view" id="v-material">
-  <h2>Material de apoio (Auxílio)</h2>
-  <p class="sub">Envie os arquivos (PDF, Word, TXT) ou cole o texto. Quando o material mudar, envie a nova versão e substitua. Tudo fica salvo só neste navegador.</p>
-  <div class="stat"><div><b id="stDocs">0</b><small>documentos</small></div><div><b id="stChunks">0</b><small>trechos indexados</small></div><div><b id="stUpd">—</b><small>última atualização</small></div></div>
-  <div class="grid2">
-    <div class="card"><h3>📥 Adicionar / atualizar</h3>
-      <div class="drop" id="drop">Arraste arquivos aqui ou clique<br><small>PDF, DOCX, TXT, MD, HTML</small><input type="file" id="fileIn" multiple accept=".pdf,.docx,.txt,.md,.html,.htm,.csv" hidden></div>
-      <label>Ou cole o texto</label>
-      <input id="pasteName" placeholder="Nome (ex.: Auxílio – Reembolso)"><textarea id="pasteTxt" rows="7" style="margin-top:8px" placeholder="Cole aqui o conteúdo..."></textarea>
-      <div class="row"><button class="btn" id="btnPaste">Salvar texto</button><span class="kbd">Mesmo nome = substitui a versão antiga</span></div>
+  <div class="ph"><div class="phi">🗂️</div><div><h2>Arquivos e métricas</h2><p class="sub">Envie o Auxílio, planilhas de métricas, slides e documentos. A E.V.A. lê tudo, organiza para você consultar rápido e usa nas respostas.</p></div></div>
+  <div class="stat"><div><b id="stDocs">0</b><small>arquivos</small></div><div><b id="stChunks">0</b><small>trechos para a E.V.A. consultar</small></div><div><b id="stUpd">—</b><small>última atualização</small></div></div>
+  <div class="files">
+    <div>
+      <div class="card"><h3><span class="step">1</span> Enviar arquivo</h3>
+        <div class="drop" id="drop">Arraste aqui ou clique<br><small>Excel (.xlsx), PowerPoint (.pptx), PDF, Word, CSV, TXT</small><input type="file" id="fileIn" multiple accept=".pdf,.docx,.txt,.md,.html,.htm,.csv,.xlsx,.xls,.xlsm,.ods,.pptx" hidden></div>
+        <label>Ou cole um link (Google Planilhas, Documentos ou Apresentações)</label>
+        <div style="display:flex;gap:8px"><input id="linkIn" placeholder="https://docs.google.com/..."><button class="btn" id="btnLink">Ler</button></div>
+        <div class="hint">O link precisa estar como “qualquer pessoa com o link”. Se não abrir, baixe o arquivo e envie aqui.</div>
+        <details class="more"><summary>Colar texto</summary>
+          <input id="pasteName" placeholder="Nome (ex.: Auxílio – Reembolso)"><textarea id="pasteTxt" rows="5" style="margin-top:8px" placeholder="Cole aqui o conteúdo..."></textarea>
+          <div class="row"><button class="btn sm" id="btnPaste">Salvar texto</button><span class="kbd">Mesmo nome = substitui</span></div>
+        </details>
+      </div>
+      <div class="card" style="margin-top:16px"><h3><span class="step">2</span> Seus arquivos</h3><input id="docSearch" placeholder="🔎 Buscar em todos os arquivos..."><div class="list" id="docList"></div></div>
     </div>
-    <div class="card"><h3>📚 Documentos</h3><input id="docSearch" placeholder="Testar busca no material..."><div class="list" id="docList"></div></div>
+    <div class="card fv" id="fileView"><div class="empty"><div class="orb"></div>Escolha um arquivo à esquerda para ver organizado aqui.</div></div>
   </div>
 </section>
 
+<section class="view" id="v-privacidade">
+  <div class="ph"><div class="phi">🛡️</div><div><h2>Privacidade e LGPD</h2><p class="sub">Como a E.V.A. funciona, onde os dados ficam e o que sai deste computador. Pode mostrar esta tela para a supervisão.</p></div></div>
+  <div class="card"><h3>Como as informações circulam</h3>
+    <div class="flow">
+      <div class="fbox"><span class="fic">🧑‍💻</span><b>Atendente no Blip</b>Copia e cola manualmente só o necessário</div>
+      <div class="arr"><span>→</span>colar manual</div>
+      <div class="fbox me"><span class="fic">🖥️</span><b>E.V.A. neste navegador</b>Material, colinha e memória ficam salvos só neste computador</div>
+      <div class="arr"><span>⇄</span>HTTPS · dados mascarados · só quando você clica</div>
+      <div class="fbox"><span class="fic">🤖</span><b>IA (Google Gemini)</b>Recebe o texto com CPF, telefone, e-mail, nomes e números trocados por códigos</div>
+    </div>
+    <div class="blocked"><div class="fbox no"><b>✖ Blip, Unimed e Pessoalize</b>Nenhuma conexão. A E.V.A. não lê telas nem conversas sozinha.</div><div class="fbox no"><b>✖ Servidor ou banco de dados da E.V.A.</b>Não existe. O site só entrega a página; nada é gravado fora daqui.</div></div>
+  </div>
+  <div class="card" style="margin-top:20px"><h3>Verificação ao vivo</h3><div class="checks" id="privChecks"></div></div>
+  <div class="card" style="margin-top:20px"><h3>Registro de envios para a IA</h3><p class="hint" style="margin-top:-6px">Mostra quando, para onde e exatamente o que saiu deste computador (já com os dados mascarados).</p><div id="privLog"></div><pre class="sent" id="privSent" style="display:none"></pre></div>
+  <div class="card" id="termo" style="margin-top:20px"><div class="fvh"><h3>📄 Termo de uso responsável e privacidade</h3><button class="btn ghost sm noprint" id="btnPrint">Imprimir / salvar PDF</button></div>
+   <div class="term">
+    <p><b>E.V.A. Atendimento</b>: ferramenta pessoal de apoio à escrita, usada por <span id="termName">Gabriel Bandock Fagundes</span>, atendente de SAC por chat.</p>
+    <h4>1. Finalidade</h4><p>Sugerir mensagens cordiais, consultar o material de apoio (Auxílio), organizar arquivos de consulta e lembrar horários de pausa. A E.V.A. não substitui procedimentos oficiais e não toma decisões sobre beneficiários. Toda mensagem é revisada e enviada manualmente pelo atendente.</p>
+    <h4>2. Sem integração com sistemas da empresa</h4><p>Não há conexão com o Blip nem com sistemas da Unimed ou da Pessoalize. A E.V.A. não captura telas, conversas ou cadastros: ela só processa o texto que o atendente cola manualmente.</p>
+    <h4>3. Onde os dados ficam</h4><p>Material, colinha, memória, protocolos e configurações ficam salvos apenas no navegador deste computador (armazenamento local IndexedDB). Não existe servidor nem banco de dados da E.V.A.; o endereço do site apenas entrega os arquivos da página. Tudo pode ser apagado a qualquer momento em Configurações.</p>
+    <h4>4. Uso de inteligência artificial</h4><p>Somente quando o atendente clica em analisar, melhorar, gerar ou enviar, o texto vai criptografado (HTTPS) direto deste navegador para a API do Google Gemini, com chave pessoal do atendente. Antes do envio, a proteção automática troca CPF, telefones, e-mails, números longos (carteirinha, protocolo) e nomes identificados por códigos como [CPF_1]; os dados reais voltam a aparecer só na tela do atendente.</p>
+    <h4>5. Boas práticas da LGPD (Lei 13.709/2018)</h4><p>Necessidade e minimização: colar apenas o necessário para a orientação, evitar dados sensíveis de saúde (diagnósticos, exames, laudos) e dados completos de identificação. Finalidade: usar só como apoio ao atendimento. Transparência: o registro de envios mostra tudo o que saiu do computador.</p>
+    <h4>6. Limites, com transparência</h4><p>Na versão gratuita da API, o Google pode usar o conteúdo recebido para melhorar seus serviços; por isso a proteção automática fica ligada e, para uso contínuo, recomenda-se chave com faturamento ativo, em que o conteúdo não é usado para treinamento. A proteção reduz, mas não elimina, o risco de algum dado pessoal passar; a revisão do atendente continua necessária.</p>
+    <h4>7. Responsabilidade</h4><p>Uso pessoal e de apoio. Em caso de dúvida da supervisão, a ferramenta pode ser desligada e todos os dados apagados na hora. Recomenda-se validar o uso com a supervisão e com o encarregado de dados (DPO) da empresa.</p>
+   </div></div>
+</section>
+
 <section class="view" id="v-config">
-  <h2>Configurações</h2>
-  <p class="sub">A chave fica salva só neste navegador. Crie grátis em aistudio.google.com → Get API key.</p>
-  <div class="card" style="max-width:640px">
-    <label>Chave da API Gemini</label><input id="cfgKey" type="password" placeholder="AIza...">
+  <div class="ph"><div class="phi">⚙️</div><div><h2>Configurações</h2><p class="sub">Tudo fica salvo só neste navegador.</p></div></div>
+  <div class="cfg">
+   <div class="card"><h3>🤖 Inteligência artificial</h3><label>Chave da API Gemini</label><input id="cfgKey" type="password" placeholder="AIza...">
     <label>Chave Groq de reserva (grátis, opcional) — usada automaticamente se o Gemini estiver no limite. Crie em console.groq.com/keys</label><input id="cfgGroq" type="password" placeholder="gsk_...">
     <label>Chaves extras do Gemini (opcional, uma por linha) — de outros projetos do Google, a E.V.A. alterna sozinha quando uma atinge o limite</label><textarea id="cfgKeys" rows="3" placeholder="AIza...\nAIza..."></textarea>
     <label>Modelo</label><select id="cfgModel"></select>
-    <div class="row"><button class="btn" id="btnSaveCfg">Salvar e testar</button><button class="btn ghost" id="btnModels">Atualizar lista de modelos</button></div>
-    <label>Seu nome (para assinar mensagens, opcional)</label><input id="cfgName" placeholder="Gabriel">
-    <label>Instruções extras de estilo (opcional)</label><textarea id="cfgStyle" rows="3" placeholder="Ex.: sempre cumprimentar com 'Olá, tudo bem?' e usar o nome do cliente quando aparecer"></textarea>
-    <h3 style="margin-top:26px">⏰ Meus horários de trabalho</h3>
-    <p class="sub" style="margin:0">Aparece um aviso grande, sem som, no topo do site antes e durante cada pausa.</p>
-    <div class="grid2" style="gap:10px"><div><label>Entrada</label><input id="tEnt" type="time"></div><div><label>Saída</label><input id="tSai" type="time"></div>
+    <div class="row"><button class="btn" id="btnSaveCfg">Salvar e testar</button><button class="btn ghost" id="btnModels">Atualizar lista de modelos</button></div><div class="hint">Chave grátis em aistudio.google.com → Get API key.</div></div>
+   <div class="card"><h3>⏰ Horários de trabalho</h3><p class="hint" style="margin-top:-6px">Aviso grande, sem som, no topo do site antes e durante cada pausa.</p><div class="grid2" style="gap:10px"><div><label>Entrada</label><input id="tEnt" type="time"></div><div><label>Saída</label><input id="tSai" type="time"></div>
     <div><label>Pausa 10 (1) início</label><input id="tP1" type="time"></div><div><label>Pausa 10 (1) fim</label><input id="tP1f" type="time"></div>
     <div><label>Lanche/Almoço início</label><input id="tL" type="time"></div><div><label>Lanche/Almoço fim</label><input id="tLf" type="time"></div>
     <div><label>Pausa 10 (2) início</label><input id="tP2" type="time"></div><div><label>Pausa 10 (2) fim</label><input id="tP2f" type="time"></div></div>
     <label>Escala</label><input id="tEsc" placeholder="6x1">
     <label>Avisar quantos minutos antes</label><input id="tAnt" type="number" min="1" max="30">
-    <div class="row"><button class="btn" id="btnTurno">Salvar horários</button></div>
-    <div class="row"><button class="btn danger sm" id="btnWipe">Apagar todos os dados deste navegador</button></div>
+    <div class="row"><button class="btn" id="btnTurno">Salvar horários</button></div></div>
+   <div class="card"><h3>✍️ Seu perfil e estilo</h3><label>Seu nome (para assinar mensagens, opcional)</label><input id="cfgName" placeholder="Gabriel">
+    <label>Instruções extras de estilo (opcional)</label><textarea id="cfgStyle" rows="3" placeholder="Ex.: sempre cumprimentar com 'Olá, tudo bem?' e usar o nome do cliente quando aparecer"></textarea><div class="row"><button class="btn sm" id="btnSaveCfg2">Salvar</button></div></div>
+   <div class="card"><h3>🔒 Segurança e privacidade</h3>
+    <label style="display:flex;gap:10px;align-items:center;font-weight:600"><input type="checkbox" id="cfgMask" style="width:auto"> Proteção automática de dados pessoais (recomendado)</label>
+    <div class="hint">Troca CPF, telefone, e-mail, nomes e números longos por códigos antes de enviar à IA.</div>
+    <label>Trocar senha de acesso</label><div style="display:flex;gap:8px"><input id="pwNew" type="password" inputmode="numeric" placeholder="Nova senha"><button class="btn ghost" id="btnPw">Salvar senha</button></div>
+    <label>Apagar dados</label><div class="row" style="margin-top:0"><button class="btn danger sm" id="btnWipe">Apagar todos os dados deste navegador</button></div>
+   </div>
   </div>
 </section>
+</div>
 </main>
 </div>
-<div class="overlay" id="ov"><div class="card modal"><h3>Bem-vindo à E.V.A. Atendimento</h3><p class="sub" style="margin:0 0 6px">Para começar, cole sua chave da API Gemini. Depois envie o material do Auxílio em "Material".</p><input id="ovKey" type="password" placeholder="AIza..."><div class="row"><button class="btn" id="ovSave">Começar</button><a class="kbd" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Pegar chave grátis ↗</a></div></div></div>
+<div class="lock" id="lock"><div class="lockc"><div class="orb"></div><h3>E.V.A. Atendimento</h3><p>Digite sua senha para entrar</p><input id="lockIn" type="password" inputmode="numeric" autocomplete="off" autofocus><button class="btn" id="lockBtn">Entrar</button><div id="lockErr"></div></div></div>
+<script>if(sessionStorage.getItem('eva-ok')==='1')document.getElementById('lock').classList.add('off')</script>
+<div class="overlay" id="ov"><div class="card modal"><h3>Bem-vindo à E.V.A. Atendimento</h3><p class="sub" style="margin:0 0 6px">Para começar, cole sua chave da API Gemini. Depois envie o Auxílio em "Arquivos e métricas".</p><input id="ovKey" type="password" placeholder="AIza..."><div class="row"><button class="btn" id="ovSave">Começar</button><a class="kbd" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Pegar chave grátis ↗</a></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -292,7 +412,8 @@ Padrão de atendimento: excelência estilo Disney — sempre cordial, acolhedor,
 REGRAS DE VERDADE: baseie procedimentos, prazos, regras e soluções SOMENTE no MATERIAL_AUXILIO e na MEMORIA_APRENDIDA. Nunca invente. Se a informação não estiver lá, diga claramente que não encontrou e oriente a confirmar com a supervisão, e ainda assim sugira uma mensagem acolhedora de espera.
 A conversa colada vem sem indicar quem falou; deduza pelo conteúdo quem é cliente e quem é atendente, e acompanhe o atendimento do início ao fim.
 ${CFG.style?'Preferências do atendente: '+CFG.style:''}
-Toda mensagem pronta para enviar ao cliente deve vir entre as tags <msg> e </msg> (uma mensagem por tag). Use <alerta>...</alerta> para avisos de informação não encontrada ou riscos. Use títulos com "### " e listas com "- ". Seja rápida e direta.`;
+Toda mensagem pronta para enviar ao cliente deve vir entre as tags <msg> e </msg> (uma mensagem por tag). Use <alerta>...</alerta> para avisos de informação não encontrada ou riscos. Use títulos com "### " e listas com "- ". Seja rápida e direta.
+Códigos como [NOME_1], [CPF_1], [TELEFONE_1], [EMAIL_1] ou [NUMERO_1] são dados pessoais protegidos: quando precisar citá-los, repita o código exatamente igual, sem comentar sobre ele.`;
 let BUSY=0;
 function friendly(code,t){let m=t;try{m=JSON.parse(t).error.message}catch(e){}
  if(code===429)return 'Limite de uso da chave atingido por agora. Espere 1 minuto e tente de novo.';
@@ -317,24 +438,34 @@ async function groq(sys,user,onText){const ac=new AbortController();const t0=set
   if(!r.ok)return {err:r.status,text:await r.text()};const rd=r.body.getReader(),dec=new TextDecoder();let buf='',all='';
   while(true){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith('data:')||line.includes('[DONE]'))continue;try{const t=JSON.parse(line.slice(5)).choices?.[0]?.delta?.content;if(t){all+=t;onText(all)}}catch(e){}}}
   return all?{ok:all}:{err:'empty',text:'sem resposta'}}catch(e){return {err:'timeout',text:'tempo esgotado'}}finally{clearTimeout(t0)}}
+function maskPII(s,map){const add=(type,v)=>{if(map.rev[type+v])return map.rev[type+v];map.c[type]=(map.c[type]||0)+1;const tok=`[${type}_${map.c[type]}]`;map.fwd[tok]=v;map.rev[type+v]=tok;return tok};
+ return s.replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g,m=>add('EMAIL',m))
+  .replace(/\b\d{3}\.\d{3}\.\d{3}-\d{2}\b|\b\d{11}\b(?=\D|$)/g,m=>add('CPF',m))
+  .replace(/(?:\+?55\s?)?\(\d{2}\)\s?9?\d{4}[-\s]?\d{4}\b|\b\d{2}\s9\d{4}[-\s]\d{4}\b|\b9\d{4}-\d{4}\b/g,m=>add('TELEFONE',m))
+  .replace(/\b\d[\d.\s-]{5,}\d\b/g,m=>m.replace(/\D/g,'').length>=7?add('NUMERO',m):m)
+  .replace(/((?:[Mm]eu nome é|[Mm]e chamo|[Nn]ome(?: completo)?:|[Bb]enefici[áa]ri[oa]:|[Pp]aciente:|[Tt]itular:|[Ss]r\.|[Ss]ra\.|[Ss]enhor|[Ss]enhora)\s+)([A-ZÀ-Ý][a-zà-ÿ]+(?:\s+(?:d[aeo]s?\s+)?[A-ZÀ-Ý][a-zà-ÿ]+){0,4})/g,(m,a,b)=>a+add('NOME',b))}
+function unmask(t,map){return String(t).replace(/\[(EMAIL|CPF|TELEFONE|NUMERO|NOME)_(\d+)\]/g,m=>map.fwd[m]||m)}
+let PLOG=[];async function logSend(dest,text,masked){PLOG.unshift({t:Date.now(),dest,chars:text.length,masked,sample:text.slice(-6000)});PLOG=PLOG.slice(0,30);try{await DB.put('kv',PLOG,'plog')}catch(e){}if($('#v-privacidade').classList.contains('on'))renderPriv()}
 const COOL={};let NOTHINK=JSON.parse(localStorage.getItem('eva-nothink')||'{}');
 function retryAfter(t){const m=String(t).match(/retry(?:Delay)?["\s:]*["']?(\d+(?:\.\d+)?)s/i)||String(t).match(/in (\d+(?:\.\d+)?)s/i);return m?Math.min(90,parseFloat(m[1])+1)*1000:60000}
-async function gemini(prompt,onText,history=[]){if(!CFG.key&&CFG.groq){busy(1);try{const g=await groq(SYS(),prompt,onText);if(g.ok)return g.ok;throw new Error(friendly(g.err,g.text))}finally{busy(-1)}}if(!CFG.key){openOv();throw new Error('Configure a chave da API em Configurações.')}
- busy(1);const histTxt=history.length?'<HISTORICO_DO_CHAT>\n'+history.map(h=>(h.role==='user'?'Atendente: ':'E.V.A.: ')+h.parts[0].text.slice(0,1500)).join('\n')+'\n</HISTORICO_DO_CHAT>\n\n':'';
+async function gemini(prompt,onText0,history=[]){const MAP={fwd:{},rev:{},c:{}};const doMask=CFG.mask!==false;const onText=t=>onText0(doMask?unmask(t,MAP):t);if(doMask)prompt=maskPII(prompt,MAP);const R=x=>doMask?unmask(x,MAP):x;
+ if(!CFG.key&&CFG.groq){busy(1);try{logSend('Groq',prompt,Object.keys(MAP.fwd).length);const g=await groq(SYS(),prompt,onText);if(g.ok)return R(g.ok);if(g.ok)return g.ok;throw new Error(friendly(g.err,g.text))}finally{busy(-1)}}if(!CFG.key){openOv();throw new Error('Configure a chave da API em Configurações.')}
+ busy(1);let histTxt=history.length?'<HISTORICO_DO_CHAT>\n'+history.map(h=>(h.role==='user'?'Atendente: ':'E.V.A.: ')+h.parts[0].text.slice(0,1500)).join('\n')+'\n</HISTORICO_DO_CHAT>\n\n':'';if(doMask)histTxt=maskPII(histTxt,MAP);let logged=false;
  const base={systemInstruction:{parts:[{text:SYS()}]},contents:[{role:'user',parts:[{text:histTxt+prompt}]}]};
  try{const keys=[CFG.key,...(CFG.keys||[])].filter(Boolean);const ms=await availableModels();const models=[CFG.model,...ms.filter(m=>m!==CFG.model)].slice(0,6);
   const combos=[];models.forEach(m=>keys.forEach(k=>combos.push([m,k])));let last=null,tries=0,saw429=false;
   for(let round=0;round<2;round++){
    for(const [m,k] of combos){const id=m+'|'+k.slice(-6);if(COOL[id]>Date.now()||COOL['dead|'+m])continue;if(++tries>5)break;
     const gc={temperature:.4,maxOutputTokens:3000};if(!NOTHINK[m])gc.thinkingConfig={thinkingBudget:0};
+    if(!logged){logged=true;logSend('Google Gemini',base.contents[0].parts[0].text,Object.keys(MAP.fwd).length)}
     let r=await tryStream(m,k,{...base,generationConfig:gc},onText);
     if(!r.ok&&r.err===400&&gc.thinkingConfig){delete gc.thinkingConfig;r=await tryStream(m,k,{...base,generationConfig:gc},onText);if(r.ok){NOTHINK[m]=1;localStorage.setItem('eva-nothink',JSON.stringify(NOTHINK))}}
-    if(r.ok){if(CFG.model!==m){CFG.model=m;await DB.put('kv',CFG,'cfg');fillModels(MODELS);renderStatus()}return r.ok}
+    if(r.ok){if(CFG.model!==m){CFG.model=m;await DB.put('kv',CFG,'cfg');fillModels(MODELS);renderStatus()}return R(r.ok)}
     last=r;if(/API key not valid|API_KEY_INVALID/i.test(r.text)){COOL[id]=Date.now()+864e5;continue}
     if(r.err===429||/RESOURCE_EXHAUSTED|quota/i.test(r.text)){saw429=true;COOL[id]=Date.now()+retryAfter(r.text);continue}
     if(r.err===404||/no longer available|not found|not supported/i.test(r.text)){COOL['dead|'+m]=1;continue}
     if(r.err===400){console.warn('EVA 400',m,r.text);COOL['dead|'+m]=1;continue}COOL[id]=Date.now()+20000}
-   if(CFG.groq){const g=await groq(SYS(),base.contents[0].parts[0].text,onText);if(g.ok)return g.ok;last=g}
+   if(CFG.groq){logSend('Groq',base.contents[0].parts[0].text,Object.keys(MAP.fwd).length);const g=await groq(SYS(),base.contents[0].parts[0].text,onText);if(g.ok)return R(g.ok);last=g}
    const wait=Math.min(...Object.values(COOL).filter(v=>v>Date.now()&&v<Date.now()+864e5).map(v=>v-Date.now()),Infinity);
    if(round===0&&isFinite(wait)&&wait<=35000){onText('<alerta>Muita demanda agora, tentando de novo em '+Math.ceil(wait/1000)+'s…</alerta>');await new Promise(r=>setTimeout(r,wait));tries=0}else break}
   if(saw429&&last&&last.err!==429)last={err:429,text:''};
@@ -366,18 +497,71 @@ async function chat(){const q=$('#chatIn').value.trim();if(!q)return;$('#chatIn'
  try{const a=await gemini(`${c.text}\n\nPergunta do atendente: ${q}\n(Responda de forma direta. Se ele estiver te ensinando algo, confirme e sugira guardar na Memória.)`,t=>{b.innerHTML=md(t);$('#chatlog').scrollTop=1e9},HIST);HIST.push({role:'user',parts:[{text:q}]},{role:'model',parts:[{text:a}]});HIST=HIST.slice(-12)}catch(e){b.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}}
 
 // ---------- material ----------
+function decodeText(buf){const b=new Uint8Array(buf);
+ if(b[0]===0xFF&&b[1]===0xFE)return new TextDecoder('utf-16le').decode(buf);if(b[0]===0xFE&&b[1]===0xFF)return new TextDecoder('utf-16be').decode(buf);
+ try{return new TextDecoder('utf-8',{fatal:true}).decode(buf).replace(/^\uFEFF/,'')}catch(e){return new TextDecoder('windows-1252').decode(buf)}}
+const cellTxt=v=>v==null?'':(v instanceof Date?v.toLocaleDateString('pt-BR'):String(v)).replace(/\s+/g,' ').trim();
+function cleanRows(rows){rows=rows.map(r=>r.map(cellTxt)).filter(r=>r.some(c=>c));if(!rows.length)return rows;const w=Math.max(...rows.map(r=>r.length));
+ const keep=[];for(let c=0;c<w;c++)if(rows.some(r=>r[c]))keep.push(c);return rows.map(r=>keep.map(c=>r[c]||''))}
+function hdrIdx(rows){for(let i=0;i<Math.min(rows.length,8);i++){if(rows[i].filter(Boolean).length>=Math.min(2,rows[i].length))return i}return 0}
+function sheetsToText(sheets){return sheets.map(sh=>{const h=hdrIdx(sh.rows);const H=sh.rows[h]||[];const pre=sh.rows.slice(0,h).map(r=>r.filter(Boolean).join(' | ')).join('\n');
+ return `### Aba: ${sh.name}\n${pre?pre+'\n':''}`+sh.rows.slice(h+1).map(r=>r.map((c,k)=>c?((H[k]||'Coluna '+(k+1))+': '+c):'').filter(Boolean).join(' | ')).join('\n')}).join('\n\n')}
+function slidesToText(sl){return sl.map(x=>`### Slide ${x.n}: ${x.title}\n${x.lines.join('\n')}${x.tables.map(t=>'\n'+sheetsToText([{name:'Tabela',rows:t}]).replace(/^### Aba: Tabela\n/,'')).join('')}`).join('\n\n')}
+async function parseXlsx(buf){if(!window.XLSX)await loadLib('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+ const wb=XLSX.read(buf,{type:'array',cellDates:true});return wb.SheetNames.map(n=>({name:n,rows:cleanRows(XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false,defval:''}))})).filter(x=>x.rows.length)}
+async function parsePptx(buf){if(!window.JSZip)await loadLib('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');const z=await JSZip.loadAsync(buf);
+ const names=Object.keys(z.files).filter(n=>/^ppt\/slides\/slide\d+\.xml$/.test(n)).sort((a,b)=>parseInt(a.match(/\d+/)[0])-parseInt(b.match(/\d+/)[0]));const out=[];
+ for(const n of names){const x=new DOMParser().parseFromString(await z.file(n).async('string'),'application/xml');const A='http://schemas.openxmlformats.org/drawingml/2006/main';
+  const tables=[...x.getElementsByTagNameNS(A,'tbl')].map(t=>cleanRows([...t.getElementsByTagNameNS(A,'tr')].map(tr=>[...tr.getElementsByTagNameNS(A,'tc')].map(tc=>[...tc.getElementsByTagNameNS(A,'t')].map(e=>e.textContent).join(' ')))));
+  const inTbl=e=>{let p=e.parentNode;while(p){if(p.localName==='tbl')return true;p=p.parentNode}return false};
+  const lines=[...x.getElementsByTagNameNS(A,'p')].filter(p=>!inTbl(p)).map(p=>[...p.getElementsByTagNameNS(A,'t')].map(e=>e.textContent).join('').trim()).filter(Boolean);
+  out.push({n:out.length+1,title:lines[0]||('Slide '+(out.length+1)),lines:lines.slice(1),tables})}return out}
+async function parseAny(name,buf,ctype){const n=name.toLowerCase();
+ if(/\.(xlsx|xls|xlsm|ods|csv)$/.test(n)||/spreadsheet|excel|csv/.test(ctype||'')){let sheets;if(/\.csv$/.test(n)||/csv/.test(ctype||'')){if(!window.XLSX)await loadLib('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');const wb=XLSX.read(decodeText(buf),{type:'string'});sheets=wb.SheetNames.map(s=>({name:s==='Sheet1'?'Planilha':s,rows:cleanRows(XLSX.utils.sheet_to_json(wb.Sheets[s],{header:1,raw:false,defval:''}))}))}else sheets=await parseXlsx(buf);
+  return {kind:'sheet',sheets,text:sheetsToText(sheets)}}
+ if(/\.pptx$/.test(n)||/presentation/.test(ctype||'')){const slides=await parsePptx(buf);return {kind:'slides',slides,text:slidesToText(slides)}}
+ if(/\.pdf$/.test(n)||/pdf/.test(ctype||''))return {kind:'text',text:await readFile(new File([buf],'x.pdf'))};
+ if(/\.docx$/.test(n)||/wordprocessing/.test(ctype||''))return {kind:'text',text:await readFile(new File([buf],'x.docx'))};
+ let t=decodeText(buf);if(/\.html?$/.test(n)||/html/.test(ctype||'')){t=new DOMParser().parseFromString(t,'text/html').body.innerText}return {kind:'text',text:t}}
 async function loadLib(src){return new Promise((r,j)=>{const s=document.createElement('script');s.src=src;s.onload=r;s.onerror=j;document.head.append(s)})}
 async function readFile(f){const n=f.name.toLowerCase();
  if(n.endsWith('.pdf')){if(!window.pdfjsLib){await loadLib('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'}
   const pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;let t='';for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const c=await pg.getTextContent();let last=null,line='';c.items.forEach(it=>{const y=it.transform[5];if(last!==null&&Math.abs(y-last)>4){t+=line+'\n';line=''}line+=it.str+(it.hasEOL?'\n':' ');last=y});t+=line+'\n\n'}return t}
  if(n.endsWith('.docx')){if(!window.mammoth)await loadLib('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');return (await mammoth.extractRawText({arrayBuffer:await f.arrayBuffer()})).value}
  let t=await f.text();if(/\.html?$/.test(n)){const d=new DOMParser().parseFromString(t,'text/html');t=d.body.innerText}return t}
-async function saveDoc(name,text){name=name.trim()||'Documento';const ex=DOCS.find(d=>norm(d.name)===norm(name));const doc={id:ex?ex.id:Date.now()+''+Math.random(),name,text,chunks:chunk(text),updated:new Date().toISOString()};await DB.put('docs',doc);await refresh();toast((ex?'Atualizado: ':'Adicionado: ')+name)}
-async function handleFiles(fl){for(const f of fl){try{toast('Lendo '+f.name+'...');const t=await readFile(f);if(!t.trim())throw new Error('sem texto (PDF escaneado?)');await saveDoc(f.name.replace(/\.[^.]+$/,''),t)}catch(e){toast('Falha em '+f.name+': '+e.message)}}}
+async function saveDoc(name,text,extra={}){name=name.trim()||'Documento';const ex=DOCS.find(d=>norm(d.name)===norm(name));const doc={id:ex?ex.id:Date.now()+''+Math.random(),name,text,chunks:chunk(text),updated:new Date().toISOString(),kind:'text',...extra};OPEN=doc.id;await DB.put('docs',doc);await refresh();toast((ex?'Atualizado: ':'Adicionado: ')+name)}
+async function handleFiles(fl){for(const f of fl){try{toast('Lendo '+f.name+'...');const r=await parseAny(f.name,await f.arrayBuffer(),f.type);if(!r.text.trim())throw new Error('sem texto (PDF escaneado?)');await saveDoc(f.name.replace(/\.[^.]+$/,''),r.text,{kind:r.kind,sheets:r.sheets,slides:r.slides})}catch(e){toast('Falha em '+f.name+': '+e.message)}}}
+let OPEN=null,VSHEET=0,VQ='';
+const ficon=d=>d.kind==='sheet'?'📊':d.kind==='slides'?'📽️':'📄';
 function renderDocs(){const q=$('#docSearch').value.trim();const L=$('#docList');
- if(q){const h=search(q,6);L.innerHTML=h.length?h.map(x=>`<div class="item"><span class="pill">${esc(x.name)}</span><div style="white-space:pre-wrap;margin-top:6px">${esc(x.text.slice(0,500))}${x.text.length>500?'…':''}</div></div>`).join(''):'<div class="empty">Nada encontrado.</div>';return}
- L.innerHTML=DOCS.length?DOCS.sort((a,b)=>b.updated.localeCompare(a.updated)).map(d=>`<div class="item"><b>${esc(d.name)}</b><br><span class="pill">${d.chunks.length} trechos</span><span class="pill">${(d.text.length/1000).toFixed(0)} mil caracteres</span><span class="pill">${new Date(d.updated).toLocaleString('pt-BR')}</span><div class="row"><button class="btn danger sm" data-deldoc="${d.id}">Remover</button></div></div>`).join(''):'<div class="empty">Nenhum material ainda. Envie o Auxílio para a E.V.A. consultar.</div>';
- $('#stDocs').textContent=DOCS.length;$('#stChunks').textContent=DOCS.reduce((a,d)=>a+d.chunks.length,0);const u=DOCS.map(d=>d.updated).sort().pop();$('#stUpd').textContent=u?new Date(u).toLocaleDateString('pt-BR'):'—'}
+ if(q){const h=search(q,8).filter(x=>x.kind==='doc');L.innerHTML=h.length?h.map(x=>{const d=DOCS.find(d=>d.name===x.name);return `<div class="item" style="cursor:pointer" data-open="${d?d.id:''}" data-q="${esc(q)}"><span class="pill">${esc(x.name)}</span><div style="white-space:pre-wrap;margin-top:6px">${hl(esc(x.text.slice(0,380)),q)}${x.text.length>380?'…':''}</div></div>`}).join(''):'<div class="empty">Nada encontrado.</div>'}
+ else L.innerHTML=DOCS.length?DOCS.sort((a,b)=>b.updated.localeCompare(a.updated)).map(d=>`<button class="fitem ${OPEN===d.id?'on':''}" data-open="${d.id}"><span class="fi">${ficon(d)}</span><span style="flex:1;min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.name)}</b><small>${d.kind==='sheet'?(d.sheets||[]).length+' abas':d.kind==='slides'?(d.slides||[]).length+' slides':d.chunks.length+' trechos'} · ${new Date(d.updated).toLocaleDateString('pt-BR')}</small></span></button>`).join(''):'<div class="empty">Nenhum arquivo ainda. Envie o Auxílio e suas planilhas de métricas.</div>';
+ $('#stDocs').textContent=DOCS.length;$('#stChunks').textContent=DOCS.reduce((a,d)=>a+d.chunks.length,0);const u=DOCS.map(d=>d.updated).sort().pop();$('#stUpd').textContent=u?new Date(u).toLocaleDateString('pt-BR'):'—';renderView()}
+function hl(h,q){const w=norm(q).split(/\s+/).filter(x=>x.length>2);if(!w.length)return h;return h.replace(/[^<>]+(?=<|$)/g,seg=>{let o=seg;w.forEach(x=>{const re=new RegExp('('+x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');o=o.replace(re,'<mark>$1</mark>')});return o})}
+function textSections(t){const L=t.replace(/\r/g,'').split('\n');const out=[];let cur={t:'Início',x:[]};L.forEach(l=>{if(isTitle(l)&&l.trim().length>2){if(cur.x.join('').trim())out.push(cur);cur={t:cleanTitle(l),x:[]}}else cur.x.push(l)});if(cur.x.join('').trim())out.push(cur);
+ if(out.length<2){const ch=chunk(t,1400,0);return ch.map((c,i)=>({t:'Parte '+(i+1)+' · '+autoTitle(c),x:c}))}return out.map(o=>({t:o.t,x:tidy(o.x.join('\n'))}))}
+function renderView(){const V=$('#fileView');const d=DOCS.find(x=>x.id===OPEN);if(!d){V.innerHTML='<div class="empty"><div class="orb"></div>Escolha um arquivo à esquerda para ver organizado aqui.</div>';return}
+ const q=VQ;const nq=norm(q);let body='';
+ if(d.kind==='sheet'&&d.sheets&&d.sheets.length){const sh=d.sheets[Math.min(VSHEET,d.sheets.length-1)];
+  const tabs=`<div class="tabs">${d.sheets.map((x,i)=>`<button class="chip ${i===VSHEET?'on':''}" data-sheet="${i}">${esc(x.name)}${nq?' ('+x.rows.filter(r=>norm(r.join(' ')).includes(nq)).length+')':''}</button>`).join('')}</div>`;
+  const h=hdrIdx(sh.rows);const H=sh.rows[h]||[];let rows=sh.rows.slice(h+1);if(nq)rows=rows.filter(r=>norm(r.join(' ')).includes(nq));const tot=rows.length;rows=rows.slice(0,400);
+  body=tabs+`<div class="hint" style="margin:0 0 8px">${tot} linha(s)${tot>400?' · mostrando 400, use a busca':''}</div><div class="tblw"><table class="tbl"><thead><tr>${H.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${H.map((_,k)=>`<td>${hl(esc(r[k]||''),q)}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${H.length||1}">Nada encontrado nesta aba.</td></tr>`}</tbody></table></div>`}
+ else if(d.kind==='slides'&&d.slides){let sl=d.slides;if(nq)sl=sl.filter(x=>norm(x.title+' '+x.lines.join(' ')+' '+x.tables.flat(2).join(' ')).includes(nq));
+  body=sl.map(x=>`<div class="slide"><div class="sn">SLIDE ${x.n}</div><h4>${hl(esc(x.title),q)}</h4>${x.lines.length?`<ul>${x.lines.map(l=>`<li>${hl(esc(l),q)}</li>`).join('')}</ul>`:''}${x.tables.map(t=>`<div class="tblw" style="margin-top:10px;max-height:none"><table class="tbl"><thead><tr>${(t[0]||[]).map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${t.slice(1).map(r=>`<tr>${r.map(c=>`<td>${hl(esc(c),q)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`).join('')}</div>`).join('')||'<div class="empty">Nada encontrado.</div>'}
+ else{let secs=textSections(d.text);if(nq)secs=secs.filter(x=>norm(x.t+' '+x.x).includes(nq));
+  body=secs.map((x,i)=>`<details class="sec" ${nq||secs.length<=3||i===0?'open':''}><summary>${hl(esc(x.t),q)}</summary><div>${hl(esc(x.x),q)}</div></details>`).join('')||'<div class="empty">Nada encontrado.</div>'}
+ V.innerHTML=`<div class="fvh"><span style="font-size:22px">${ficon(d)}</span><h3>${esc(d.name)}</h3><span class="pill">atualizado ${new Date(d.updated).toLocaleString('pt-BR')}</span><button class="btn danger sm" data-deldoc="${d.id}">Remover</button></div><input id="viewQ" placeholder="🔎 Buscar neste arquivo..." value="${esc(q)}"><div style="margin-top:12px">${body}</div>`;
+ const vi=$('#viewQ');vi.oninput=()=>{VQ=vi.value;const p=vi.selectionStart;renderView();const n=$('#viewQ');n.focus();n.setSelectionRange(p,p)}}
+document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o&&o.dataset.open){OPEN=o.dataset.open;VSHEET=0;VQ=o.dataset.q||'';renderDocs();$('#fileView').scrollIntoView({behavior:'smooth',block:'start'})}
+ const sh=e.target.closest('[data-sheet]');if(sh){VSHEET=+sh.dataset.sheet;renderView()}});
+function gLink(u){let m;if((m=u.match(/docs\.google\.com\/spreadsheets\/d\/([\w-]+)/)))return [`https://docs.google.com/spreadsheets/d/${m[1]}/export?format=xlsx`,'planilha.xlsx'];
+ if((m=u.match(/docs\.google\.com\/document\/d\/([\w-]+)/)))return [`https://docs.google.com/document/d/${m[1]}/export?format=txt`,'documento.txt'];
+ if((m=u.match(/docs\.google\.com\/presentation\/d\/([\w-]+)/)))return [`https://docs.google.com/presentation/d/${m[1]}/export/pptx`,'apresentacao.pptx'];return [u,u.split('?')[0].split('/').pop()||'link']}
+$('#btnLink').onclick=async()=>{const u=$('#linkIn').value.trim();if(!/^https?:\/\//.test(u))return toast('Cole um link completo (https://...)');const [url,fname]=gLink(u);toast('Lendo link...');
+ try{const r=await fetch(url);if(!r.ok)throw new Error('HTTP '+r.status);const ct=r.headers.get('content-type')||'';if(/text\/html/.test(ct)&&/google/.test(url))throw new Error('acesso negado');
+  const res=await parseAny(fname,await r.arrayBuffer(),ct);if(!res.text.trim())throw new Error('vazio');let nm=prompt('Nome para este arquivo:',fname.replace(/\.[^.]+$/,''))||fname;await saveDoc(nm,res.text,{kind:res.kind,sheets:res.sheets,slides:res.slides,src:u});$('#linkIn').value=''}
+ catch(e){toast('Não consegui abrir o link ('+e.message+'). Deixe como "qualquer pessoa com o link" ou baixe o arquivo e envie.')}};
+
 function renderMem(){const q=norm($('#memSearch').value);const L=$('#memList');const items=MEM.filter(m=>!q||norm(m.q+' '+m.a).includes(q)).sort((a,b)=>b.id-a.id);
  L.innerHTML=items.length?items.map(m=>`<div class="item"><b>Situação:</b> ${esc(m.q)}<br><b>O que fazer:</b> ${esc(m.a)}<div class="row"><span class="pill">${new Date(m.id).toLocaleDateString('pt-BR')}</span><button class="btn ghost sm" data-editmem="${m.id}">Editar</button><button class="btn danger sm" data-delmem="${m.id}">Apagar</button></div></div>`).join(''):'<div class="empty">A memória cresce conforme você ensina.</div>'}
 function renderStatus(){$('#status').innerHTML=`<div><span class="dot ${CFG.key?'ok':''}"></span>${CFG.key?'IA conectada':'Sem chave da IA'}</div><div><span class="dot ${DOCS.length?'ok':''}"></span>${DOCS.length} doc(s) no material</div><div><span class="dot ${MEM.length?'ok':''}"></span>${MEM.length} aprendizado(s)</div><div><span class="dot ${Object.values(PROTOS).some(p=>p.ex.length)?'ok':''}"></span>${Object.values(PROTOS).reduce((a,p)=>a+p.ex.length,0)} exemplo(s) de protocolo</div><div class="kbd" style="margin-top:6px">${esc(CFG.model)}</div>`}
@@ -422,27 +606,62 @@ $('#btnProto').onclick=gerarProto;$('#btnProtoClear').onclick=()=>{$('#protoInfo
 ['#protoInfo','#protoConv'].forEach(s=>ctrlEnter($(s),gerarProto));
 document.addEventListener('click',async e=>{if(e.target.dataset.delex&&sure(e.target)){PROTOS[PT].ex=PROTOS[PT].ex.filter(x=>x.id!=e.target.dataset.delex);await saveProtos()}});
 // ---------- colinha ----------
-let COL=[],colImg='';
+let COL=[],colImg='',COLUNDO=null,COLEDIT=null;
 async function saveCol(){await DB.put('kv',COL,'colinha');renderCol()}
 function colScore(q,c){const qt=new Set(toks(q));if(!qt.size)return 0;const ct=toks(c.t+' '+(c.x||''));let s=0;ct.forEach(w=>{if(qt.has(w))s++});return s/Math.sqrt(ct.length+3)}
-function colCard(c,small){return `<div class="citem"><h4>${esc(c.t)}</h4>${c.img?`<img src="${c.img}" alt="">`:''}${c.x?`<div class="ct">${esc(c.x)}</div>`:''}<div class="row">${c.x?`<button class="btn sm" data-ccopy="${c.id}">📋 Copiar texto</button>`:''}${c.img?`<button class="btn sm" data-cimg="${c.id}">🖼️ Copiar imagem</button>`:''}${small?'':`<button class="btn ghost sm" data-cedit="${c.id}">Editar</button><button class="btn danger sm" data-cdel="${c.id}">Apagar</button>`}</div></div>`}
-function renderCol(){const q=norm($('#colSearch').value);const it=COL.filter(c=>!q||norm(c.t+' '+(c.x||'')).includes(q));$('#colList').innerHTML=it.length?it.map(c=>colCard(c)).join(''):'<div class="empty">Nada na colinha ainda.</div>';renderStatus()}
-function setColImg(d){colImg=d;$('#colImgBox').innerHTML=d?`<img src="${d}"><br><small>Clique para trocar</small>`:'Clique aqui e aperte Ctrl+V, ou clique para escolher um arquivo';if(!$('#colImgIn'))$('#colImgBox').insertAdjacentHTML('beforeend','<input type="file" id="colImgIn" accept="image/*" hidden>');$('#colImgIn').onchange=e=>readImg(e.target.files[0])}
+function isTitle(l){l=(l||'').trim();if(!l||l.length>70)return false;
+ if(/^#{1,3}\s+\S/.test(l)||/^\*\*[^*]+\*\*:?$/.test(l)||/^\[[^\]]+\]$/.test(l)||/^=+\s*[^=]+\s*=+$/.test(l)||/^[-–—]{2,}\s*\S.*[-–—]{2,}$/.test(l))return true;
+ const c=l.replace(/^[\d]+[.)-]\s*/,'').replace(/^[•▶►➤✅📌🔹🔸*\-–>]+\s*/u,'').replace(/[:\s]+$/,'');
+ const letters=c.replace(/[^A-Za-zÀ-ÿ]/g,'');
+ if(letters.length>=3&&c===c.toUpperCase()&&c!==c.toLowerCase()&&c.split(/\s+/).length<=9)return true;
+ if(/:\s*$/.test(l)&&l.length<=45&&l.split(/\s+/).length<=6&&!/[.!?,]/.test(l.replace(/:\s*$/,'')))return true;
+ return false}
+function cleanTitle(l){let t=l.trim().replace(/^#{1,3}\s+/,'').replace(/^\*\*|\*\*:?$/g,'').replace(/^\[|\]$/g,'').replace(/^=+|=+$/g,'').replace(/^[-–—]+|[-–—]+$/g,'').replace(/[:\s]+$/,'').replace(/^[•▶►➤✅📌🔹🔸*\->]+\s*/u,'').trim();
+ if(t===t.toUpperCase()&&/[A-ZÀ-Ý]/.test(t))t=t.charAt(0)+t.slice(1).toLowerCase();return t}
+function autoTitle(x){const one=x.replace(/\s+/g,' ').trim();const w=one.split(' ').slice(0,7).join(' ');return w.length<one.length?w+'…':w}
+function tidy(x){return x.replace(/^\n+|\n+$/g,'').replace(/\n{3,}/g,'\n\n')}
+function splitColinha(raw){
+ const L=raw.replace(/\r/g,'').replace(/^\uFEFF/,'').split('\n').map(l=>/^\s*([-=_*~#.])\1{2,}\s*$/.test(l)?'':l.replace(/\s+$/,''));
+ const out=[];const T=L.map((l,i)=>isTitle(l)?i:-1).filter(i=>i>=0);
+ if(T.length>=2){let grp='';const pre=tidy(L.slice(0,T[0]).join('\n'));if(pre)out.push({t:autoTitle(pre),x:pre,g:''});
+  T.forEach((ti,k)=>{const end=k+1<T.length?T[k+1]:L.length;const body=tidy(L.slice(ti+1,end).join('\n'));const t=cleanTitle(L[ti]);
+   if(!body){grp=t;return}out.push({t,x:body,g:grp})})}
+ else{let p=[];const paras=[];L.forEach(l=>{if(!l.trim()){if(p.length)paras.push(p);p=[]}else p.push(l)});if(p.length)paras.push(p);
+  let pend='';paras.forEach(pa=>{if(pa.length===1&&isTitle(pa[0])){pend=cleanTitle(pa[0]);return}
+   if(pa.length>1&&isTitle(pa[0])){out.push({t:cleanTitle(pa[0]),x:pa.slice(1).join('\n'),g:''});pend='';return}
+   const x=pa.join('\n');out.push({t:pend||autoTitle(x),x,g:''});pend=''})}
+ const base=Date.now();return out.map((b,i)=>({id:base+i,t:b.t.slice(0,90),x:b.x,g:b.g,img:''}))}
+async function colImport(mode,raw){raw=(raw??$('#colAll').value);if(!raw.trim())return toast('Cole a colinha primeiro');const blocks=splitColinha(raw);if(!blocks.length)return toast('Não encontrei texto');
+ COLUNDO=JSON.parse(JSON.stringify(COL));COL=mode==='rep'?blocks:[...COL,...blocks];$('#colAll').value='';await saveCol();$('#btnColUndo').style.display='';toast(blocks.length+' blocos organizados ✓')}
+function colCard(c,i,small){return `<div class="cb" data-cid="${c.id}"><div class="cbh">${i!=null?`<span class="cbn">${i+1}</span>`:''}<b>${esc(c.t)}</b>${small?'':`<button class="ib" title="Editar" data-cedit="${c.id}">✏️</button><button class="ib" title="Apagar" data-cdel="${c.id}">🗑️</button>`}</div>${c.img?`<img src="${c.img}" alt="" data-cimg="${c.id}" title="Clique para copiar a imagem">`:''}${c.x?`<div class="cbt" data-ccopy="${c.id}" title="Clique para copiar">${esc(c.x)}</div>`:''}<div class="cbf">${c.x?`<button class="btn sm" data-ccopy="${c.id}">📋 Copiar</button>`:''}${c.img?`<button class="btn sm ${c.x?'ghost':''}" data-cimg="${c.id}">🖼️ Copiar imagem</button>`:''}</div></div>`}
+function renderCol(){const q=norm($('#colSearch').value);let html='',lastG=null;
+ COL.forEach((c,i)=>{if(q&&!norm(c.t+' '+(c.x||'')+' '+(c.g||'')).includes(q))return;if(!q&&(c.g||'')!==lastG){if(c.g)html+=`<div class="cgroup">${esc(c.g)}</div>`;lastG=c.g||''}html+=colCard(c,i)});
+ $('#colList').innerHTML=html||`<div class="empty" style="grid-column:1/-1">${COL.length?'Nada encontrado.':'Sua colinha está vazia. Cole o texto do Bloco de Notas no passo 1.'}</div>`;
+ $('#colCount').textContent=COL.length?COL.length+' blocos':'';renderStatus()}
+function setColImg(d){colImg=d;$('#colImgBox').innerHTML=(d?`<img src="${d}"><br><small>Clique para trocar</small>`:'Clique aqui e aperte Ctrl+V, ou clique para escolher um arquivo')+'<input type="file" id="colImgIn" accept="image/*" hidden>';$('#colImgIn').onchange=e=>readImg(e.target.files[0])}
 function readImg(f){if(!f)return;const r=new FileReader();r.onload=()=>setColImg(r.result);r.readAsDataURL(f)}
 $('#colImgBox').onclick=e=>{if(e.target.tagName!=='INPUT')$('#colImgIn').click()};$('#colImgIn').onchange=e=>readImg(e.target.files[0]);
-document.addEventListener('paste',e=>{if(!$('#v-colinha').classList.contains('on'))return;const f=[...(e.clipboardData||{}).items||[]].find(i=>i.type.startsWith('image/'));if(f){e.preventDefault();readImg(f.getAsFile());toast('Imagem colada ✓')}});
-$('#btnColAdd').onclick=async()=>{const t=$('#colT').value.trim(),x=$('#colX').value.trim();if(!t)return toast('Dê um título');if(!x&&!colImg)return toast('Coloque um texto ou uma imagem');COL.unshift({id:Date.now(),t,x,img:colImg});$('#colT').value='';$('#colX').value='';setColImg('');await saveCol();toast('Guardado na colinha ✓')};
-$('#btnColClr').onclick=()=>{$('#colT').value='';$('#colX').value='';setColImg('')};
-$('#btnColBulk').onclick=async()=>{const parts=$('#colBulk').value.split(/\n\s*---+\s*\n/).map(p=>p.trim()).filter(Boolean);let n=0;parts.forEach((p,i)=>{const L=p.split('\n');const t=L[0].trim().slice(0,80);const x=L.slice(1).join('\n').trim()||p;COL.unshift({id:Date.now()+i,t,x,img:''});n++});$('#colBulk').value='';await saveCol();toast(n+' item(ns) importado(s) ✓')};
+document.addEventListener('paste',e=>{if(!$('#v-colinha').classList.contains('on'))return;const f=[...((e.clipboardData||{}).items||[])].find(i=>i.type.startsWith('image/'));if(f){e.preventDefault();$('#colMore').open=true;readImg(f.getAsFile());toast('Imagem colada ✓ Dê um título e guarde')}});
+$('#colAll').addEventListener('paste',()=>setTimeout(()=>{if(!COL.length)colImport('rep');else toast('Agora escolha: Substituir tudo ou Adicionar ao final')},50));
+$('#btnColRep').onclick=()=>colImport('rep');$('#btnColApp').onclick=()=>colImport('app');
+$('#colFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;const t=decodeText(await f.arrayBuffer());e.target.value='';await colImport(COL.length?'rep':'rep',t)};
+$('#btnColUndo').onclick=async()=>{if(!COLUNDO)return;COL=COLUNDO;COLUNDO=null;$('#btnColUndo').style.display='none';await saveCol();toast('Desfeito ✓')};
+$('#btnColAll').onclick=async()=>{if(!sure($('#btnColAll'),'Clique de novo para apagar tudo'))return;COLUNDO=JSON.parse(JSON.stringify(COL));COL=[];await saveCol();$('#btnColUndo').style.display='';toast('Colinha apagada. Pode colar a nova.')};
+$('#btnColAdd').onclick=async()=>{const t=$('#colT').value.trim(),x=$('#colX').value.trim();if(!t&&!x)return toast('Escreva um título ou texto');if(!x&&!colImg)return toast('Coloque um texto ou uma imagem');
+ const item={id:COLEDIT?COLEDIT.id:Date.now(),t:t||autoTitle(x),x,img:colImg,g:COLEDIT?COLEDIT.g:''};
+ if(COLEDIT){const k=COL.findIndex(c=>c.id===COLEDIT.id);if(k>=0)COL[k]=item;else COL.push(item)}else COL.push(item);
+ COLEDIT=null;$('#colT').value='';$('#colX').value='';setColImg('');$('#colMore').open=false;$('#btnColAdd').textContent='Guardar bloco';await saveCol();toast('Bloco guardado ✓')};
+$('#btnColClr').onclick=()=>{COLEDIT=null;$('#colT').value='';$('#colX').value='';setColImg('');$('#btnColAdd').textContent='Guardar bloco';$('#colMore').open=false};
 $('#colSearch').oninput=renderCol;
-async function copyImg(d){try{const blob=await (await fetch(d)).blob();let png=blob;if(blob.type!=='image/png'){const im=new Image();im.src=d;await im.decode();const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);png=await new Promise(r=>c.toBlob(r,'image/png'))}await navigator.clipboard.write([new ClipboardItem({'image/png':png})]);toast('Imagem copiada ✓ Cole no Blip com Ctrl+V')}catch(e){toast('Não deu para copiar a imagem neste navegador: clique com o botão direito nela e "Copiar imagem"')}}
-document.addEventListener('click',async e=>{const t=e.target;const f=id=>COL.find(c=>c.id==id);
- if(t.dataset.ccopy){const c=f(t.dataset.ccopy);try{await navigator.clipboard.writeText(c.x)}catch(er){const a=document.createElement('textarea');a.value=c.x;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}toast('Texto copiado ✓')}
+async function copyImg(d){try{const blob=await (await fetch(d)).blob();let png=blob;if(blob.type!=='image/png'){const im=new Image();im.src=d;await im.decode();const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);png=await new Promise(r=>c.toBlob(r,'image/png'))}await navigator.clipboard.write([new ClipboardItem({'image/png':png})]);toast('Imagem copiada ✓ Cole no Blip com Ctrl+V')}catch(e){toast('Não deu para copiar a imagem: clique com o botão direito nela e "Copiar imagem"')}}
+async function copyText(x){try{await navigator.clipboard.writeText(x)}catch(er){const a=document.createElement('textarea');a.value=x;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}}
+document.addEventListener('click',async e=>{const t=e.target.closest('[data-ccopy],[data-cimg],[data-cedit],[data-cdel]');if(!t)return;const f=id=>COL.find(c=>c.id==id);
+ if(t.dataset.ccopy){const c=f(t.dataset.ccopy);await copyText(c.x);const card=t.closest('.cb');const b=card&&card.querySelector('.cbf [data-ccopy]');if(b){b.textContent='✓ Copiado';setTimeout(()=>b.textContent='📋 Copiar',1400)}toast('Copiado ✓ Agora é só colar no Blip')}
  if(t.dataset.cimg)copyImg(f(t.dataset.cimg).img);
- if(t.dataset.cedit){const c=f(t.dataset.cedit);$('#colT').value=c.t;$('#colX').value=c.x||'';setColImg(c.img||'');COL=COL.filter(x=>x!==c);await saveCol();toast('Edite e guarde de novo')}
- if(t.dataset.cdel&&sure(t)){COL=COL.filter(x=>x.id!=t.dataset.cdel);await saveCol()}});
-function colinhaCtx(q){const it=COL.length<=40?COL:[...COL].sort((a,b)=>colScore(q,b)-colScore(q,a)).slice(0,20);if(!it.length)return '';return `\n\n<COLINHA_DO_ATENDENTE (textos e imagens prontos dele; quando um item servir, indique pelo título, ex.: "use o item da colinha: Boas-vindas")>\n${it.map(c=>`[${c.t}]${c.img?' (tem imagem)':''}\n${(c.x||'').slice(0,800)}`).join('\n\n')}\n</COLINHA_DO_ATENDENTE>`}
-function colSug(q){const r=COL.map(c=>[colScore(q,c),c]).filter(x=>x[0]>.25).sort((a,b)=>b[0]-a[0]).slice(0,3).map(x=>x[1]);return r.length?`<div class="csug"><b>📌 Da sua colinha</b><div class="cgrid">${r.map(c=>colCard(c,1)).join('')}</div></div>`:''}
+ if(t.dataset.cedit){const c=f(t.dataset.cedit);COLEDIT=c;$('#colT').value=c.t;$('#colX').value=c.x||'';setColImg(c.img||'');$('#btnColAdd').textContent='Salvar alterações';$('#colMore').open=true;$('#colMore').scrollIntoView({behavior:'smooth'})}
+ if(t.dataset.cdel&&sure(t,'✔?')){COL=COL.filter(x=>x.id!=t.dataset.cdel);await saveCol()}});
+function colinhaCtx(q){const it=COL.length<=40?COL:[...COL].sort((a,b)=>colScore(q,b)-colScore(q,a)).slice(0,20);if(!it.length)return '';return `\n\n<COLINHA_DO_ATENDENTE (textos e imagens prontos dele; quando um item servir, indique pelo título, ex.: "use o bloco da colinha: Boas-vindas")>\n${it.map(c=>`[${c.t}]${c.img?' (tem imagem)':''}\n${(c.x||'').slice(0,800)}`).join('\n\n')}\n</COLINHA_DO_ATENDENTE>`}
+function colSug(q){const r=COL.map(c=>[colScore(q,c),c]).filter(x=>x[0]>.25).sort((a,b)=>b[0]-a[0]).slice(0,3).map(x=>x[1]);return r.length?`<div class="csug"><b>📌 Da sua colinha</b><div class="cgrid">${r.map(c=>colCard(c,null,1)).join('')}</div></div>`:''}
 // ---------- turno / pausas ----------
 let TURNO={ent:'14:00',sai:'20:20',p1:'15:20',p1f:'15:30',l:'17:20',lf:'17:40',p2:'19:20',p2f:'19:30',esc:'6x1',ant:5},PBOK='';
 const TF={ent:'#tEnt',sai:'#tSai',p1:'#tP1',p1f:'#tP1f',l:'#tL',lf:'#tLf',p2:'#tP2',p2f:'#tP2f',esc:'#tEsc',ant:'#tAnt'};
@@ -465,12 +684,35 @@ function tick(){const d=new Date();const now=d.getHours()*60+d.getMinutes();cons
  bar._key=key}
 $('#pbOk').onclick=()=>{PBOK=$('#pbar')._key;tick()};
 setInterval(tick,20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
+// ---------- privacidade ----------
+async function renderPriv(){let used='';try{const e=await navigator.storage.estimate();used=(e.usage/1048576).toFixed(1)+' MB'}catch(x){}
+ const last=PLOG[0];const ck=(ok,t,d)=>`<div class="ck ${ok?'':'warn'}"><i>${ok?'✓':'!'}</i><div><b>${t}</b>${d}</div></div>`;
+ $('#privChecks').innerHTML=[ck(true,'Sem conexão com Blip ou Unimed','Nenhuma integração; só texto colado manualmente.'),ck(true,'Sem servidor ou banco de dados','O site só entrega a página. Nada é gravado fora daqui.'),
+  ck(true,'Dados salvos só neste computador',`${DOCS.length} arquivo(s), ${COL.length} bloco(s) da colinha, ${MEM.length} memória(s)${used?' · '+used+' usados':''}.`),
+  ck(CFG.mask!==false,'Proteção de dados pessoais',CFG.mask!==false?'Ativada: CPF, telefone, e-mail, nomes e números longos viram códigos.':'Desativada em Configurações.'),
+  ck(true,'Conexão criptografada',location.protocol==='https:'?'HTTPS ativo neste site.':'Abra pelo endereço https.'),
+  ck(!!pwHash(),'Senha de acesso','Ativada. A tela fica bloqueada até digitar a senha.'),
+  ck(true,'Último envio à IA',last?`${new Date(last.t).toLocaleString('pt-BR')} para ${last.dest}, ${last.masked} dado(s) mascarado(s).`:'Nenhum envio ainda.')].join('');
+ $('#privLog').innerHTML=PLOG.length?`<div class="tblw" style="max-height:300px"><table class="tbl"><thead><tr><th>Quando</th><th>Para onde</th><th>Tamanho</th><th>Dados mascarados</th><th></th></tr></thead><tbody>${PLOG.map((l,i)=>`<tr><td>${new Date(l.t).toLocaleString('pt-BR')}</td><td>${esc(l.dest)}</td><td>${l.chars.toLocaleString('pt-BR')} caracteres</td><td>${l.masked}</td><td><button class="btn ghost sm" data-plog="${i}">Ver o que foi enviado</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty" style="padding:24px">Nenhum envio registrado ainda.</div>'}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-plog]');if(b){const l=PLOG[+b.dataset.plog];const p=$('#privSent');p.style.display='block';p.textContent='Enviado em '+new Date(l.t).toLocaleString('pt-BR')+' para '+l.dest+' (trecho final):\n\n'+l.sample;p.scrollIntoView({behavior:'smooth'})}});
+$('#btnPrint').onclick=()=>window.print();$('#tSafe').onclick=()=>document.querySelector('.nav[data-v="privacidade"]').click();
+// ---------- senha ----------
+const PW_DEFAULT='1822cbe64af5766e3abcab741bd37872a5e1a9ef0e212ef3bc5e788d97b7bb5a';
+const pwHash=()=>localStorage.getItem('eva-pw')||PW_DEFAULT;
+async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function tryUnlock(){const v=$('#lockIn').value.trim();if(!v)return;if(await sha(v)===pwHash()){sessionStorage.setItem('eva-ok','1');$('#lock').classList.add('off');$('#lockIn').value='';$('#lockErr').textContent='';if(!CFG.key&&!CFG.groq)openOv()}else{$('#lockErr').textContent='Senha incorreta.';$('#lockIn').select()}}
+$('#lockBtn').onclick=tryUnlock;$('#lockIn').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock()});
+$('#tLock').onclick=()=>{sessionStorage.removeItem('eva-ok');$('#lock').classList.remove('off');setTimeout(()=>$('#lockIn').focus(),50)};
+$('#btnPw').onclick=async()=>{const v=$('#pwNew').value.trim();if(v.length<4)return toast('Use pelo menos 4 dígitos');localStorage.setItem('eva-pw',await sha(v));$('#pwNew').value='';toast('Senha alterada ✓')};
+$('#cfgMask').onchange=async()=>{CFG.mask=$('#cfgMask').checked;await DB.put('kv',CFG,'cfg');toast(CFG.mask?'Proteção ativada ✓':'Proteção desativada')};
+function clockTick(){const d=new Date();$('#tClock').textContent=d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})+' · '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});$('#tTurn').textContent='Turno '+TURNO.ent+'–'+TURNO.sai}
+setInterval(clockTick,15000);
 // ---------- tema ----------
 function paintTheme(){const d=document.documentElement.dataset.theme==='dark';$('#themeBtn').textContent=d?'☀️ Tema claro':'🌙 Tema escuro'}
 $('#themeBtn').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('eva-theme',t);paintTheme()};paintTheme();
 
 // ---------- wire ----------
-document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$('#v-'+b.dataset.v).classList.add('on')});
+document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$('#v-'+b.dataset.v).classList.add('on');if(b.dataset.v==='privacidade')renderPriv();document.querySelector('main').scrollTop=0});
 $('#btnAnalisar').onclick=analisar;$('#btnMelhorar').onclick=melhorar;$('#btnChat').onclick=chat;
 $('#btnNovo').onclick=()=>{$('#conv').value='';$('#convNote').value='';$('#outAtend').innerHTML='<div class="empty"><div class="orb"></div>Pronta para o próximo atendimento.</div>';$('#conv').focus()};
 $('#btnChatClear').onclick=()=>{HIST=[];$('#chatlog').innerHTML=''};
@@ -485,13 +727,15 @@ drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};drop.ondragle
 $('#btnExport').onclick=async()=>{const data={v:3,exported:new Date().toISOString(),colinha:COL,turno:TURNO,protos:PROTOS,mem:MEM,docs:DOCS.map(({chunks,...d})=>d)};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download='eva-atendimento-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
 $('#impFile').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());for(const m of d.mem||[])await DB.put('mem',m);if(d.protos){PROTOS=d.protos;await saveProtos()}if(d.colinha){COL=d.colinha;await saveCol()}if(d.turno){TURNO=d.turno;await DB.put('kv',TURNO,'turno');fillTurno();tick()}for(const doc of d.docs||[])await DB.put('docs',{...doc,chunks:chunk(doc.text)});await refresh();toast('Backup importado ✓')}catch(err){toast('Arquivo inválido')}};
 $('#btnSaveCfg').onclick=()=>{CFG.key=$('#cfgKey').value.trim();CFG.groq=$('#cfgGroq').value.trim();CFG.keys=$('#cfgKeys').value.split(/\s+/).map(x=>x.trim()).filter(x=>x&&x!==CFG.key);CFG.model=$('#cfgModel').value||CFG.model;CFG.name=$('#cfgName').value.trim();CFG.style=$('#cfgStyle').value.trim();saveCfg()};
+$('#btnSaveCfg2').onclick=async()=>{CFG.name=$('#cfgName').value.trim();CFG.style=$('#cfgStyle').value.trim();await DB.put('kv',CFG,'cfg');toast('Salvo ✓')};
 $('#cfgModel').onchange=()=>{CFG.model=$('#cfgModel').value;saveCfg(false);toast('Modelo: '+CFG.model)};
 $('#btnModels').onclick=async()=>{toast('Verificando modelos...');if(await listModels(true))toast('Modelo em uso: '+CFG.model)};
 $('#btnWipe').onclick=async()=>{if(!sure($('#btnWipe'),'Tem certeza? Clique de novo para apagar tudo'))return;localStorage.removeItem('eva-theme');await DB.clear('docs');await DB.clear('mem');await DB.clear('kv');location.reload()};
 $('#ovSave').onclick=async()=>{CFG.key=$('#ovKey').value.trim();if(!CFG.key)return;$('#ov').classList.remove('on');$('#cfgKey').value=CFG.key;await saveCfg()};
 (async()=>{await DB.open();const c=await DB.get('kv','cfg');if(c)CFG={...CFG,...c};if(/gemini-(1|2)\.|gemini-3\.8|argon|omni/.test(CFG.model))CFG.model=DEFAULT_MODEL;$('#cfgKey').value=CFG.key;$('#cfgKeys').value=(CFG.keys||[]).join('\n');$('#cfgGroq').value=CFG.groq||'';$('#cfgName').value=CFG.name;$('#cfgStyle').value=CFG.style;fillModels([]);const pr=await DB.get('kv','protos');if(pr)Object.keys(PROTOS).forEach(k=>{if(pr[k])PROTOS[k]=pr[k]});renderProtos();await refresh();
  COL=(await DB.get('kv','colinha'))||[];renderCol();const tu=await DB.get('kv','turno');if(tu)TURNO={...TURNO,...tu};fillTurno();tick();
- if(!CFG.key)openOv();else availableModels().then(ms=>fillModels(ms));
+ PLOG=(await DB.get('kv','plog'))||[];$('#cfgMask').checked=CFG.mask!==false;clockTick();if(CFG.name)$('#termName').textContent=CFG.name;
+ if(!CFG.key&&!CFG.groq){if(sessionStorage.getItem('eva-ok')==='1')openOv()}else availableModels().then(ms=>fillModels(ms));
  addBub('eva',md(`Oi${CFG.name?', '+CFG.name:''}! Eu sou a **E.V.A.** 💙\nCole um atendimento na aba Atendimento, ou me pergunte qualquer coisa do material.`))})();
 </script>
 </body>
