@@ -195,7 +195,8 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
   <p class="sub">A chave fica salva só neste navegador. Crie grátis em aistudio.google.com → Get API key.</p>
   <div class="card" style="max-width:640px">
     <label>Chave da API Gemini</label><input id="cfgKey" type="password" placeholder="AIza...">
-    <label>Chaves extras (opcional, uma por linha) — de outros projetos do Google, a E.V.A. alterna sozinha quando uma atinge o limite</label><textarea id="cfgKeys" rows="3" placeholder="AIza...\nAIza..."></textarea>
+    <label>Chave Groq de reserva (grátis, opcional) — usada automaticamente se o Gemini estiver no limite. Crie em console.groq.com/keys</label><input id="cfgGroq" type="password" placeholder="gsk_...">
+    <label>Chaves extras do Gemini (opcional, uma por linha) — de outros projetos do Google, a E.V.A. alterna sozinha quando uma atinge o limite</label><textarea id="cfgKeys" rows="3" placeholder="AIza...\nAIza..."></textarea>
     <label>Modelo</label><select id="cfgModel"></select>
     <div class="row"><button class="btn" id="btnSaveCfg">Salvar e testar</button><button class="btn ghost" id="btnModels">Atualizar lista de modelos</button></div>
     <label>Seu nome (para assinar mensagens, opcional)</label><input id="cfgName" placeholder="Gabriel">
@@ -267,13 +268,21 @@ async function tryStream(model,key,body,onText){const ac=new AbortController();l
   while(true){const {done,value}=await rd.read();if(done)break;arm();buf+=dec.decode(value,{stream:true});let i;while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith('data:'))continue;try{const j=JSON.parse(line.slice(5));if(j.error)return {err:j.error.code||500,text:JSON.stringify(j)};const t=partsText(j);if(t){got=true;all+=t;onText(all)}}catch(e){}}}
   clearTimeout(idle);return all?{ok:all}:{err:'empty',text:'sem resposta'}}
  catch(e){return {err:got?'cut':'timeout',text:'tempo esgotado'}}finally{clearTimeout(t0)}}
+let GROQM=null;
+async function groqModel(){if(GROQM)return GROQM;try{const r=await fetch('https://api.groq.com/openai/v1/models',{headers:{Authorization:'Bearer '+CFG.groq}});const j=await r.json();const ids=(j.data||[]).map(m=>m.id);
+ const pref=['openai/gpt-oss-120b','llama-3.3-70b-versatile','moonshotai/kimi-k2-instruct','qwen/qwen3-32b','openai/gpt-oss-20b','llama-3.1-8b-instant'];GROQM=pref.find(p=>ids.includes(p))||ids.find(i=>!/whisper|guard|tts|playai/.test(i))||'llama-3.3-70b-versatile'}catch(e){GROQM='llama-3.3-70b-versatile'}return GROQM}
+async function groq(sys,user,onText){const ac=new AbortController();const t0=setTimeout(()=>ac.abort(),45000);
+ try{const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+CFG.groq},signal:ac.signal,body:JSON.stringify({model:await groqModel(),stream:true,temperature:.4,max_tokens:3000,messages:[{role:'system',content:sys},{role:'user',content:user}]})});
+  if(!r.ok)return {err:r.status,text:await r.text()};const rd=r.body.getReader(),dec=new TextDecoder();let buf='',all='';
+  while(true){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith('data:')||line.includes('[DONE]'))continue;try{const t=JSON.parse(line.slice(5)).choices?.[0]?.delta?.content;if(t){all+=t;onText(all)}}catch(e){}}}
+  return all?{ok:all}:{err:'empty',text:'sem resposta'}}catch(e){return {err:'timeout',text:'tempo esgotado'}}finally{clearTimeout(t0)}}
 const COOL={};let NOTHINK=JSON.parse(localStorage.getItem('eva-nothink')||'{}');
 function retryAfter(t){const m=String(t).match(/retry(?:Delay)?["\s:]*["']?(\d+(?:\.\d+)?)s/i)||String(t).match(/in (\d+(?:\.\d+)?)s/i);return m?Math.min(90,parseFloat(m[1])+1)*1000:60000}
-async function gemini(prompt,onText,history=[]){if(!CFG.key){openOv();throw new Error('Configure a chave da API em Configurações.')}
+async function gemini(prompt,onText,history=[]){if(!CFG.key&&CFG.groq){busy(1);try{const g=await groq(SYS(),prompt,onText);if(g.ok)return g.ok;throw new Error(friendly(g.err,g.text))}finally{busy(-1)}}if(!CFG.key){openOv();throw new Error('Configure a chave da API em Configurações.')}
  busy(1);const histTxt=history.length?'<HISTORICO_DO_CHAT>\n'+history.map(h=>(h.role==='user'?'Atendente: ':'E.V.A.: ')+h.parts[0].text.slice(0,1500)).join('\n')+'\n</HISTORICO_DO_CHAT>\n\n':'';
  const base={systemInstruction:{parts:[{text:SYS()}]},contents:[{role:'user',parts:[{text:histTxt+prompt}]}]};
  try{const keys=[CFG.key,...(CFG.keys||[])].filter(Boolean);const ms=await availableModels();const models=[CFG.model,...ms.filter(m=>m!==CFG.model)].slice(0,6);
-  const combos=[];models.forEach(m=>keys.forEach(k=>combos.push([m,k])));let last=null,tries=0;
+  const combos=[];models.forEach(m=>keys.forEach(k=>combos.push([m,k])));let last=null,tries=0,saw429=false;
   for(let round=0;round<2;round++){
    for(const [m,k] of combos){const id=m+'|'+k.slice(-6);if(COOL[id]>Date.now()||COOL['dead|'+m])continue;if(++tries>5)break;
     const gc={temperature:.4,maxOutputTokens:3000};if(!NOTHINK[m])gc.thinkingConfig={thinkingBudget:0};
@@ -281,12 +290,14 @@ async function gemini(prompt,onText,history=[]){if(!CFG.key){openOv();throw new 
     if(!r.ok&&r.err===400&&gc.thinkingConfig){delete gc.thinkingConfig;r=await tryStream(m,k,{...base,generationConfig:gc},onText);if(r.ok){NOTHINK[m]=1;localStorage.setItem('eva-nothink',JSON.stringify(NOTHINK))}}
     if(r.ok){if(CFG.model!==m){CFG.model=m;await DB.put('kv',CFG,'cfg');fillModels(MODELS);renderStatus()}return r.ok}
     last=r;if(/API key not valid|API_KEY_INVALID/i.test(r.text)){COOL[id]=Date.now()+864e5;continue}
-    if(r.err===429||/RESOURCE_EXHAUSTED|quota/i.test(r.text)){COOL[id]=Date.now()+retryAfter(r.text);continue}
+    if(r.err===429||/RESOURCE_EXHAUSTED|quota/i.test(r.text)){saw429=true;COOL[id]=Date.now()+retryAfter(r.text);continue}
     if(r.err===404||/no longer available|not found|not supported/i.test(r.text)){COOL['dead|'+m]=1;continue}
     if(r.err===400){console.warn('EVA 400',m,r.text);COOL['dead|'+m]=1;continue}COOL[id]=Date.now()+20000}
+   if(CFG.groq){const g=await groq(SYS(),base.contents[0].parts[0].text,onText);if(g.ok)return g.ok;last=g}
    const wait=Math.min(...Object.values(COOL).filter(v=>v>Date.now()&&v<Date.now()+864e5).map(v=>v-Date.now()),Infinity);
    if(round===0&&isFinite(wait)&&wait<=35000){onText('<alerta>Muita demanda agora, tentando de novo em '+Math.ceil(wait/1000)+'s…</alerta>');await new Promise(r=>setTimeout(r,wait));tries=0}else break}
-  throw new Error(last?friendly(last.err,last.text)+(keys.length<2?' Dica: adicione chaves extras em Configurações ou ative o faturamento da chave para não ter limite.':''):'Não consegui conectar ao modelo.')}finally{busy(-1)}}
+  if(saw429&&last&&last.err!==429)last={err:429,text:''};
+  throw new Error(last?friendly(last.err,last.text)+(keys.length<2?' Para nunca travar: ative o faturamento da chave do Gemini ou adicione uma chave Groq grátis em Configurações.':''):'Não consegui conectar ao modelo.')}finally{busy(-1)}}
 function busy(d){BUSY=Math.max(0,BUSY+d);$('#orb').classList.toggle('busy',BUSY>0)}
 
 // ---------- render ----------
@@ -388,12 +399,12 @@ const drop=$('#drop');drop.onclick=()=>$('#fileIn').click();$('#fileIn').onchang
 drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};drop.ondragleave=()=>drop.classList.remove('over');drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');handleFiles(e.dataTransfer.files)};
 $('#btnExport').onclick=async()=>{const data={v:2,exported:new Date().toISOString(),protos:PROTOS,mem:MEM,docs:DOCS.map(({chunks,...d})=>d)};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download='eva-atendimento-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
 $('#impFile').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());for(const m of d.mem||[])await DB.put('mem',m);if(d.protos){PROTOS=d.protos;await saveProtos()}for(const doc of d.docs||[])await DB.put('docs',{...doc,chunks:chunk(doc.text)});await refresh();toast('Backup importado ✓')}catch(err){toast('Arquivo inválido')}};
-$('#btnSaveCfg').onclick=()=>{CFG.key=$('#cfgKey').value.trim();CFG.keys=$('#cfgKeys').value.split(/\s+/).map(x=>x.trim()).filter(x=>x&&x!==CFG.key);CFG.model=$('#cfgModel').value||CFG.model;CFG.name=$('#cfgName').value.trim();CFG.style=$('#cfgStyle').value.trim();saveCfg()};
+$('#btnSaveCfg').onclick=()=>{CFG.key=$('#cfgKey').value.trim();CFG.groq=$('#cfgGroq').value.trim();CFG.keys=$('#cfgKeys').value.split(/\s+/).map(x=>x.trim()).filter(x=>x&&x!==CFG.key);CFG.model=$('#cfgModel').value||CFG.model;CFG.name=$('#cfgName').value.trim();CFG.style=$('#cfgStyle').value.trim();saveCfg()};
 $('#cfgModel').onchange=()=>{CFG.model=$('#cfgModel').value;saveCfg(false);toast('Modelo: '+CFG.model)};
 $('#btnModels').onclick=async()=>{toast('Verificando modelos...');if(await listModels(true))toast('Modelo em uso: '+CFG.model)};
 $('#btnWipe').onclick=async()=>{if(!sure($('#btnWipe'),'Tem certeza? Clique de novo para apagar tudo'))return;localStorage.removeItem('eva-theme');await DB.clear('docs');await DB.clear('mem');await DB.clear('kv');location.reload()};
 $('#ovSave').onclick=async()=>{CFG.key=$('#ovKey').value.trim();if(!CFG.key)return;$('#ov').classList.remove('on');$('#cfgKey').value=CFG.key;await saveCfg()};
-(async()=>{await DB.open();const c=await DB.get('kv','cfg');if(c)CFG={...CFG,...c};if(/gemini-(1|2)\.|gemini-3\.8|argon|omni/.test(CFG.model))CFG.model=DEFAULT_MODEL;$('#cfgKey').value=CFG.key;$('#cfgKeys').value=(CFG.keys||[]).join('\n');$('#cfgName').value=CFG.name;$('#cfgStyle').value=CFG.style;fillModels([]);const pr=await DB.get('kv','protos');if(pr)Object.keys(PROTOS).forEach(k=>{if(pr[k])PROTOS[k]=pr[k]});renderProtos();await refresh();
+(async()=>{await DB.open();const c=await DB.get('kv','cfg');if(c)CFG={...CFG,...c};if(/gemini-(1|2)\.|gemini-3\.8|argon|omni/.test(CFG.model))CFG.model=DEFAULT_MODEL;$('#cfgKey').value=CFG.key;$('#cfgKeys').value=(CFG.keys||[]).join('\n');$('#cfgGroq').value=CFG.groq||'';$('#cfgName').value=CFG.name;$('#cfgStyle').value=CFG.style;fillModels([]);const pr=await DB.get('kv','protos');if(pr)Object.keys(PROTOS).forEach(k=>{if(pr[k])PROTOS[k]=pr[k]});renderProtos();await refresh();
  if(!CFG.key)openOv();else availableModels().then(ms=>fillModels(ms));
  addBub('eva',md(`Oi${CFG.name?', '+CFG.name:''}! Eu sou a **E.V.A.** 💙\nCole um atendimento na aba Atendimento, ou me pergunte qualquer coisa do material.`))})();
 </script>
