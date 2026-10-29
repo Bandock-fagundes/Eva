@@ -74,6 +74,18 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
 .item b{color:var(--pri2)}.item .row{margin-top:8px}
 .pill{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:99px;background:#fff;border:1px solid var(--line);color:var(--mut);margin-right:6px}
 .drop{border:1.5px dashed #d0d5dd;border-radius:10px;padding:26px;text-align:center;color:var(--mut);cursor:pointer;transition:.15s;background:var(--card2)}.drop:hover,.drop.over{border-color:var(--pri);color:var(--pri2);background:var(--priL)}
+.pbar{display:none;align-items:center;gap:16px;padding:16px 22px;border-radius:14px;margin:0 0 20px;border:2px solid var(--line);background:var(--card);font-size:17px;box-shadow:0 6px 18px rgba(16,24,40,.08)}
+.pbar.on{display:flex}.pbar .pi{font-size:30px}.pbar b{font-size:20px}.pbar .pt{flex:1;line-height:1.35}.pbar small{display:block;color:var(--mut);font-size:14px;margin-top:2px}
+.pbar.soon{background:#fff4e5;border-color:#f79009;color:#7a2e0e}.pbar.now{background:#e7f8ef;border-color:#12b76a;color:#05603a;animation:pul 1.6s ease-in-out 4}.pbar.back{background:#fef3f2;border-color:#f04438;color:#912018;animation:pul 1.6s ease-in-out 4}
+:root[data-theme=dark] .pbar.soon,:root[data-theme=dark] .pbar.now,:root[data-theme=dark] .pbar.back{background:var(--card);color:var(--tx)}
+@keyframes pul{50%{transform:scale(1.015);box-shadow:0 0 0 6px rgba(18,183,106,.18)}}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:14px}
+.citem{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card2);display:flex;flex-direction:column;gap:8px}
+.citem img{max-width:100%;max-height:180px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid var(--line)}
+.citem .ct{white-space:pre-wrap;font-size:14px;max-height:150px;overflow:auto}.citem h4{margin:0;font-size:15px}
+.csug{margin-top:16px;border-top:1px dashed var(--line);padding-top:12px}.csug .row{margin-top:6px}
+.pasteimg{border:2px dashed var(--line);border-radius:10px;padding:14px;text-align:center;color:var(--mut);cursor:pointer;margin-top:8px}
+.pasteimg img{max-height:140px;max-width:100%}
 .toast{position:fixed;bottom:22px;right:22px;background:#1d2939;color:#fff;padding:11px 16px;border-radius:10px;box-shadow:0 12px 24px rgba(16,24,40,.18);transform:translateY(120px);opacity:0;transition:.3s;z-index:9;font-size:14px}
 .toast.on{transform:none;opacity:1}
 .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}.stat div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}.stat b{display:block;font:600 20px Inter}.stat small{color:var(--mut);font-size:12px}
@@ -89,6 +101,7 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
   <button class="nav" data-v="chat"><i>💬</i><span>Chat com a E.V.A.</span></button>
   <button class="nav" data-v="melhorar"><i>✨</i><span>Melhorar mensagem</span></button>
   
+  <button class="nav" data-v="colinha"><i>📌</i><span>Colinha</span></button>
   <button class="nav" data-v="protocolos"><i>📝</i><span>Protocolos</span></button>
   <button class="nav" data-v="aprender"><i>🧠</i><span>Memória</span></button>
   <button class="nav" data-v="material"><i>📚</i><span>Material (Auxílio)</span></button>
@@ -97,6 +110,7 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
   <div class="status" id="status" style="margin-top:0"></div>
 </aside>
 <main>
+<div class="pbar" id="pbar"><div class="pi" id="pbIcon">⏰</div><div class="pt" id="pbText"></div><button class="btn ghost sm" id="pbOk">Ok, entendi</button></div>
 
 <section class="view on" id="v-atend">
   <h2>Atendimento em andamento</h2>
@@ -133,6 +147,24 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
   <div class="card chat">
     <div class="chatlog" id="chatlog"></div>
     <div class="chatbar"><textarea id="chatIn" rows="2" style="flex:1" placeholder="Converse com a E.V.A. para testar ou tirar dúvidas... (Enter envia)"></textarea><button class="btn" id="btnChat">Enviar</button><button class="btn ghost" id="btnChatClear">Limpar</button></div>
+  </div>
+</section>
+
+<section class="view" id="v-colinha">
+  <h2>Colinha</h2>
+  <p class="sub">Seus textos e imagens prontos para copiar e colar no Blip. A E.V.A. também consulta a colinha e sugere o item certo em cada atendimento.</p>
+  <div class="grid2">
+    <div class="card"><h3>➕ Adicionar item</h3>
+      <label>Título</label><input id="colT" placeholder="Ex.: Boas-vindas, Prazo de reembolso, Imagem do app">
+      <label>Texto (opcional)</label><textarea id="colX" rows="6" placeholder="Texto pronto para copiar..."></textarea>
+      <label>Imagem (opcional): cole com Ctrl+V aqui ou clique para escolher</label>
+      <div class="pasteimg" id="colImgBox" tabindex="0">Clique aqui e aperte Ctrl+V, ou clique para escolher um arquivo<input type="file" id="colImgIn" accept="image/*" hidden></div>
+      <div class="row"><button class="btn" id="btnColAdd">Guardar na colinha</button><button class="btn ghost" id="btnColClr">Limpar</button></div>
+      <label>Importar várias de uma vez (separe cada item com uma linha só com ---; a primeira linha vira o título)</label>
+      <textarea id="colBulk" rows="4" placeholder="Boas-vindas\nOlá! Tudo bem? ...\n---\nEncerramento\nAgradeço o contato..."></textarea>
+      <div class="row"><button class="btn ghost sm" id="btnColBulk">Importar textos</button></div>
+    </div>
+    <div class="card"><h3>📌 Minha colinha</h3><input id="colSearch" placeholder="Buscar na colinha..."><div class="cgrid" id="colList"></div></div>
   </div>
 </section>
 
@@ -201,6 +233,15 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
     <div class="row"><button class="btn" id="btnSaveCfg">Salvar e testar</button><button class="btn ghost" id="btnModels">Atualizar lista de modelos</button></div>
     <label>Seu nome (para assinar mensagens, opcional)</label><input id="cfgName" placeholder="Gabriel">
     <label>Instruções extras de estilo (opcional)</label><textarea id="cfgStyle" rows="3" placeholder="Ex.: sempre cumprimentar com 'Olá, tudo bem?' e usar o nome do cliente quando aparecer"></textarea>
+    <h3 style="margin-top:26px">⏰ Meus horários de trabalho</h3>
+    <p class="sub" style="margin:0">Aparece um aviso grande, sem som, no topo do site antes e durante cada pausa.</p>
+    <div class="grid2" style="gap:10px"><div><label>Entrada</label><input id="tEnt" type="time"></div><div><label>Saída</label><input id="tSai" type="time"></div>
+    <div><label>Pausa 10 (1) início</label><input id="tP1" type="time"></div><div><label>Pausa 10 (1) fim</label><input id="tP1f" type="time"></div>
+    <div><label>Lanche/Almoço início</label><input id="tL" type="time"></div><div><label>Lanche/Almoço fim</label><input id="tLf" type="time"></div>
+    <div><label>Pausa 10 (2) início</label><input id="tP2" type="time"></div><div><label>Pausa 10 (2) fim</label><input id="tP2f" type="time"></div></div>
+    <label>Escala</label><input id="tEsc" placeholder="6x1">
+    <label>Avisar quantos minutos antes</label><input id="tAnt" type="number" min="1" max="30">
+    <div class="row"><button class="btn" id="btnTurno">Salvar horários</button></div>
     <div class="row"><button class="btn danger sm" id="btnWipe">Apagar todos os dados deste navegador</button></div>
   </div>
 </section>
@@ -243,7 +284,7 @@ function context(query){const full=totalChars()<24000;let docPart='';let src=[];
  else if(DOCS.length){let hits=retrieve(query,8);let acc=0;hits=hits.filter(h=>(acc+=h.text.length)<26000);docPart=hits.map(h=>`=== ${h.name} (trecho ${h.j+1}) ===\n${h.text}`).join('\n\n');src=[...new Set(hits.map(h=>h.name))]}
  const mem=(MEM.length<=80?MEM:search(query,15).filter(h=>h.kind==='mem').map(h=>MEM.find(m=>m.id===h.id)).filter(Boolean));
  const memPart=mem.map(m=>`- Situação: ${m.q}\n  O que fazer: ${m.a}`).join('\n');
- return {text:`<MATERIAL_AUXILIO>\n${docPart||'(nenhum material carregado ainda — avise o atendente que não há material para consultar)'}\n</MATERIAL_AUXILIO>\n\n<MEMORIA_APRENDIDA (confirmada pela supervisão, tem prioridade sobre o material)>\n${memPart||'(vazia)'}\n</MEMORIA_APRENDIDA>`,src:[...src,...(mem.length?['Memória']:[])]}}
+ return {text:`<MATERIAL_AUXILIO>\n${docPart||'(nenhum material carregado ainda — avise o atendente que não há material para consultar)'}\n</MATERIAL_AUXILIO>\n\n<MEMORIA_APRENDIDA (confirmada pela supervisão, tem prioridade sobre o material)>\n${memPart||'(vazia)'}\n</MEMORIA_APRENDIDA>`+colinhaCtx(query)+`\n\n<HORARIOS_DO_ATENDENTE>Agora: ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}. Turno ${TURNO.ent}-${TURNO.sai}, escala ${TURNO.esc}. Pausa 10 (1): ${TURNO.p1}-${TURNO.p1f}. Lanche/Almoço: ${TURNO.l}-${TURNO.lf}. Pausa 10 (2): ${TURNO.p2}-${TURNO.p2f}.</HORARIOS_DO_ATENDENTE>`,src:[...src,...(mem.length?['Memória']:[])]}}
 
 // ---------- Gemini ----------
 const SYS=()=>`Você é a E.V.A. Atendimento, assistente pessoal e "supervisora de bolso" de ${CFG.name||'um atendente'} do SAC por chat de um plano de saúde (Unimed). Você nunca fala com o cliente: você orienta o atendente, que envia as mensagens.
@@ -315,7 +356,7 @@ function srcLine(src){return src.length?`<div class="src">Fontes consultadas: ${
 async function analisar(){const conv=$('#conv').value.trim();if(!conv)return toast('Cole a conversa primeiro');const out=$('#outAtend');out.innerHTML=typing;
  const c=context(conv.slice(-3000)+' '+$('#convNote').value);
  const p=`${c.text}\n\n<CONVERSA_DO_ATENDIMENTO>\n${conv}\n</CONVERSA_DO_ATENDIMENTO>\n${$('#convNote').value?'\nNota do atendente: '+$('#convNote').value:''}\n\nAnalise como uma supervisora experiente e responda exatamente nesta estrutura:\n### Situação\n(1-2 linhas: o que o cliente quer e em que ponto o atendimento está)\n### Como o cliente está\n(sentimento e cuidado necessário, 1 linha)\n### O que fazer agora\n(passos objetivos baseados no material; cite o documento)\n<msg>melhor próxima mensagem para enviar agora</msg>\n<msg>alternativa mais curta</msg>\n### Atenção\n(o que evitar, informação faltando, ou <alerta> se não encontrou no material)`;
- try{await gemini(p,t=>out.innerHTML=md(t));out.innerHTML+=srcLine(c.src)}catch(e){out.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}}
+ try{await gemini(p,t=>out.innerHTML=md(t));out.innerHTML+=srcLine(c.src)+colSug(conv.slice(-1500)+' '+$('#convNote').value)}catch(e){out.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}}
 async function melhorar(){const d=$('#draft').value.trim();if(!d)return toast('Escreva o rascunho');const out=$('#outMelhorar');out.innerHTML=typing;const c=context(d+' '+$('#draftCtx').value);
  const p=`${c.text}\n\n${$('#draftCtx').value?'<CONTEXTO>\n'+$('#draftCtx').value+'\n</CONTEXTO>\n':''}Rascunho do atendente:\n"""${d}"""\n\nReescreva como mensagem final ao cliente: acolhedora, educada, clara, mantendo o sentido. Se algo do rascunho contradizer o material, avise em <alerta>. Responda só com:\n<msg>versão principal</msg>\n<msg>versão mais curta</msg>`;
  try{await gemini(p,t=>out.innerHTML=md(t))}catch(e){out.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}}
@@ -380,6 +421,50 @@ $('#btnProtoRules').onclick=async()=>{PROTOS[PT].rules=$('#protoRules').value.tr
 $('#btnProto').onclick=gerarProto;$('#btnProtoClear').onclick=()=>{$('#protoInfo').value='';$('#protoConv').value='';$('#outProto').innerHTML=''};
 ['#protoInfo','#protoConv'].forEach(s=>ctrlEnter($(s),gerarProto));
 document.addEventListener('click',async e=>{if(e.target.dataset.delex&&sure(e.target)){PROTOS[PT].ex=PROTOS[PT].ex.filter(x=>x.id!=e.target.dataset.delex);await saveProtos()}});
+// ---------- colinha ----------
+let COL=[],colImg='';
+async function saveCol(){await DB.put('kv',COL,'colinha');renderCol()}
+function colScore(q,c){const qt=new Set(toks(q));if(!qt.size)return 0;const ct=toks(c.t+' '+(c.x||''));let s=0;ct.forEach(w=>{if(qt.has(w))s++});return s/Math.sqrt(ct.length+3)}
+function colCard(c,small){return `<div class="citem"><h4>${esc(c.t)}</h4>${c.img?`<img src="${c.img}" alt="">`:''}${c.x?`<div class="ct">${esc(c.x)}</div>`:''}<div class="row">${c.x?`<button class="btn sm" data-ccopy="${c.id}">📋 Copiar texto</button>`:''}${c.img?`<button class="btn sm" data-cimg="${c.id}">🖼️ Copiar imagem</button>`:''}${small?'':`<button class="btn ghost sm" data-cedit="${c.id}">Editar</button><button class="btn danger sm" data-cdel="${c.id}">Apagar</button>`}</div></div>`}
+function renderCol(){const q=norm($('#colSearch').value);const it=COL.filter(c=>!q||norm(c.t+' '+(c.x||'')).includes(q));$('#colList').innerHTML=it.length?it.map(c=>colCard(c)).join(''):'<div class="empty">Nada na colinha ainda.</div>';renderStatus()}
+function setColImg(d){colImg=d;$('#colImgBox').innerHTML=d?`<img src="${d}"><br><small>Clique para trocar</small>`:'Clique aqui e aperte Ctrl+V, ou clique para escolher um arquivo';if(!$('#colImgIn'))$('#colImgBox').insertAdjacentHTML('beforeend','<input type="file" id="colImgIn" accept="image/*" hidden>');$('#colImgIn').onchange=e=>readImg(e.target.files[0])}
+function readImg(f){if(!f)return;const r=new FileReader();r.onload=()=>setColImg(r.result);r.readAsDataURL(f)}
+$('#colImgBox').onclick=e=>{if(e.target.tagName!=='INPUT')$('#colImgIn').click()};$('#colImgIn').onchange=e=>readImg(e.target.files[0]);
+document.addEventListener('paste',e=>{if(!$('#v-colinha').classList.contains('on'))return;const f=[...(e.clipboardData||{}).items||[]].find(i=>i.type.startsWith('image/'));if(f){e.preventDefault();readImg(f.getAsFile());toast('Imagem colada ✓')}});
+$('#btnColAdd').onclick=async()=>{const t=$('#colT').value.trim(),x=$('#colX').value.trim();if(!t)return toast('Dê um título');if(!x&&!colImg)return toast('Coloque um texto ou uma imagem');COL.unshift({id:Date.now(),t,x,img:colImg});$('#colT').value='';$('#colX').value='';setColImg('');await saveCol();toast('Guardado na colinha ✓')};
+$('#btnColClr').onclick=()=>{$('#colT').value='';$('#colX').value='';setColImg('')};
+$('#btnColBulk').onclick=async()=>{const parts=$('#colBulk').value.split(/\n\s*---+\s*\n/).map(p=>p.trim()).filter(Boolean);let n=0;parts.forEach((p,i)=>{const L=p.split('\n');const t=L[0].trim().slice(0,80);const x=L.slice(1).join('\n').trim()||p;COL.unshift({id:Date.now()+i,t,x,img:''});n++});$('#colBulk').value='';await saveCol();toast(n+' item(ns) importado(s) ✓')};
+$('#colSearch').oninput=renderCol;
+async function copyImg(d){try{const blob=await (await fetch(d)).blob();let png=blob;if(blob.type!=='image/png'){const im=new Image();im.src=d;await im.decode();const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);png=await new Promise(r=>c.toBlob(r,'image/png'))}await navigator.clipboard.write([new ClipboardItem({'image/png':png})]);toast('Imagem copiada ✓ Cole no Blip com Ctrl+V')}catch(e){toast('Não deu para copiar a imagem neste navegador: clique com o botão direito nela e "Copiar imagem"')}}
+document.addEventListener('click',async e=>{const t=e.target;const f=id=>COL.find(c=>c.id==id);
+ if(t.dataset.ccopy){const c=f(t.dataset.ccopy);try{await navigator.clipboard.writeText(c.x)}catch(er){const a=document.createElement('textarea');a.value=c.x;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}toast('Texto copiado ✓')}
+ if(t.dataset.cimg)copyImg(f(t.dataset.cimg).img);
+ if(t.dataset.cedit){const c=f(t.dataset.cedit);$('#colT').value=c.t;$('#colX').value=c.x||'';setColImg(c.img||'');COL=COL.filter(x=>x!==c);await saveCol();toast('Edite e guarde de novo')}
+ if(t.dataset.cdel&&sure(t)){COL=COL.filter(x=>x.id!=t.dataset.cdel);await saveCol()}});
+function colinhaCtx(q){const it=COL.length<=40?COL:[...COL].sort((a,b)=>colScore(q,b)-colScore(q,a)).slice(0,20);if(!it.length)return '';return `\n\n<COLINHA_DO_ATENDENTE (textos e imagens prontos dele; quando um item servir, indique pelo título, ex.: "use o item da colinha: Boas-vindas")>\n${it.map(c=>`[${c.t}]${c.img?' (tem imagem)':''}\n${(c.x||'').slice(0,800)}`).join('\n\n')}\n</COLINHA_DO_ATENDENTE>`}
+function colSug(q){const r=COL.map(c=>[colScore(q,c),c]).filter(x=>x[0]>.25).sort((a,b)=>b[0]-a[0]).slice(0,3).map(x=>x[1]);return r.length?`<div class="csug"><b>📌 Da sua colinha</b><div class="cgrid">${r.map(c=>colCard(c,1)).join('')}</div></div>`:''}
+// ---------- turno / pausas ----------
+let TURNO={ent:'14:00',sai:'20:20',p1:'15:20',p1f:'15:30',l:'17:20',lf:'17:40',p2:'19:20',p2f:'19:30',esc:'6x1',ant:5},PBOK='';
+const TF={ent:'#tEnt',sai:'#tSai',p1:'#tP1',p1f:'#tP1f',l:'#tL',lf:'#tLf',p2:'#tP2',p2f:'#tP2f',esc:'#tEsc',ant:'#tAnt'};
+function fillTurno(){Object.entries(TF).forEach(([k,s])=>$(s).value=TURNO[k]??'')}
+$('#btnTurno').onclick=async()=>{Object.entries(TF).forEach(([k,s])=>TURNO[k]=$(s).value);TURNO.ant=+TURNO.ant||5;await DB.put('kv',TURNO,'turno');PBOK='';tick();toast('Horários salvos ✓')};
+const mins=h=>{if(!h)return null;const [a,b]=h.split(':').map(Number);return a*60+b};const fmt=m=>Math.floor(m/60)+'h'+(m%60?String(m%60).padStart(2,'0'):'');const rel=m=>m<60?m+' min':fmt(m);
+let baseTitle=document.title,flash=null;
+function tick(){const d=new Date();const now=d.getHours()*60+d.getMinutes();const T=TURNO;
+ const ps=[['Pausa 10 (1)',T.p1,T.p1f,'☕'],['Lanche/Almoço',T.l,T.lf,'🍽️'],['Pausa 10 (2)',T.p2,T.p2f,'☕']].map(([n,a,b,i])=>({n,a:mins(a),b:mins(b),i,ha:a,hb:b})).filter(p=>p.a!=null&&p.b!=null);
+ let st='',icon='⏰',txt='';const ant=+T.ant||5;
+ const cur=ps.find(p=>now>=p.a&&now<p.b),nxt=ps.find(p=>p.a>now);
+ if(cur){st='now';icon=cur.i;txt=`<b>Você está na ${cur.n} agora</b><small>Volte às ${cur.hb} (faltam ${rel(cur.b-now)}).</small>`}
+ else if(ps.some(p=>now>=p.b&&now<p.b+2)){const p=ps.find(p=>now>=p.b&&now<p.b+2);st='back';icon='🔔';txt=`<b>Fim da ${p.n}: hora de voltar!</b><small>Pausa terminou às ${p.hb}.</small>`}
+ else if(nxt&&nxt.a-now<=ant){st='soon';icon=nxt.i;txt=`<b>${nxt.n} em ${rel(nxt.a-now)} (às ${nxt.ha})</b><small>Prepare-se para encerrar o atendimento atual.</small>`}
+ else if(nxt){icon='⏰';txt=`<b>Próxima: ${nxt.n} às ${nxt.ha}</b><small>Faltam ${rel(nxt.a-now)} · Turno ${T.ent}–${T.sai} · Escala ${T.esc||''}${ps.length?' · Pausas: '+ps.map(p=>p.ha).join(', '):''}</small>`}
+ else{icon='✅';txt=`<b>Sem mais pausas hoje</b><small>Turno ${T.ent}–${T.sai}${mins(T.sai)>now?' · saída em '+rel(mins(T.sai)-now):''}</small>`}
+ const key=st+'|'+(cur||nxt||{}).n;const bar=$('#pbar');
+ $('#pbIcon').textContent=icon;$('#pbText').innerHTML=txt;bar.className='pbar'+(st?' '+st:'')+(PBOK===key?'':' on');
+ clearInterval(flash);document.title=baseTitle;if(st&&PBOK!==key){let f=0;const msg=st==='now'?'☕ PAUSA AGORA':st==='back'?'🔔 VOLTAR DA PAUSA':'⏰ PAUSA EM BREVE';flash=setInterval(()=>{document.title=(f++%2)?baseTitle:msg},1200)}
+ bar._key=key}
+$('#pbOk').onclick=()=>{PBOK=$('#pbar')._key;tick()};
+setInterval(tick,20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
 // ---------- tema ----------
 function paintTheme(){const d=document.documentElement.dataset.theme==='dark';$('#themeBtn').textContent=d?'☀️ Tema claro':'🌙 Tema escuro'}
 $('#themeBtn').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('eva-theme',t);paintTheme()};paintTheme();
@@ -397,14 +482,15 @@ $('#memSearch').oninput=renderMem;$('#docSearch').oninput=renderDocs;
 $('#btnPaste').onclick=async()=>{const t=$('#pasteTxt').value.trim();if(!t)return toast('Cole o texto');await saveDoc($('#pasteName').value||'Texto colado',t);$('#pasteTxt').value=''};
 const drop=$('#drop');drop.onclick=()=>$('#fileIn').click();$('#fileIn').onchange=e=>handleFiles(e.target.files);
 drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};drop.ondragleave=()=>drop.classList.remove('over');drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');handleFiles(e.dataTransfer.files)};
-$('#btnExport').onclick=async()=>{const data={v:2,exported:new Date().toISOString(),protos:PROTOS,mem:MEM,docs:DOCS.map(({chunks,...d})=>d)};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download='eva-atendimento-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
-$('#impFile').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());for(const m of d.mem||[])await DB.put('mem',m);if(d.protos){PROTOS=d.protos;await saveProtos()}for(const doc of d.docs||[])await DB.put('docs',{...doc,chunks:chunk(doc.text)});await refresh();toast('Backup importado ✓')}catch(err){toast('Arquivo inválido')}};
+$('#btnExport').onclick=async()=>{const data={v:3,exported:new Date().toISOString(),colinha:COL,turno:TURNO,protos:PROTOS,mem:MEM,docs:DOCS.map(({chunks,...d})=>d)};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download='eva-atendimento-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
+$('#impFile').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());for(const m of d.mem||[])await DB.put('mem',m);if(d.protos){PROTOS=d.protos;await saveProtos()}if(d.colinha){COL=d.colinha;await saveCol()}if(d.turno){TURNO=d.turno;await DB.put('kv',TURNO,'turno');fillTurno();tick()}for(const doc of d.docs||[])await DB.put('docs',{...doc,chunks:chunk(doc.text)});await refresh();toast('Backup importado ✓')}catch(err){toast('Arquivo inválido')}};
 $('#btnSaveCfg').onclick=()=>{CFG.key=$('#cfgKey').value.trim();CFG.groq=$('#cfgGroq').value.trim();CFG.keys=$('#cfgKeys').value.split(/\s+/).map(x=>x.trim()).filter(x=>x&&x!==CFG.key);CFG.model=$('#cfgModel').value||CFG.model;CFG.name=$('#cfgName').value.trim();CFG.style=$('#cfgStyle').value.trim();saveCfg()};
 $('#cfgModel').onchange=()=>{CFG.model=$('#cfgModel').value;saveCfg(false);toast('Modelo: '+CFG.model)};
 $('#btnModels').onclick=async()=>{toast('Verificando modelos...');if(await listModels(true))toast('Modelo em uso: '+CFG.model)};
 $('#btnWipe').onclick=async()=>{if(!sure($('#btnWipe'),'Tem certeza? Clique de novo para apagar tudo'))return;localStorage.removeItem('eva-theme');await DB.clear('docs');await DB.clear('mem');await DB.clear('kv');location.reload()};
 $('#ovSave').onclick=async()=>{CFG.key=$('#ovKey').value.trim();if(!CFG.key)return;$('#ov').classList.remove('on');$('#cfgKey').value=CFG.key;await saveCfg()};
 (async()=>{await DB.open();const c=await DB.get('kv','cfg');if(c)CFG={...CFG,...c};if(/gemini-(1|2)\.|gemini-3\.8|argon|omni/.test(CFG.model))CFG.model=DEFAULT_MODEL;$('#cfgKey').value=CFG.key;$('#cfgKeys').value=(CFG.keys||[]).join('\n');$('#cfgGroq').value=CFG.groq||'';$('#cfgName').value=CFG.name;$('#cfgStyle').value=CFG.style;fillModels([]);const pr=await DB.get('kv','protos');if(pr)Object.keys(PROTOS).forEach(k=>{if(pr[k])PROTOS[k]=pr[k]});renderProtos();await refresh();
+ COL=(await DB.get('kv','colinha'))||[];renderCol();const tu=await DB.get('kv','turno');if(tu)TURNO={...TURNO,...tu};fillTurno();tick();
  if(!CFG.key)openOv();else availableModels().then(ms=>fillModels(ms));
  addBub('eva',md(`Oi${CFG.name?', '+CFG.name:''}! Eu sou a **E.V.A.** 💙\nCole um atendimento na aba Atendimento, ou me pergunte qualquer coisa do material.`))})();
 </script>
