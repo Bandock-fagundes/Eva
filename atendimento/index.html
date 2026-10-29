@@ -256,7 +256,7 @@ function friendly(code,t){let m=t;try{m=JSON.parse(t).error.message}catch(e){}
  if(code===429)return 'Limite de uso da chave atingido por agora. Espere 1 minuto e tente de novo.';
  if(/API key/i.test(m))return 'Chave da API inválida. Confira em Configurações.';
  if(code===403)return 'A chave não tem permissão para este modelo. Troque em Configurações.';
- return String(m).slice(0,300)}
+ return String(m).slice(0,300)+' ['+code+']'}
 const BASE='https://generativelanguage.googleapis.com/v1beta/models/';
 function partsText(j){return (j.candidates?.[0]?.content?.parts||[]).filter(p=>!p.thought).map(p=>p.text||'').join('')}
 async function tryStream(model,key,body,onText){const ac=new AbortController();let got=false;const t0=setTimeout(()=>{if(!got)ac.abort()},15000);
@@ -270,19 +270,20 @@ async function tryStream(model,key,body,onText){const ac=new AbortController();l
 const COOL={};let NOTHINK=JSON.parse(localStorage.getItem('eva-nothink')||'{}');
 function retryAfter(t){const m=String(t).match(/retry(?:Delay)?["\s:]*["']?(\d+(?:\.\d+)?)s/i)||String(t).match(/in (\d+(?:\.\d+)?)s/i);return m?Math.min(90,parseFloat(m[1])+1)*1000:60000}
 async function gemini(prompt,onText,history=[]){if(!CFG.key){openOv();throw new Error('Configure a chave da API em Configurações.')}
- busy(1);const base={systemInstruction:{parts:[{text:SYS()}]},contents:[...history,{role:'user',parts:[{text:prompt}]}]};
+ busy(1);const histTxt=history.length?'<HISTORICO_DO_CHAT>\n'+history.map(h=>(h.role==='user'?'Atendente: ':'E.V.A.: ')+h.parts[0].text.slice(0,1500)).join('\n')+'\n</HISTORICO_DO_CHAT>\n\n':'';
+ const base={systemInstruction:{parts:[{text:SYS()}]},contents:[{role:'user',parts:[{text:histTxt+prompt}]}]};
  try{const keys=[CFG.key,...(CFG.keys||[])].filter(Boolean);const ms=await availableModels();const models=[CFG.model,...ms.filter(m=>m!==CFG.model)].slice(0,6);
   const combos=[];models.forEach(m=>keys.forEach(k=>combos.push([m,k])));let last=null,tries=0;
   for(let round=0;round<2;round++){
-   for(const [m,k] of combos){const id=m+'|'+k.slice(-6);if(COOL[id]>Date.now()||COOL['dead|'+m])continue;if(++tries>8)break;
+   for(const [m,k] of combos){const id=m+'|'+k.slice(-6);if(COOL[id]>Date.now()||COOL['dead|'+m])continue;if(++tries>5)break;
     const gc={temperature:.4,maxOutputTokens:3000};if(!NOTHINK[m])gc.thinkingConfig={thinkingBudget:0};
     let r=await tryStream(m,k,{...base,generationConfig:gc},onText);
-    if(!r.ok&&r.err===400&&gc.thinkingConfig&&/thinking/i.test(r.text)){NOTHINK[m]=1;localStorage.setItem('eva-nothink',JSON.stringify(NOTHINK));delete gc.thinkingConfig;r=await tryStream(m,k,{...base,generationConfig:gc},onText)}
+    if(!r.ok&&r.err===400&&gc.thinkingConfig){delete gc.thinkingConfig;r=await tryStream(m,k,{...base,generationConfig:gc},onText);if(r.ok){NOTHINK[m]=1;localStorage.setItem('eva-nothink',JSON.stringify(NOTHINK))}}
     if(r.ok){if(CFG.model!==m){CFG.model=m;await DB.put('kv',CFG,'cfg');fillModels(MODELS);renderStatus()}return r.ok}
     last=r;if(/API key not valid|API_KEY_INVALID/i.test(r.text)){COOL[id]=Date.now()+864e5;continue}
     if(r.err===429||/RESOURCE_EXHAUSTED|quota/i.test(r.text)){COOL[id]=Date.now()+retryAfter(r.text);continue}
     if(r.err===404||/no longer available|not found|not supported/i.test(r.text)){COOL['dead|'+m]=1;continue}
-    COOL[id]=Date.now()+20000}
+    if(r.err===400){console.warn('EVA 400',m,r.text);COOL['dead|'+m]=1;continue}COOL[id]=Date.now()+20000}
    const wait=Math.min(...Object.values(COOL).filter(v=>v>Date.now()&&v<Date.now()+864e5).map(v=>v-Date.now()),Infinity);
    if(round===0&&isFinite(wait)&&wait<=35000){onText('<alerta>Muita demanda agora, tentando de novo em '+Math.ceil(wait/1000)+'s…</alerta>');await new Promise(r=>setTimeout(r,wait));tries=0}else break}
   throw new Error(last?friendly(last.err,last.text)+(keys.length<2?' Dica: adicione chaves extras em Configurações ou ative o faturamento da chave para não ter limite.':''):'Não consegui conectar ao modelo.')}finally{busy(-1)}}
