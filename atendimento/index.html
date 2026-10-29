@@ -597,9 +597,9 @@ function wsAoa(ws){const a=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defva
 function sheetBlocks(aoa){let rows=aoa.map(r=>(r||[]).map(cellTxt));const w=Math.max(0,...rows.map(r=>r.length));const keep=[];for(let c=0;c<w;c++)if(rows.some(r=>r[c]))keep.push(c);rows=rows.map(r=>keep.map(c=>r[c]||''));
  const nz=r=>r.filter(Boolean).length;const blocks=[];let cur=null,title='';
  rows.forEach((r,i)=>{const n=nz(r);if(!n){cur=null;return}
-  if(n===1&&w>=2&&keep.length>=2){const t=r.find(Boolean);if(cur&&cur.rows.length){cur={title:t,header:cur.header,rows:[],cat:1};blocks.push(cur);return}if(!cur){title=t;return}}
+  if(n===1&&w>=2&&keep.length>=2){const t=r.find(Boolean);if(cur){if(!cur.rows.length&&!cur.title&&blocks[blocks.length-1]===cur){cur.title=t;cur.cat=0;return}cur={title:t,header:cur.header,rows:[],cat:1};blocks.push(cur);return}if(!cur){title=t;return}}
   if(!cur){cur={title,header:r,rows:[]};blocks.push(cur);title='';return}cur.rows.push(r)});
- const bl=blocks.filter(b=>b.rows.length||!b.cat);
+ const bl=blocks.filter((b,i)=>b.rows.length||!(b.cat||(blocks[i+1]&&blocks[i+1].header===b.header)));
  return {rows:rows.filter(r=>nz(r)),blocks:bl}}
 async function parseXlsx(buf){if(!window.XLSX)await loadLib('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
  const wb=XLSX.read(buf,{type:'array',cellDates:true});return wb.SheetNames.map(n=>{const b=sheetBlocks(wsAoa(wb.Sheets[n]));return {name:n,rows:b.rows,blocks:b.blocks}}).filter(x=>x.rows.length)}
