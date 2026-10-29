@@ -219,7 +219,7 @@ clear(s){return new Promise(r=>{const q=this.tx(s,'readwrite').clear();q.onsucce
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2600)};
-const DEFAULT_MODEL='gemini-3.8-flash';
+const DEFAULT_MODEL='gemini-3.6-flash';
 let CFG={key:'',model:DEFAULT_MODEL,name:'',style:''},DOCS=[],MEM=[],INDEX=null;
 
 // ---------- search (BM25) ----------
@@ -250,29 +250,38 @@ REGRAS DE VERDADE: baseie procedimentos, prazos, regras e soluções SOMENTE no 
 A conversa colada vem sem indicar quem falou; deduza pelo conteúdo quem é cliente e quem é atendente, e acompanhe o atendimento do início ao fim.
 ${CFG.style?'Preferências do atendente: '+CFG.style:''}
 Toda mensagem pronta para enviar ao cliente deve vir entre as tags <msg> e </msg> (uma mensagem por tag). Use <alerta>...</alerta> para avisos de informação não encontrada ou riscos. Use títulos com "### " e listas com "- ". Seja rápida e direta.`;
-let ctrl=null;
+let BUSY=0;
 function friendly(code,t){let m=t;try{m=JSON.parse(t).error.message}catch(e){}
- if(code===429)return 'Limite de uso da chave atingido por agora. Espere 1 minuto e tente de novo (ou troque o modelo em Configurações).';
- if(code===400&&/API key/i.test(m))return 'Chave da API inválida. Confira em Configurações.';
- if(code===403)return 'A chave não tem permissão para este modelo. Confira em Configurações.';
- return m.slice(0,300)}
-async function callStream(body,signal){const url=`https://generativelanguage.googleapis.com/v1beta/models/${CFG.model}:streamGenerateContent?alt=sse`;
- return fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':CFG.key},body:JSON.stringify(body),signal})}
+ if(code===429)return 'Limite de uso da chave atingido por agora. Espere 1 minuto e tente de novo.';
+ if(/API key/i.test(m))return 'Chave da API inválida. Confira em Configurações.';
+ if(code===403)return 'A chave não tem permissão para este modelo. Troque em Configurações.';
+ return String(m).slice(0,300)}
+const BASE='https://generativelanguage.googleapis.com/v1beta/models/';
+function partsText(j){return (j.candidates?.[0]?.content?.parts||[]).filter(p=>!p.thought).map(p=>p.text||'').join('')}
+async function tryStream(model,body,onText){const ac=new AbortController();let got=false;const t0=setTimeout(()=>{if(!got)ac.abort()},20000);
+ try{const r=await fetch(BASE+model+':streamGenerateContent?alt=sse',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':CFG.key},body:JSON.stringify(body),signal:ac.signal});
+  if(!r.ok)return {err:r.status,text:await r.text()};
+  const rd=r.body.getReader(),dec=new TextDecoder();let buf='',all='';let idle;
+  const arm=()=>{clearTimeout(idle);idle=setTimeout(()=>ac.abort(),30000)};arm();
+  while(true){const {done,value}=await rd.read();if(done)break;arm();buf+=dec.decode(value,{stream:true});let i;while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith('data:'))continue;try{const j=JSON.parse(line.slice(5));if(j.error)return {err:j.error.code||500,text:JSON.stringify(j)};const t=partsText(j);if(t){got=true;all+=t;onText(all)}}catch(e){}}}
+  clearTimeout(idle);return all?{ok:all}:{err:'empty',text:'sem resposta'}}
+ catch(e){return {err:'timeout',text:'tempo esgotado'}}finally{clearTimeout(t0)}}
+async function tryPlain(model,body,onText){const ac=new AbortController();const t0=setTimeout(()=>ac.abort(),45000);
+ try{const r=await fetch(BASE+model+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':CFG.key},body:JSON.stringify(body),signal:ac.signal});const tx=await r.text();
+  if(!r.ok)return {err:r.status,text:tx};const t=partsText(JSON.parse(tx));if(!t)return {err:'empty',text:'sem resposta'};onText(t);return {ok:t}}
+ catch(e){return {err:'timeout',text:'tempo esgotado'}}finally{clearTimeout(t0)}}
 async function gemini(prompt,onText,history=[]){if(!CFG.key){openOv();throw new Error('Configure a chave da API em Configurações.')}
- if(ctrl)ctrl.abort();ctrl=new AbortController();busy(true);
- const body={systemInstruction:{parts:[{text:SYS()}]},contents:[...history,{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:.4,maxOutputTokens:4096,thinkingConfig:{thinkingBudget:0}}};
- try{let r,tried=new Set();
-  for(let attempt=0;attempt<4;attempt++){r=await callStream(body,ctrl.signal);if(r.ok)break;const t=await r.text();
-   if(r.status===400&&body.generationConfig.thinkingConfig&&!/API key/i.test(t)){delete body.generationConfig.thinkingConfig;continue}
-   if(r.status===404||/no longer available|not found|not supported/i.test(t)){tried.add(CFG.model);const sug=(t.match(/models\/(gemini-[\w.\-]+)/g)||[]).map(x=>x.slice(7)).find(m=>!tried.has(m));
-    const next=sug||(await availableModels()).find(m=>!tried.has(m));if(next){CFG.model=next;await DB.put('kv',CFG,'cfg');fillModels(MODELS);renderStatus();toast('Modelo atualizado para '+next);body.generationConfig.thinkingConfig={thinkingBudget:0};continue}}
-   throw new Error(friendly(r.status,t))}
-  if(!r.ok)throw new Error('Não consegui conectar ao modelo. Atualize a lista em Configurações.');
-  const rd=r.body.getReader(),dec=new TextDecoder();let buf='',all='';
-  while(true){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith('data:'))continue;try{const j=JSON.parse(line.slice(5));const t=(j.candidates?.[0]?.content?.parts||[]).filter(p=>!p.thought).map(p=>p.text||'').join('');if(t){all+=t;onText(all)}}catch(e){}}}
-  if(!all)throw new Error('A IA não retornou texto. Tente de novo.');
-  return all}finally{busy(false)}}
-function busy(b){$('#orb').classList.toggle('busy',b)}
+ busy(1);const body={systemInstruction:{parts:[{text:SYS()}]},contents:[...history,{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:.4,maxOutputTokens:4096}};
+ try{const tried=new Set();let model=CFG.model,last=null;
+  for(let n=0;n<5&&model;n++){tried.add(model);
+   let r=await tryStream(model,body,onText);
+   if(!r.ok&&r.err!==429&&!/API key/i.test(r.text))r=await tryPlain(model,body,onText);
+   if(r.ok){if(CFG.model!==model){CFG.model=model;await DB.put('kv',CFG,'cfg');fillModels(MODELS);renderStatus();toast('Modelo em uso: '+model)}return r.ok}
+   last=r;if(r.err===429||/API key/i.test(r.text))break;
+   const sug=(r.text.match(/models\/(gemini-[\w.\-]+)/g)||[]).map(x=>x.slice(7)).find(m=>!tried.has(m));
+   model=sug||(await availableModels()).find(m=>!tried.has(m))}
+  throw new Error(last?friendly(last.err,last.text):'Não consegui conectar ao modelo.')}finally{busy(-1)}}
+function busy(d){BUSY=Math.max(0,BUSY+d);$('#orb').classList.toggle('busy',BUSY>0)}
 
 // ---------- render ----------
 function md(s){let h=esc(s);
@@ -316,14 +325,14 @@ function renderMem(){const q=norm($('#memSearch').value);const L=$('#memList');c
 function renderStatus(){$('#status').innerHTML=`<div><span class="dot ${CFG.key?'ok':''}"></span>${CFG.key?'IA conectada':'Sem chave da IA'}</div><div><span class="dot ${DOCS.length?'ok':''}"></span>${DOCS.length} doc(s) no material</div><div><span class="dot ${MEM.length?'ok':''}"></span>${MEM.length} aprendizado(s)</div><div><span class="dot ${Object.values(PROTOS).some(p=>p.ex.length)?'ok':''}"></span>${Object.values(PROTOS).reduce((a,p)=>a+p.ex.length,0)} exemplo(s) de protocolo</div><div class="kbd" style="margin-top:6px">${esc(CFG.model)}</div>`}
 async function refresh(){DOCS=await DB.all('docs');MEM=await DB.all('mem');buildIndex();renderDocs();renderMem();renderStatus()}
 document.addEventListener('click',async e=>{const t=e.target;
- if(t.dataset.deldoc&&confirm('Remover este documento?')){await DB.del('docs',t.dataset.deldoc);refresh()}
- if(t.dataset.delmem&&confirm('Apagar este aprendizado?')){await DB.del('mem',+t.dataset.delmem);refresh()}
+ if(t.dataset.deldoc&&sure(t)){await DB.del('docs',t.dataset.deldoc);refresh()}
+ if(t.dataset.delmem&&sure(t)){await DB.del('mem',+t.dataset.delmem);refresh()}
  if(t.dataset.editmem){const m=MEM.find(x=>x.id==t.dataset.editmem);$('#memQ').value=m.q;$('#memA').value=m.a;await DB.del('mem',m.id);refresh();toast('Edite e guarde de novo')}});
 
 // ---------- config ----------
 let MODELS=[];
 async function availableModels(){if(MODELS.length)return MODELS;try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',{headers:{'x-goog-api-key':CFG.key}});const j=await r.json();if(j.error)throw new Error(j.error.message);
- const ms=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')&&/^models\/gemini/.test(m.name)&&!/embedding|image|tts|live|audio|vision|robotics|computer/.test(m.name)).map(m=>m.name.replace('models/',''));
+ const ms=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')&&/^models\/gemini-\d/.test(m.name)&&/flash/.test(m.name)&&!/embedding|image|tts|live|audio|vision|robotics|computer|lite/.test(m.name)).map(m=>m.name.replace('models/',''));
  const ver=n=>parseFloat((n.match(/gemini-(\d+(\.\d+)?)/)||[0,0])[1]);const rank=n=>(/flash-lite/.test(n)?1:/flash/.test(n)?0:2)+(/preview|exp|latest/.test(n)?3:0);
  ms.sort((a,b)=>rank(a)-rank(b)||ver(b)-ver(a));MODELS=ms;return ms}catch(e){toast('Chave inválida: '+e.message);return[]}}
 async function testModel(m){try{const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':CFG.key},body:JSON.stringify({contents:[{role:'user',parts:[{text:'Responda apenas: ok'}]}],generationConfig:{maxOutputTokens:20}})});return r.ok}catch(e){return false}}
@@ -332,6 +341,7 @@ async function listModels(force){if(!CFG.key)return false;if(force)MODELS=[];con
  fillModels(ms);renderStatus();return true}
 function fillModels(ms){const s=$('#cfgModel');const set=[...new Set([CFG.model,...ms])];s.innerHTML=set.map(m=>`<option ${m===CFG.model?'selected':''}>${m}</option>`).join('')}
 async function saveCfg(test=true){await DB.put('kv',CFG,'cfg');renderStatus();if(test){toast('Testando conexão...');const ok=await listModels(true);if(ok)toast('Tudo certo! E.V.A. conectada ✓')}}
+function sure(btn,txt){if(btn._armed){btn._armed=false;btn.textContent=btn._orig;return true}btn._orig=btn.textContent;btn._armed=true;btn.textContent=txt||'Clique de novo para confirmar';setTimeout(()=>{if(btn._armed){btn._armed=false;btn.textContent=btn._orig}},4000);return false}
 function openOv(){$('#ov').classList.add('on')}
 
 const ctrlEnter=(el,fn)=>el.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();fn()}});
@@ -352,7 +362,7 @@ $('#btnProtoEx').onclick=async()=>{const t=$('#protoEx').value.trim();if(!t)retu
 $('#btnProtoRules').onclick=async()=>{PROTOS[PT].rules=$('#protoRules').value.trim();await saveProtos();toast('Regras salvas ✓')};
 $('#btnProto').onclick=gerarProto;$('#btnProtoClear').onclick=()=>{$('#protoInfo').value='';$('#protoConv').value='';$('#outProto').innerHTML=''};
 ['#protoInfo','#protoConv'].forEach(s=>ctrlEnter($(s),gerarProto));
-document.addEventListener('click',async e=>{if(e.target.dataset.delex&&confirm('Apagar este exemplo?')){PROTOS[PT].ex=PROTOS[PT].ex.filter(x=>x.id!=e.target.dataset.delex);await saveProtos()}});
+document.addEventListener('click',async e=>{if(e.target.dataset.delex&&sure(e.target)){PROTOS[PT].ex=PROTOS[PT].ex.filter(x=>x.id!=e.target.dataset.delex);await saveProtos()}});
 // ---------- tema ----------
 function paintTheme(){const d=document.documentElement.dataset.theme==='dark';$('#themeBtn').textContent=d?'☀️ Tema claro':'🌙 Tema escuro'}
 $('#themeBtn').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('eva-theme',t);paintTheme()};paintTheme();
@@ -375,9 +385,9 @@ $('#impFile').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].
 $('#btnSaveCfg').onclick=()=>{CFG.key=$('#cfgKey').value.trim();CFG.model=$('#cfgModel').value||CFG.model;CFG.name=$('#cfgName').value.trim();CFG.style=$('#cfgStyle').value.trim();saveCfg()};
 $('#cfgModel').onchange=()=>{CFG.model=$('#cfgModel').value;saveCfg(false);toast('Modelo: '+CFG.model)};
 $('#btnModels').onclick=async()=>{toast('Verificando modelos...');if(await listModels(true))toast('Modelo em uso: '+CFG.model)};
-$('#btnWipe').onclick=async()=>{if(!confirm('Apagar chave, material e memória deste navegador? (Exporte um backup antes)'))return;await DB.clear('docs');await DB.clear('mem');await DB.clear('kv');location.reload()};
+$('#btnWipe').onclick=async()=>{if(!sure($('#btnWipe'),'Tem certeza? Clique de novo para apagar tudo'))return;localStorage.removeItem('eva-theme');await DB.clear('docs');await DB.clear('mem');await DB.clear('kv');location.reload()};
 $('#ovSave').onclick=async()=>{CFG.key=$('#ovKey').value.trim();if(!CFG.key)return;$('#ov').classList.remove('on');$('#cfgKey').value=CFG.key;await saveCfg()};
-(async()=>{await DB.open();const c=await DB.get('kv','cfg');if(c)CFG={...CFG,...c};if(/gemini-(1|2)\./.test(CFG.model))CFG.model=DEFAULT_MODEL;$('#cfgKey').value=CFG.key;$('#cfgName').value=CFG.name;$('#cfgStyle').value=CFG.style;fillModels([]);const pr=await DB.get('kv','protos');if(pr)Object.keys(PROTOS).forEach(k=>{if(pr[k])PROTOS[k]=pr[k]});renderProtos();await refresh();
+(async()=>{await DB.open();const c=await DB.get('kv','cfg');if(c)CFG={...CFG,...c};if(/gemini-(1|2)\.|gemini-3\.8|argon|omni/.test(CFG.model))CFG.model=DEFAULT_MODEL;$('#cfgKey').value=CFG.key;$('#cfgName').value=CFG.name;$('#cfgStyle').value=CFG.style;fillModels([]);const pr=await DB.get('kv','protos');if(pr)Object.keys(PROTOS).forEach(k=>{if(pr[k])PROTOS[k]=pr[k]});renderProtos();await refresh();
  if(!CFG.key)openOv();else listModels();
  addBub('eva',md(`Oi${CFG.name?', '+CFG.name:''}! Eu sou a **E.V.A.** 💙\nCole um atendimento na aba Atendimento, ou me pergunte qualquer coisa do material.`))})();
 </script>
