@@ -91,6 +91,39 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
 .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}.stat div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}.stat b{display:block;font:600 20px Inter}.stat small{color:var(--mut);font-size:12px}
 .overlay{position:fixed;inset:0;background:rgba(16,24,40,.45);display:none;align-items:center;justify-content:center;z-index:8}.overlay.on{display:flex}
 .modal{width:min(520px,92vw)}
+/* ===== v7 ===== */
+.app{grid-template-columns:276px 1fr}
+.nav{align-items:flex-start;padding:9px 12px}.nav span{display:flex;flex-direction:column;line-height:1.25}
+.nav span em{font-style:normal;font-size:11.5px;font-weight:400;color:var(--mut);margin-top:2px}
+.nav.on span em{color:var(--pri2);opacity:.85}.nav i{margin-top:1px}
+.hero{display:flex;gap:18px;align-items:center;padding:24px;border-radius:16px;background:linear-gradient(135deg,var(--pri),#134e4a);color:#fff;margin-bottom:22px}
+.hero .orb{width:56px;height:56px;background:rgba(255,255,255,.15);font-size:16px}
+.hero h2{color:#fff;font-size:24px;margin:0}.hero p{margin:4px 0 0;opacity:.9;font-size:14.5px}
+.hero .hk{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.hero .hk span{background:rgba(255,255,255,.14);padding:5px 11px;border-radius:99px;font-size:12.5px}
+.home{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.hsec{grid-column:1/-1;font-size:12px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--mut);margin-top:8px}
+.hcard{all:unset;cursor:pointer;display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;transition:.15s}
+.hcard:hover{border-color:var(--pri);box-shadow:0 6px 16px rgba(15,118,110,.10);transform:translateY(-1px)}
+.hcard .phi{width:38px;height:38px;font-size:18px}.hcard b{display:block;font-size:14.5px;margin-bottom:3px}.hcard small{color:var(--mut);font-size:12.8px;line-height:1.45}
+.howto{display:flex;gap:8px;flex-wrap:wrap;margin:-8px 0 18px}.howto span{font-size:12.5px;background:var(--card2);border:1px solid var(--line);border-radius:99px;padding:5px 11px;color:var(--mut)}
+.howto b{color:var(--pri2)}
+.splash{position:fixed;inset:0;z-index:40;background:rgba(10,30,28,.55);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.splash.off{display:none}
+.splc{background:var(--card);color:var(--tx);border-radius:18px;width:min(460px,92vw);padding:30px;text-align:center;box-shadow:0 30px 70px rgba(0,0,0,.35)}
+.splc .orb{width:58px;height:58px;margin:0 auto 14px;font-size:16px}
+.splc h2{font-size:22px;margin:0}.splc .tm{color:var(--mut);font-size:13.5px;margin:4px 0 14px}
+.splc p{font-size:14.5px;line-height:1.55;margin:0 0 14px}
+.sstep{display:flex;justify-content:space-between;font-size:13.5px;padding:7px 2px;border-bottom:1px solid var(--line);opacity:.35;transition:opacity .3s}
+.sstep.ok{opacity:1}.sstep.ok b{color:var(--ok)}
+.fx{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.fch{border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden}
+.fchh{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card2);border-bottom:1px solid var(--line)}
+.fchh b{flex:1;font-size:14px}.fchb{padding:12px 14px;white-space:pre-wrap;font-size:13.5px;line-height:1.55}
+.cat{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--priL);color:var(--pri2);text-transform:uppercase;letter-spacing:.5px}
+.rcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px}
+.rc{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--card);font-size:13px;line-height:1.5}
+.rc .rt{font-weight:700;font-size:14px;margin-bottom:6px;color:var(--pri2)}.rc div span{color:var(--mut)}
+.btitle{font-size:13px;font-weight:700;margin:14px 0 8px;padding-left:8px;border-left:3px solid var(--pri)}
 /* ===== v6: layout organizado ===== */
 aside{gap:1px;overflow:auto}
 .navh{font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--mut);padding:16px 12px 6px;opacity:.85}
@@ -174,19 +207,21 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
 <div class="app">
 <aside>
   <div class="brand"><div class="orb" id="orb"></div><div><h1>E.V.A. Atendimento</h1><small>Assistente de atendimento</small></div></div>
+  <button class="nav on" data-v="inicio"><i>🏠</i><span>Início<em>Resumo do dia e atalhos</em></span></button>
   <div class="navh">Atendimento</div>
-  <button class="nav on" data-v="atend"><i>🎧</i><span>Atendimento</span></button>
-  <button class="nav" data-v="melhorar"><i>✨</i><span>Melhorar mensagem</span></button>
-  <button class="nav" data-v="protocolos"><i>📝</i><span>Protocolos</span></button>
+  <button class="nav" data-v="atend"><i>🎧</i><span>Atendimento<em>Cole a conversa e veja o que responder</em></span></button>
+  <button class="nav" data-v="melhorar"><i>✨</i><span>Melhorar mensagem<em>Deixa seu texto educado e claro</em></span></button>
+  <button class="nav" data-v="protocolos"><i>📝</i><span>Protocolos<em>Gera o texto do protocolo pronto</em></span></button>
   <div class="navh">Consulta rápida</div>
-  <button class="nav" data-v="colinha"><i>📌</i><span>Colinha</span></button>
-  <button class="nav" data-v="material"><i>🗂️</i><span>Arquivos e métricas</span></button>
+  <button class="nav" data-v="colinha"><i>📌</i><span>Colinha<em>Textos prontos: um clique copia</em></span></button>
+  <button class="nav" data-v="fichas"><i>📒</i><span>Fichas e métricas<em>Suas anotações, na ordem que você põe</em></span></button>
+  <button class="nav" data-v="material"><i>🗂️</i><span>Arquivos<em>Auxílio, planilhas e slides organizados</em></span></button>
   <div class="navh">E.V.A.</div>
-  <button class="nav" data-v="chat"><i>💬</i><span>Conversar com a E.V.A.</span></button>
-  <button class="nav" data-v="aprender"><i>🧠</i><span>Memória</span></button>
+  <button class="nav" data-v="chat"><i>💬</i><span>Conversar com a E.V.A.<em>Pergunte sobre material e métricas</em></span></button>
+  <button class="nav" data-v="aprender"><i>🧠</i><span>Memória<em>Ensine regras que ela deve lembrar</em></span></button>
   <div class="navh">Sistema</div>
-  <button class="nav" data-v="privacidade"><i>🛡️</i><span>Privacidade e LGPD</span></button>
-  <button class="nav" data-v="config"><i>⚙️</i><span>Configurações</span></button>
+  <button class="nav" data-v="privacidade"><i>🛡️</i><span>Privacidade e LGPD<em>Como seus dados ficam protegidos</em></span></button>
+  <button class="nav" data-v="config"><i>⚙️</i><span>Configurações<em>Chave da IA, horários e senha</em></span></button>
   <button class="themeBtn" id="themeBtn" style="margin-top:auto"></button>
   <div class="status" id="status" style="margin-top:0"></div>
 </aside>
@@ -195,8 +230,46 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
 <div class="mainin">
 <div class="pbar" id="pbar"><div class="pi" id="pbIcon">⏰</div><div class="pt" id="pbText"></div><button class="btn ghost sm" id="pbOk">Ok, entendi</button></div>
 
-<section class="view on" id="v-atend">
+<section class="view on" id="v-inicio">
+  <div class="hero"><div class="orb"></div><div style="flex:1"><h2 id="hGreet">Olá!</h2><p id="hSub">Estou conectada ao seu sistema de atendimento para te auxiliar no trabalho.</p><div class="hk" id="hKpis"></div></div></div>
+  <div class="home">
+   <div class="hsec">Durante o atendimento</div>
+   <button class="hcard" data-go="atend"><div class="phi">🎧</div><div><b>Atendimento</b><small>Cole a conversa do Blip. A E.V.A. diz a situação, o que fazer e já sugere a próxima mensagem.</small></div></button>
+   <button class="hcard" data-go="melhorar"><div class="phi">✨</div><div><b>Melhorar mensagem</b><small>Escreva do seu jeito e receba a versão educada e acolhedora, pronta pra enviar.</small></div></button>
+   <button class="hcard" data-go="protocolos"><div class="phi">📝</div><div><b>Protocolos</b><small>Preencha os dados e receba o texto do protocolo no modelo certo.</small></div></button>
+   <div class="hsec">Consulta rápida</div>
+   <button class="hcard" data-go="colinha"><div class="phi">📌</div><div><b>Colinha</b><small>Seus textos prontos em blocos. Clicou, copiou, colou no cliente.</small></div></button>
+   <button class="hcard" data-go="fichas"><div class="phi">📒</div><div><b>Fichas e métricas</b><small>Anote métricas, protocolos e regras do seu jeito. Ficam na ordem em que você adiciona.</small></div></button>
+   <button class="hcard" data-go="material"><div class="phi">🗂️</div><div><b>Arquivos</b><small>Envie Auxílio, Excel e slides. A E.V.A. separa por abas e deixa fácil de buscar.</small></div></button>
+   <div class="hsec">E.V.A.</div>
+   <button class="hcard" data-go="chat"><div class="phi">💬</div><div><b>Conversar com a E.V.A.</b><small>Pergunte qualquer coisa: qual métrica usar, como abrir um protocolo, uma regra.</small></div></button>
+   <button class="hcard" data-go="aprender"><div class="phi">🧠</div><div><b>Memória</b><small>Ensine algo que a supervisão confirmou. Ela passa a usar sempre.</small></div></button>
+   <button class="hcard" data-go="privacidade"><div class="phi">🛡️</div><div><b>Privacidade e LGPD</b><small>Mostra onde os dados ficam e o que é enviado. Bom pra mostrar à supervisão.</small></div></button>
+  </div>
+</section>
+
+<section class="view" id="v-fichas">
+  <div class="ph"><div class="phi">📒</div><div><h2>Fichas e métricas</h2><p class="sub">Seu caderno de consulta. Você escreve, ela guarda na ordem em que você adicionou e usa nas respostas.</p></div></div>
+  <div class="howto"><span><b>1</b> Escolha o tipo</span><span><b>2</b> Dê um título (ex.: “Reembolso”)</span><span><b>3</b> Escreva ou cole do Excel</span><span><b>4</b> Guardar: vai pro final da lista</span></div>
+  <div class="grid2">
+   <div class="card"><h3>➕ Nova ficha</h3>
+    <label>Tipo</label><input id="fCat" list="fCats" placeholder="Métrica, Protocolo, Regra, Contato..."><datalist id="fCats"><option>Métrica</option><option>Protocolo</option><option>Regra</option><option>Prazo</option><option>Contato</option><option>Informação</option></datalist>
+    <label>Título</label><input id="fT" placeholder="Ex.: Reembolso de consulta">
+    <label>Conteúdo</label><textarea id="fX" rows="7" placeholder="Ex.: Métrica: 123 - Reembolso&#10;Quando usar: cliente pede reembolso de consulta&#10;&#10;Dica: pode colar linhas copiadas do Excel, vira tabela."></textarea>
+    <div class="row"><button class="btn" id="btnFAdd">Guardar ficha</button><button class="btn ghost" id="btnFClr">Limpar</button></div>
+    <div class="hint">A ordem nunca muda sozinha: a primeira continua primeira e as novas entram embaixo. Use ▲▼ se quiser mover.</div>
+   </div>
+   <div class="card"><h3>📚 Suas fichas <span class="kbd" id="fCount" style="margin-left:auto;font-weight:500"></span></h3>
+    <input id="fSearch" placeholder="🔎 Buscar (ex.: reembolso, TMA, autorização)...">
+    <div class="tabs" id="fTabs"></div>
+    <div class="fx" id="fList"></div>
+   </div>
+  </div>
+</section>
+
+<section class="view" id="v-atend">
   <div class="ph"><div class="phi">🎧</div><div><h2>Atendimento em andamento</h2><p class="sub">Cole a conversa inteira (como vier, sem identificar quem disse o quê). Atualize e analise de novo sempre que o cliente mandar algo.</p></div></div>
+  <div class="howto"><span><b>1</b> Cole a conversa</span><span><b>2</b> Analisar</span><span><b>3</b> Copie a mensagem sugerida</span></div>
   <div class="grid2">
     <div class="card">
       <h3>🗂️ Conversa</h3>
@@ -211,6 +284,7 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
 
 <section class="view" id="v-melhorar">
   <div class="ph"><div class="phi">✨</div><div><h2>Melhorar mensagem</h2><p class="sub">Escreva do seu jeito. A E.V.A. devolve acolhedora, educada e pronta para enviar.</p></div></div>
+  <div class="howto"><span><b>1</b> Escreva seu rascunho</span><span><b>2</b> Melhorar</span><span><b>3</b> Copie a versão final</span></div>
   <div class="grid2">
     <div class="card"><h3>✍️ Seu rascunho</h3>
       <textarea id="draft" rows="9" placeholder="Ex.: fala pro cliente que o reembolso demora 30 dias e que ele tem que mandar a nota"></textarea>
@@ -224,6 +298,7 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
 
 <section class="view" id="v-chat">
   <div class="ph"><div class="phi">💬</div><div><h2>Conversar com a E.V.A.</h2><p class="sub">Pergunte sobre procedimentos, peça ideias ou ensine algo novo. Ela consulta o material e a memória.</p></div></div>
+  <div class="howto"><span><b>1</b> Pergunte</span><span><b>2</b> Ela consulta arquivos, fichas e memória</span><span><b>3</b> Responde com a fonte</span></div>
   <div class="card chat">
     <div class="chatlog" id="chatlog"></div>
     <div class="chatbar"><textarea id="chatIn" rows="2" style="flex:1" placeholder="Converse com a E.V.A. para testar ou tirar dúvidas... (Enter envia)"></textarea><button class="btn" id="btnChat">Enviar</button><button class="btn ghost" id="btnChatClear">Limpar</button></div>
@@ -232,6 +307,7 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
 
 <section class="view" id="v-colinha">
   <div class="ph"><div class="phi">📌</div><div><h2>Colinha</h2><p class="sub">Seus textos prontos, em blocos, na mesma ordem do seu Bloco de Notas. Um clique copia; depois é só colar no Blip.</p></div></div>
+  <div class="howto"><span><b>1</b> Cole tudo do Bloco de Notas</span><span><b>2</b> Ela separa em blocos</span><span><b>3</b> Clique em Copiar</span></div>
   <div class="card">
     <h3><span class="step">1</span> Colar ou enviar a colinha inteira</h3>
     <textarea id="colAll" rows="4" placeholder="Abra o Bloco de Notas, aperte Ctrl+A, Ctrl+C e cole aqui (Ctrl+V). A E.V.A. separa em blocos automaticamente."></textarea>
@@ -254,6 +330,7 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
 
 <section class="view" id="v-protocolos">
   <div class="ph"><div class="phi">📝</div><div><h2>Protocolos</h2><p class="sub">Cada tipo aprende com os exemplos que você guardar. Depois é só passar as informações do atendimento e a E.V.A. escreve no mesmo formato.</p></div></div>
+  <div class="howto"><span><b>1</b> Escolha o tipo</span><span><b>2</b> Preencha</span><span><b>3</b> Copie o protocolo</span></div>
   <div class="chips" id="protoChips"><button class="chip on" data-pt="informativo">Informativo</button><button class="chip" data-pt="prioridade">Prioridade</button><button class="chip" data-pt="rpa">Envio de RPA</button></div>
   <div class="grid2">
     <div class="card"><h3 id="protoTitle">Novo protocolo</h3>
@@ -278,6 +355,7 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
 
 <section class="view" id="v-aprender">
   <div class="ph"><div class="phi">🧠</div><div><h2>Memória da E.V.A.</h2><p class="sub">Quando ela não encontrar algo, confirme com a supervisão e ensine aqui. Na próxima situação parecida, ela já sabe.</p></div></div>
+  <div class="howto"><span><b>1</b> Escreva a situação</span><span><b>2</b> O que fazer</span><span><b>3</b> Guardar</span></div>
   <div class="grid2">
     <div class="card"><h3>➕ Ensinar algo novo</h3>
       <label>Situação / pergunta</label><textarea id="memQ" rows="3" placeholder="Ex.: Cliente quer segunda via do boleto vencido há mais de 60 dias"></textarea>
@@ -290,12 +368,12 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
 </section>
 
 <section class="view" id="v-material">
-  <div class="ph"><div class="phi">🗂️</div><div><h2>Arquivos e métricas</h2><p class="sub">Envie o Auxílio, planilhas de métricas, slides e documentos. A E.V.A. lê tudo, organiza para você consultar rápido e usa nas respostas.</p></div></div>
+  <div class="ph"><div class="phi">🗂️</div><div><h2>Arquivos</h2><p class="sub">Envie o Auxílio, planilhas e slides. A E.V.A. lê tudo, separa por abas e seções e usa nas respostas. Para anotar do seu jeito, use Fichas e métricas.</p></div></div>
   <div class="stat"><div><b id="stDocs">0</b><small>arquivos</small></div><div><b id="stChunks">0</b><small>trechos para a E.V.A. consultar</small></div><div><b id="stUpd">—</b><small>última atualização</small></div></div>
   <div class="files">
     <div>
       <div class="card"><h3><span class="step">1</span> Enviar arquivo</h3>
-        <div class="drop" id="drop">Arraste aqui ou clique<br><small>Excel (.xlsx), PowerPoint (.pptx), PDF, Word, CSV, TXT</small><input type="file" id="fileIn" multiple accept=".pdf,.docx,.txt,.md,.html,.htm,.csv,.xlsx,.xls,.xlsm,.ods,.pptx" hidden></div>
+        <div class="howto" style="margin:0 0 10px"><span><b>1</b> Envie</span><span><b>2</b> Clique no arquivo</span><span><b>3</b> Busque</span></div><div class="drop" id="drop">Arraste aqui ou clique<br><small>Excel (.xlsx), PowerPoint (.pptx), PDF, Word, CSV, TXT</small><input type="file" id="fileIn" multiple accept=".pdf,.docx,.txt,.md,.html,.htm,.csv,.xlsx,.xls,.xlsm,.ods,.pptx" hidden></div>
         <label>Ou cole um link (Google Planilhas, Documentos ou Apresentações)</label>
         <div style="display:flex;gap:8px"><input id="linkIn" placeholder="https://docs.google.com/..."><button class="btn" id="btnLink">Ler</button></div>
         <div class="hint">O link precisa estar como “qualquer pessoa com o link”. Se não abrir, baixe o arquivo e envie aqui.</div>
@@ -367,6 +445,10 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
 </div>
 <div class="lock" id="lock"><div class="lockc"><div class="orb"></div><h3>E.V.A. Atendimento</h3><p>Digite sua senha para entrar</p><input id="lockIn" type="password" inputmode="numeric" autocomplete="off" autofocus><button class="btn" id="lockBtn">Entrar</button><div id="lockErr"></div></div></div>
 <script>if(sessionStorage.getItem('eva-ok')==='1')document.getElementById('lock').classList.add('off')</script>
+<div class="splash off" id="splash"><div class="splc"><div class="orb busy" id="splOrb"></div><h2 id="splG">Olá!</h2><div class="tm" id="splT"></div>
+ <p id="splP">Conectando ao seu sistema de atendimento…</p>
+ <div id="splSteps"><div class="sstep"><span>Carregando sua memória</span><b>✓</b></div><div class="sstep"><span>Lendo arquivos e fichas</span><b>✓</b></div><div class="sstep"><span>Preparando a colinha</span><b>✓</b></div><div class="sstep"><span>Conferindo seus horários</span><b>✓</b></div></div>
+ <button class="btn" id="splGo" style="margin-top:18px;width:100%;justify-content:center;box-sizing:border-box;visibility:hidden">Vamos começar</button></div></div>
 <div class="overlay" id="ov"><div class="card modal"><h3>Bem-vindo à E.V.A. Atendimento</h3><p class="sub" style="margin:0 0 6px">Para começar, cole sua chave da API Gemini. Depois envie o Auxílio em "Arquivos e métricas".</p><input id="ovKey" type="password" placeholder="AIza..."><div class="row"><button class="btn" id="ovSave">Começar</button><a class="kbd" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Pegar chave grátis ↗</a></div></div></div>
 <div class="toast" id="toast"></div>
 
@@ -390,7 +472,7 @@ const STOP=new Set('a o e de da do das dos em no na nos nas um uma uns umas para
 const norm=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 const toks=s=>norm(s).split(/[^a-z0-9]+/).filter(w=>w.length>2&&!STOP.has(w)).map(w=>w.length>5?w.replace(/(coes|cao|mente|ados|adas|ado|ada|ores|ar|er|ir|es|s)$/,''):w);
 function chunk(text,size=1100,ov=180){text=text.replace(/\r/g,'').replace(/\n{3,}/g,'\n\n').trim();const out=[];let i=0;while(i<text.length){let end=Math.min(text.length,i+size);if(end<text.length){const p=text.lastIndexOf('\n',end);if(p>i+size*.5)end=p;else{const q=text.lastIndexOf('. ',end);if(q>i+size*.5)end=q+1;else{const w=text.lastIndexOf(' ',end);if(w>i+size*.5)end=w}}}out.push(text.slice(i,end).trim());if(end>=text.length)break;let ni=Math.max(end-ov,i+1);const sp=text.indexOf(' ',ni);if(sp>0&&sp<end)ni=sp+1;i=ni}return out.filter(Boolean)}
-function buildIndex(){const items=[];DOCS.forEach(d=>d.chunks.forEach((c,j)=>items.push({kind:'doc',name:d.name,text:c,j})));MEM.forEach(m=>items.push({kind:'mem',name:'Memória',text:'Situação: '+m.q+'\nO que fazer: '+m.a,id:m.id}));
+function buildIndex(){const items=[];DOCS.forEach(d=>d.chunks.forEach((c,j)=>items.push({kind:'doc',name:d.name,text:c,j})));(typeof FICHAS!=='undefined'?FICHAS:[]).forEach(f=>items.push({kind:'ficha',name:'Ficha: '+f.t,text:f.cat+' - '+f.t+'\n'+f.x,id:f.id}));MEM.forEach(m=>items.push({kind:'mem',name:'Memória',text:'Situação: '+m.q+'\nO que fazer: '+m.a,id:m.id}));
 const df={},tf=[];let tot=0;items.forEach((it,i)=>{const t=toks(it.name+' '+it.text);tot+=t.length;const f={};t.forEach(w=>f[w]=(f[w]||0)+1);tf[i]={f,len:t.length};Object.keys(f).forEach(w=>df[w]=(df[w]||0)+1)});INDEX={items,df,tf,avg:tot/Math.max(1,items.length),N:items.length};renderStatus()}
 function search(q,k=10){if(!INDEX||!INDEX.N)return[];const qt=[...new Set(toks(q))];const {items,df,tf,avg,N}=INDEX;const sc=[];items.forEach((it,i)=>{let s=0;const {f,len}=tf[i];qt.forEach(w=>{if(!f[w])return;const idf=Math.log(1+(N-df[w]+.5)/(df[w]+.5));s+=idf*f[w]*2.2/(f[w]+1.2*(.25+.75*len/avg))});if(s>0&&qt.length>1){const nt=norm(it.text);const qw=norm(q).split(/[^a-z0-9]+/).filter(w=>w.length>2);for(let a=0;a<qw.length-1;a++){if(nt.includes(qw[a]+' '+qw[a+1]))s*=1.15}}if(it.kind==='mem')s*=1.35;if(s>0)sc.push({s,it})});return sc.sort((a,b)=>b.s-a.s).slice(0,k).map(x=>x.it)}
 function totalChars(){return DOCS.reduce((a,d)=>a+d.text.length,0)}
@@ -401,15 +483,16 @@ let LASTSRC=[];
 function context(query){const full=totalChars()<24000;let docPart='';let src=[];
  if(full&&DOCS.length){docPart=DOCS.map(d=>`=== DOCUMENTO: ${d.name} ===\n${d.text}`).join('\n\n');src=DOCS.map(d=>d.name);
   const top=[];if(top.length)docPart=`<TRECHOS_MAIS_RELEVANTES (confira primeiro)>\n${top.map(t=>`[${t.name} • trecho ${t.j+1}]\n${t.text}`).join('\n\n')}\n</TRECHOS_MAIS_RELEVANTES>\n\n`+docPart}
- else if(DOCS.length){let hits=retrieve(query,8);let acc=0;hits=hits.filter(h=>(acc+=h.text.length)<26000);docPart=hits.map(h=>`=== ${h.name} (trecho ${h.j+1}) ===\n${h.text}`).join('\n\n');src=[...new Set(hits.map(h=>h.name))]}
+ else if(DOCS.length){let hits=retrieve(query,8);const mh=retrieve(query+' métrica protocolo motivo',24).filter(h=>/m[eé]tric|protocol|motivo|classifica/i.test(h.name)&&!hits.some(x=>x.name===h.name&&x.j===h.j)).slice(0,6);hits=[...hits,...mh];let acc=0;hits=hits.filter(h=>(acc+=h.text.length)<26000);docPart=hits.map(h=>`=== ${h.name} (trecho ${h.j+1}) ===\n${h.text}`).join('\n\n');src=[...new Set(hits.map(h=>h.name))]}
  const mem=(MEM.length<=80?MEM:search(query,15).filter(h=>h.kind==='mem').map(h=>MEM.find(m=>m.id===h.id)).filter(Boolean));
  const memPart=mem.map(m=>`- Situação: ${m.q}\n  O que fazer: ${m.a}`).join('\n');
- return {text:`<MATERIAL_AUXILIO>\n${docPart||'(nenhum material carregado ainda — avise o atendente que não há material para consultar)'}\n</MATERIAL_AUXILIO>\n\n<MEMORIA_APRENDIDA (confirmada pela supervisão, tem prioridade sobre o material)>\n${memPart||'(vazia)'}\n</MEMORIA_APRENDIDA>`+colinhaCtx(query)+`\n\n<HORARIOS_DO_ATENDENTE>Agora: ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}. Turno ${TURNO.ent}-${TURNO.sai}, escala ${TURNO.esc}. Pausa 10 (1): ${TURNO.p1}-${TURNO.p1f}. Lanche/Almoço: ${TURNO.l}-${TURNO.lf}. Pausa 10 (2): ${TURNO.p2}-${TURNO.p2f}.</HORARIOS_DO_ATENDENTE>`,src:[...src,...(mem.length?['Memória']:[])]}}
+ return {text:`<MATERIAL_AUXILIO>\n${docPart||'(nenhum material carregado ainda — avise o atendente que não há material para consultar)'}\n</MATERIAL_AUXILIO>\n\n<MEMORIA_APRENDIDA (confirmada pela supervisão, tem prioridade sobre o material)>\n${memPart||'(vazia)'}\n</MEMORIA_APRENDIDA>`+fichasCtx(query)+colinhaCtx(query)+`\n\n<HORARIOS_DO_ATENDENTE>Agora: ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}. Turno ${TURNO.ent}-${TURNO.sai}, escala ${TURNO.esc}. Pausa 10 (1): ${TURNO.p1}-${TURNO.p1f}. Lanche/Almoço: ${TURNO.l}-${TURNO.lf}. Pausa 10 (2): ${TURNO.p2}-${TURNO.p2f}.</HORARIOS_DO_ATENDENTE>`,src:[...src,...(mem.length?['Memória']:[])]}}
 
 // ---------- Gemini ----------
 const SYS=()=>`Você é a E.V.A. Atendimento, assistente pessoal e "supervisora de bolso" de ${CFG.name||'um atendente'} do SAC por chat de um plano de saúde (Unimed). Você nunca fala com o cliente: você orienta o atendente, que envia as mensagens.
 Padrão de atendimento: excelência estilo Disney — sempre cordial, acolhedor, empático, educado e paciente, mesmo se o cliente for grosseiro, mandar mensagens grandes, curtas ou picadas. Reconheça o sentimento antes de explicar. Linguagem simples, clara, sem jargão, frases curtas, português do Brasil. Não prometa o que não está no material.
-REGRAS DE VERDADE: baseie procedimentos, prazos, regras e soluções SOMENTE no MATERIAL_AUXILIO e na MEMORIA_APRENDIDA. Nunca invente. Se a informação não estiver lá, diga claramente que não encontrou e oriente a confirmar com a supervisão, e ainda assim sugira uma mensagem acolhedora de espera.
+REGRAS DE VERDADE: baseie procedimentos, prazos, regras, métricas e soluções SOMENTE no MATERIAL_AUXILIO, nas FICHAS_DO_ATENDENTE e na MEMORIA_APRENDIDA.
+MÉTRICAS E PROTOCOLOS: sempre que a pergunta ou o atendimento envolver abrir protocolo, registrar, classificar ou escolher métrica/motivo, procure nas FICHAS e nos arquivos (planilhas/slides de métricas) e informe a métrica exata como está escrita (nome e código), dizendo de qual ficha ou arquivo veio. Se houver mais de uma possível, liste as opções e quando usar cada uma. Se não houver, diga que não encontrou. Nunca invente. Se a informação não estiver lá, diga claramente que não encontrou e oriente a confirmar com a supervisão, e ainda assim sugira uma mensagem acolhedora de espera.
 A conversa colada vem sem indicar quem falou; deduza pelo conteúdo quem é cliente e quem é atendente, e acompanhe o atendimento do início ao fim.
 ${CFG.style?'Preferências do atendente: '+CFG.style:''}
 Toda mensagem pronta para enviar ao cliente deve vir entre as tags <msg> e </msg> (uma mensagem por tag). Use <alerta>...</alerta> para avisos de informação não encontrada ou riscos. Use títulos com "### " e listas com "- ". Seja rápida e direta.
@@ -504,11 +587,22 @@ const cellTxt=v=>v==null?'':(v instanceof Date?v.toLocaleDateString('pt-BR'):Str
 function cleanRows(rows){rows=rows.map(r=>r.map(cellTxt)).filter(r=>r.some(c=>c));if(!rows.length)return rows;const w=Math.max(...rows.map(r=>r.length));
  const keep=[];for(let c=0;c<w;c++)if(rows.some(r=>r[c]))keep.push(c);return rows.map(r=>keep.map(c=>r[c]||''))}
 function hdrIdx(rows){for(let i=0;i<Math.min(rows.length,8);i++){if(rows[i].filter(Boolean).length>=Math.min(2,rows[i].length))return i}return 0}
-function sheetsToText(sheets){return sheets.map(sh=>{const h=hdrIdx(sh.rows);const H=sh.rows[h]||[];const pre=sh.rows.slice(0,h).map(r=>r.filter(Boolean).join(' | ')).join('\n');
+function shBlocks(sh){return sh.blocks&&sh.blocks.length?sh.blocks:sheetBlocks(sh.rows).blocks}
+function rowLines(H,r){return r.map((c,k)=>c?((H[k]||'Coluna '+(k+1))+': '+c):'').filter(Boolean).join(' | ')}
+function sheetsToText(sheets){return sheets.map(sh=>`### Aba: ${sh.name}\n`+shBlocks(sh).map(b=>`${b.title?'## '+b.title+'\n':''}`+(b.rows.length?b.rows.map(r=>rowLines(b.header,r)).join('\n'):b.header.filter(Boolean).join(' | '))).join('\n\n')).join('\n\n')}
+function sheetsToTextOld(sheets){return sheets.map(sh=>{const h=hdrIdx(sh.rows);const H=sh.rows[h]||[];const pre=sh.rows.slice(0,h).map(r=>r.filter(Boolean).join(' | ')).join('\n');
  return `### Aba: ${sh.name}\n${pre?pre+'\n':''}`+sh.rows.slice(h+1).map(r=>r.map((c,k)=>c?((H[k]||'Coluna '+(k+1))+': '+c):'').filter(Boolean).join(' | ')).join('\n')}).join('\n\n')}
 function slidesToText(sl){return sl.map(x=>`### Slide ${x.n}: ${x.title}\n${x.lines.join('\n')}${x.tables.map(t=>'\n'+sheetsToText([{name:'Tabela',rows:t}]).replace(/^### Aba: Tabela\n/,'')).join('')}`).join('\n\n')}
+function wsAoa(ws){const a=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:'',blankrows:true});(ws['!merges']||[]).forEach(m=>{const v=(a[m.s.r]||[])[m.s.c];if(v===''||v==null)return;for(let r=m.s.r;r<=m.e.r;r++){a[r]=a[r]||[];for(let c=m.s.c;c<=m.e.c;c++)if(r!==m.s.r||c!==m.s.c)a[r][c]=(m.e.c>m.s.c&&r===m.s.r)?'':v}});return a}
+function sheetBlocks(aoa){let rows=aoa.map(r=>(r||[]).map(cellTxt));const w=Math.max(0,...rows.map(r=>r.length));const keep=[];for(let c=0;c<w;c++)if(rows.some(r=>r[c]))keep.push(c);rows=rows.map(r=>keep.map(c=>r[c]||''));
+ const nz=r=>r.filter(Boolean).length;const blocks=[];let cur=null,title='';
+ rows.forEach((r,i)=>{const n=nz(r);if(!n){cur=null;return}
+  if(n===1&&w>=2&&keep.length>=2){const t=r.find(Boolean);if(cur&&cur.rows.length){cur={title:t,header:cur.header,rows:[],cat:1};blocks.push(cur);return}if(!cur){title=t;return}}
+  if(!cur){cur={title,header:r,rows:[]};blocks.push(cur);title='';return}cur.rows.push(r)});
+ const bl=blocks.filter(b=>b.rows.length||!b.cat);
+ return {rows:rows.filter(r=>nz(r)),blocks:bl}}
 async function parseXlsx(buf){if(!window.XLSX)await loadLib('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
- const wb=XLSX.read(buf,{type:'array',cellDates:true});return wb.SheetNames.map(n=>({name:n,rows:cleanRows(XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false,defval:''}))})).filter(x=>x.rows.length)}
+ const wb=XLSX.read(buf,{type:'array',cellDates:true});return wb.SheetNames.map(n=>{const b=sheetBlocks(wsAoa(wb.Sheets[n]));return {name:n,rows:b.rows,blocks:b.blocks}}).filter(x=>x.rows.length)}
 async function parsePptx(buf){if(!window.JSZip)await loadLib('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');const z=await JSZip.loadAsync(buf);
  const names=Object.keys(z.files).filter(n=>/^ppt\/slides\/slide\d+\.xml$/.test(n)).sort((a,b)=>parseInt(a.match(/\d+/)[0])-parseInt(b.match(/\d+/)[0]));const out=[];
  for(const n of names){const x=new DOMParser().parseFromString(await z.file(n).async('string'),'application/xml');const A='http://schemas.openxmlformats.org/drawingml/2006/main';
@@ -517,7 +611,7 @@ async function parsePptx(buf){if(!window.JSZip)await loadLib('https://cdnjs.clou
   const lines=[...x.getElementsByTagNameNS(A,'p')].filter(p=>!inTbl(p)).map(p=>[...p.getElementsByTagNameNS(A,'t')].map(e=>e.textContent).join('').trim()).filter(Boolean);
   out.push({n:out.length+1,title:lines[0]||('Slide '+(out.length+1)),lines:lines.slice(1),tables})}return out}
 async function parseAny(name,buf,ctype){const n=name.toLowerCase();
- if(/\.(xlsx|xls|xlsm|ods|csv)$/.test(n)||/spreadsheet|excel|csv/.test(ctype||'')){let sheets;if(/\.csv$/.test(n)||/csv/.test(ctype||'')){if(!window.XLSX)await loadLib('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');const wb=XLSX.read(decodeText(buf),{type:'string'});sheets=wb.SheetNames.map(s=>({name:s==='Sheet1'?'Planilha':s,rows:cleanRows(XLSX.utils.sheet_to_json(wb.Sheets[s],{header:1,raw:false,defval:''}))}))}else sheets=await parseXlsx(buf);
+ if(/\.(xlsx|xls|xlsm|ods|csv)$/.test(n)||/spreadsheet|excel|csv/.test(ctype||'')){let sheets;if(/\.csv$/.test(n)||/csv/.test(ctype||'')){if(!window.XLSX)await loadLib('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');const wb=XLSX.read(decodeText(buf),{type:'string'});sheets=wb.SheetNames.map(s=>{const b=sheetBlocks(wsAoa(wb.Sheets[s]));return {name:s==='Sheet1'?'Planilha':s,rows:b.rows,blocks:b.blocks}})}else sheets=await parseXlsx(buf);
   return {kind:'sheet',sheets,text:sheetsToText(sheets)}}
  if(/\.pptx$/.test(n)||/presentation/.test(ctype||'')){const slides=await parsePptx(buf);return {kind:'slides',slides,text:slidesToText(slides)}}
  if(/\.pdf$/.test(n)||/pdf/.test(ctype||''))return {kind:'text',text:await readFile(new File([buf],'x.pdf'))};
@@ -542,10 +636,14 @@ function textSections(t){const L=t.replace(/\r/g,'').split('\n');const out=[];le
  if(out.length<2){const ch=chunk(t,1400,0);return ch.map((c,i)=>({t:'Parte '+(i+1)+' · '+autoTitle(c),x:c}))}return out.map(o=>({t:o.t,x:tidy(o.x.join('\n'))}))}
 function renderView(){const V=$('#fileView');const d=DOCS.find(x=>x.id===OPEN);if(!d){V.innerHTML='<div class="empty"><div class="orb"></div>Escolha um arquivo à esquerda para ver organizado aqui.</div>';return}
  const q=VQ;const nq=norm(q);let body='';
- if(d.kind==='sheet'&&d.sheets&&d.sheets.length){const sh=d.sheets[Math.min(VSHEET,d.sheets.length-1)];
-  const tabs=`<div class="tabs">${d.sheets.map((x,i)=>`<button class="chip ${i===VSHEET?'on':''}" data-sheet="${i}">${esc(x.name)}${nq?' ('+x.rows.filter(r=>norm(r.join(' ')).includes(nq)).length+')':''}</button>`).join('')}</div>`;
-  const h=hdrIdx(sh.rows);const H=sh.rows[h]||[];let rows=sh.rows.slice(h+1);if(nq)rows=rows.filter(r=>norm(r.join(' ')).includes(nq));const tot=rows.length;rows=rows.slice(0,400);
-  body=tabs+`<div class="hint" style="margin:0 0 8px">${tot} linha(s)${tot>400?' · mostrando 400, use a busca':''}</div><div class="tblw"><table class="tbl"><thead><tr>${H.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${H.map((_,k)=>`<td>${hl(esc(r[k]||''),q)}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${H.length||1}">Nada encontrado nesta aba.</td></tr>`}</tbody></table></div>`}
+ if(d.kind==='sheet'&&d.sheets&&d.sheets.length){const sh=d.sheets[Math.min(VSHEET,d.sheets.length-1)];const mode=localStorage.getItem('eva-vmode')||'cards';
+  const tabs=`<div class="tabs">${d.sheets.map((x,i)=>`<button class="chip ${i===VSHEET?'on':''}" data-sheet="${i}">${esc(x.name)}${nq?' ('+x.rows.filter(r=>norm(r.join(' ')).includes(nq)).length+')':''}</button>`).join('')}<span style="flex:1"></span><button class="chip ${mode==='cards'?'on':''}" data-vmode="cards">▦ Fichas</button><button class="chip ${mode==='table'?'on':''}" data-vmode="table">☰ Tabela</button></div>`;
+  let shown=0;const parts=shBlocks(sh).map(b=>{let rows=b.rows;const H=b.header;if(nq)rows=rows.filter(r=>norm(r.join(' ')+' '+(b.title||'')).includes(nq));if(nq&&!rows.length&&!norm(H.join(' ')+' '+(b.title||'')).includes(nq))return '';rows=rows.slice(0,Math.max(0,300-shown));shown+=rows.length;
+   const head=b.title?`<div class="btitle">${hl(esc(b.title),q)}</div>`:'';
+   if(!b.rows.length)return head+`<div class="rc">${hl(esc(H.filter(Boolean).join(' · ')),q)}</div>`;
+   if(mode==='table')return head+`<div class="tblw" style="margin-bottom:14px"><table class="tbl"><thead><tr>${H.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${H.map((_,k)=>`<td>${hl(esc(r[k]||''),q)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+   return head+`<div class="rcards">${rows.map(r=>{const fi=r.findIndex(Boolean);return `<div class="rc"><div class="rt">${hl(esc(r[fi]),q)}</div>${r.map((c,k)=>k!==fi&&c?`<div><span>${esc(H[k]||'')}${H[k]?': ':''}</span>${hl(esc(c),q)}</div>`:'').join('')}</div>`}).join('')}</div>`}).join('');
+  body=tabs+(parts||'<div class="empty">Nada encontrado nesta aba.</div>')}
  else if(d.kind==='slides'&&d.slides){let sl=d.slides;if(nq)sl=sl.filter(x=>norm(x.title+' '+x.lines.join(' ')+' '+x.tables.flat(2).join(' ')).includes(nq));
   body=sl.map(x=>`<div class="slide"><div class="sn">SLIDE ${x.n}</div><h4>${hl(esc(x.title),q)}</h4>${x.lines.length?`<ul>${x.lines.map(l=>`<li>${hl(esc(l),q)}</li>`).join('')}</ul>`:''}${x.tables.map(t=>`<div class="tblw" style="margin-top:10px;max-height:none"><table class="tbl"><thead><tr>${(t[0]||[]).map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${t.slice(1).map(r=>`<tr>${r.map(c=>`<td>${hl(esc(c),q)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`).join('')}</div>`).join('')||'<div class="empty">Nada encontrado.</div>'}
  else{let secs=textSections(d.text);if(nq)secs=secs.filter(x=>norm(x.t+' '+x.x).includes(nq));
@@ -553,7 +651,7 @@ function renderView(){const V=$('#fileView');const d=DOCS.find(x=>x.id===OPEN);i
  V.innerHTML=`<div class="fvh"><span style="font-size:22px">${ficon(d)}</span><h3>${esc(d.name)}</h3><span class="pill">atualizado ${new Date(d.updated).toLocaleString('pt-BR')}</span><button class="btn danger sm" data-deldoc="${d.id}">Remover</button></div><input id="viewQ" placeholder="🔎 Buscar neste arquivo..." value="${esc(q)}"><div style="margin-top:12px">${body}</div>`;
  const vi=$('#viewQ');vi.oninput=()=>{VQ=vi.value;const p=vi.selectionStart;renderView();const n=$('#viewQ');n.focus();n.setSelectionRange(p,p)}}
 document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o&&o.dataset.open){OPEN=o.dataset.open;VSHEET=0;VQ=o.dataset.q||'';renderDocs();$('#fileView').scrollIntoView({behavior:'smooth',block:'start'})}
- const sh=e.target.closest('[data-sheet]');if(sh){VSHEET=+sh.dataset.sheet;renderView()}});
+ const sh=e.target.closest('[data-sheet]');if(sh){VSHEET=+sh.dataset.sheet;renderView()}const vm=e.target.closest('[data-vmode]');if(vm){localStorage.setItem('eva-vmode',vm.dataset.vmode);renderView()}});
 function gLink(u){let m;if((m=u.match(/docs\.google\.com\/spreadsheets\/d\/([\w-]+)/)))return [`https://docs.google.com/spreadsheets/d/${m[1]}/export?format=xlsx`,'planilha.xlsx'];
  if((m=u.match(/docs\.google\.com\/document\/d\/([\w-]+)/)))return [`https://docs.google.com/document/d/${m[1]}/export?format=txt`,'documento.txt'];
  if((m=u.match(/docs\.google\.com\/presentation\/d\/([\w-]+)/)))return [`https://docs.google.com/presentation/d/${m[1]}/export/pptx`,'apresentacao.pptx'];return [u,u.split('?')[0].split('/').pop()||'link']}
@@ -684,6 +782,48 @@ function tick(){const d=new Date();const now=d.getHours()*60+d.getMinutes();cons
  bar._key=key}
 $('#pbOk').onclick=()=>{PBOK=$('#pbar')._key;tick()};
 setInterval(tick,20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
+// ---------- fichas ----------
+let FICHAS=[],FEDIT=null,FCAT='';
+async function saveF(){await DB.put('kv',FICHAS,'fichas');renderF();buildIndex()}
+function fbody(x){const L=x.replace(/\r/g,'').split('\n');if(L.filter(l=>l.includes('\t')).length>=2){let html='',tb=[];const flushT=()=>{if(tb.length){const w=Math.max(...tb.map(r=>r.length));html+=`<div class="tblw" style="max-height:none;margin:6px 0"><table class="tbl"><thead><tr>${tb[0].concat(Array(w-tb[0].length).fill('')).map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${tb.slice(1).map(r=>`<tr>${r.concat(Array(w-r.length).fill('')).map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;tb=[]}};
+ L.forEach(l=>{if(l.includes('\t'))tb.push(l.split('\t').map(c=>c.trim()));else{flushT();if(l.trim())html+=esc(l)+'\n'}});flushT();return html}return esc(x)}
+function renderF(){const q=norm($('#fSearch').value);const cats=[...new Set(FICHAS.map(f=>f.cat||'Geral'))];
+ $('#fTabs').innerHTML=cats.length>1?['',...cats].map(c=>`<button class="chip ${FCAT===c?'on':''}" data-fcat="${esc(c)}">${c?esc(c):'Todas'} (${c?FICHAS.filter(f=>(f.cat||'Geral')===c).length:FICHAS.length})</button>`).join(''):'';
+ const list=FICHAS.map((f,i)=>[f,i]).filter(([f])=>(!FCAT||(f.cat||'Geral')===FCAT)&&(!q||norm(f.cat+' '+f.t+' '+f.x).includes(q)));
+ $('#fList').innerHTML=list.map(([f,i])=>`<div class="fch"><div class="fchh"><span class="cbn">${i+1}</span><span class="cat">${esc(f.cat||'Geral')}</span><b>${esc(f.t)}</b><button class="ib" title="Copiar" data-fcopy="${f.id}">📋</button><button class="ib" title="Subir" data-fup="${f.id}">▲</button><button class="ib" title="Descer" data-fdn="${f.id}">▼</button><button class="ib" title="Editar" data-fed="${f.id}">✏️</button><button class="ib" title="Apagar" data-fdel="${f.id}">🗑️</button></div><div class="fchb">${q?hl(fbody(f.x),q):fbody(f.x)}</div></div>`).join('')||`<div class="empty">${FICHAS.length?'Nada encontrado.':'Nenhuma ficha ainda. Comece pela primeira ao lado.'}</div>`;
+ $('#fCount').textContent=FICHAS.length?FICHAS.length+' fichas':''}
+$('#btnFAdd').onclick=async()=>{const cat=$('#fCat').value.trim()||'Geral',t=$('#fT').value.trim(),x=$('#fX').value.replace(/\s+$/,'');if(!t&&!x)return toast('Escreva o título ou o conteúdo');
+ const it={id:FEDIT?FEDIT.id:Date.now(),cat,t:t||autoTitle(x),x,created:FEDIT?FEDIT.created:new Date().toISOString()};
+ if(FEDIT){const k=FICHAS.findIndex(f=>f.id===FEDIT.id);if(k>=0)FICHAS[k]=it;else FICHAS.push(it)}else FICHAS.push(it);
+ FEDIT=null;$('#fT').value='';$('#fX').value='';$('#btnFAdd').textContent='Guardar ficha';await saveF();toast('Ficha guardada ✓')};
+$('#btnFClr').onclick=()=>{FEDIT=null;$('#fT').value='';$('#fX').value='';$('#btnFAdd').textContent='Guardar ficha'};
+$('#fSearch').oninput=renderF;
+document.addEventListener('click',async e=>{const t=e.target.closest('[data-fcopy],[data-fup],[data-fdn],[data-fed],[data-fdel],[data-fcat]');if(!t)return;
+ if(t.dataset.fcat!==undefined){FCAT=t.dataset.fcat;return renderF()}
+ const id=+(t.dataset.fcopy||t.dataset.fup||t.dataset.fdn||t.dataset.fed||t.dataset.fdel);const k=FICHAS.findIndex(f=>f.id===id);if(k<0)return;const f=FICHAS[k];
+ if(t.dataset.fcopy){await copyText(f.x);toast('Copiado ✓')}
+ if(t.dataset.fup&&k>0){[FICHAS[k-1],FICHAS[k]]=[FICHAS[k],FICHAS[k-1]];await saveF()}
+ if(t.dataset.fdn&&k<FICHAS.length-1){[FICHAS[k+1],FICHAS[k]]=[FICHAS[k],FICHAS[k+1]];await saveF()}
+ if(t.dataset.fed){FEDIT=f;$('#fCat').value=f.cat;$('#fT').value=f.t;$('#fX').value=f.x;$('#btnFAdd').textContent='Salvar alterações';$('#fT').focus()}
+ if(t.dataset.fdel&&sure(t,'✔?')){FICHAS.splice(k,1);await saveF()}});
+function fichasCtx(q){if(!FICHAS.length)return '';let it=FICHAS;const tot=FICHAS.reduce((a,f)=>a+f.x.length+f.t.length,0);
+ if(tot>16000){const qt=new Set(toks(q));it=FICHAS.map(f=>{const ft=toks(f.cat+' '+f.t+' '+f.x);let s=0;ft.forEach(w=>{if(qt.has(w))s++});return [s/Math.sqrt(ft.length+3),f]}).sort((a,b)=>b[0]-a[0]).slice(0,25).map(x=>x[1])}
+ return `\n\n<FICHAS_DO_ATENDENTE (anotações conferidas por ele: métricas, protocolos, regras. Prioridade alta, junto com a memória)>\n${it.map(f=>`[${f.cat||'Geral'}] ${f.t}\n${f.x.slice(0,2500)}`).join('\n\n')}\n</FICHAS_DO_ATENDENTE>`}
+// ---------- saudação / início ----------
+function greet(){const h=new Date().getHours();return h<12?'Bom dia':h<18?'Boa tarde':'Boa noite'}
+function firstName(){return ((CFG.name||'Gabriel').trim().split(/\s+/)[0])}
+function nextPause(){const d=new Date(),now=d.getHours()*60+d.getMinutes(),T=TURNO;const toM=x=>{const [a,b]=(x||'').split(':').map(Number);return a*60+b};
+ const ps=[[T.p1,'Pausa 10'],[T.l,'Lanche'],[T.p2,'Pausa 10']].filter(p=>p[0]).map(p=>[toM(p[0]),p[0],p[1]]).filter(p=>p[0]>now).sort((a,b)=>a[0]-b[0]);return ps[0]?ps[0][2]+' às '+ps[0][1]:'sem mais pausas hoje'}
+function renderHome(){const d=new Date();$('#hGreet').textContent=`${greet()}, ${firstName()}!`;
+ $('#hSub').textContent=`${d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})} · ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}. Estou conectada ao seu sistema de atendimento para te auxiliar no trabalho.`;
+ $('#hKpis').innerHTML=[`🗂️ ${DOCS.length} arquivo(s)`,`📒 ${FICHAS.length} ficha(s)`,`📌 ${COL.length} bloco(s) na colinha`,`🧠 ${MEM.length} memória(s)`,`☕ Próxima: ${nextPause()}`,CFG.key||CFG.groq?'🟢 IA conectada':'🔴 IA sem chave'].map(x=>`<span>${x}</span>`).join('')}
+function maybeSplash(){const today=new Date().toDateString();if(localStorage.getItem('eva-greet')===today)return;localStorage.setItem('eva-greet',today);
+ const d=new Date();$('#splG').textContent=`${greet()}, ${firstName()}!`;$('#splT').textContent=d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})+' · '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+ $('#splP').textContent='Conectando ao seu novo sistema de atendimento…';$('#splGo').style.visibility='hidden';$('#splOrb').classList.add('busy');
+ const st=[...document.querySelectorAll('#splSteps .sstep')];st.forEach(x=>x.classList.remove('ok'));$('#splash').classList.remove('off');
+ st.forEach((x,i)=>setTimeout(()=>x.classList.add('ok'),450*(i+1)));
+ setTimeout(()=>{$('#splOrb').classList.remove('busy');$('#splP').textContent=`Pronto! Já estou conectada ao seu sistema de atendimento para te auxiliar no trabalho. ${DOCS.length} arquivo(s), ${FICHAS.length} ficha(s) e ${COL.length} bloco(s) da colinha carregados. Próxima: ${nextPause()}.`;$('#splGo').style.visibility='visible'},450*st.length+300)}
+$('#splGo').onclick=()=>$('#splash').classList.add('off');
 // ---------- privacidade ----------
 async function renderPriv(){let used='';try{const e=await navigator.storage.estimate();used=(e.usage/1048576).toFixed(1)+' MB'}catch(x){}
  const last=PLOG[0];const ck=(ok,t,d)=>`<div class="ck ${ok?'':'warn'}"><i>${ok?'✓':'!'}</i><div><b>${t}</b>${d}</div></div>`;
@@ -697,10 +837,10 @@ async function renderPriv(){let used='';try{const e=await navigator.storage.esti
 document.addEventListener('click',e=>{const b=e.target.closest('[data-plog]');if(b){const l=PLOG[+b.dataset.plog];const p=$('#privSent');p.style.display='block';p.textContent='Enviado em '+new Date(l.t).toLocaleString('pt-BR')+' para '+l.dest+' (trecho final):\n\n'+l.sample;p.scrollIntoView({behavior:'smooth'})}});
 $('#btnPrint').onclick=()=>window.print();$('#tSafe').onclick=()=>document.querySelector('.nav[data-v="privacidade"]').click();
 // ---------- senha ----------
-const PW_DEFAULT='1822cbe64af5766e3abcab741bd37872a5e1a9ef0e212ef3bc5e788d97b7bb5a';
+const PW_DEFAULT='7c71d9d474216728164c5b8f02a73433cbe93c43e633abca27486ecb86148df4';
 const pwHash=()=>localStorage.getItem('eva-pw')||PW_DEFAULT;
 async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
-async function tryUnlock(){const v=$('#lockIn').value.trim();if(!v)return;if(await sha(v)===pwHash()){sessionStorage.setItem('eva-ok','1');$('#lock').classList.add('off');$('#lockIn').value='';$('#lockErr').textContent='';if(!CFG.key&&!CFG.groq)openOv()}else{$('#lockErr').textContent='Senha incorreta.';$('#lockIn').select()}}
+async function tryUnlock(){const v=$('#lockIn').value.trim();if(!v)return;if(await sha(v)===pwHash()){sessionStorage.setItem('eva-ok','1');$('#lock').classList.add('off');$('#lockIn').value='';$('#lockErr').textContent='';if(!CFG.key&&!CFG.groq)openOv();else maybeSplash()}else{$('#lockErr').textContent='Senha incorreta.';$('#lockIn').select()}}
 $('#lockBtn').onclick=tryUnlock;$('#lockIn').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock()});
 $('#tLock').onclick=()=>{sessionStorage.removeItem('eva-ok');$('#lock').classList.remove('off');setTimeout(()=>$('#lockIn').focus(),50)};
 $('#btnPw').onclick=async()=>{const v=$('#pwNew').value.trim();if(v.length<4)return toast('Use pelo menos 4 dígitos');localStorage.setItem('eva-pw',await sha(v));$('#pwNew').value='';toast('Senha alterada ✓')};
@@ -712,7 +852,8 @@ function paintTheme(){const d=document.documentElement.dataset.theme==='dark';$(
 $('#themeBtn').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('eva-theme',t);paintTheme()};paintTheme();
 
 // ---------- wire ----------
-document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$('#v-'+b.dataset.v).classList.add('on');if(b.dataset.v==='privacidade')renderPriv();document.querySelector('main').scrollTop=0});
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)document.querySelector('.nav[data-v="'+g.dataset.go+'"]').click()});
+document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$('#v-'+b.dataset.v).classList.add('on');if(b.dataset.v==='privacidade')renderPriv();if(b.dataset.v==='inicio')renderHome();document.querySelector('main').scrollTop=0});
 $('#btnAnalisar').onclick=analisar;$('#btnMelhorar').onclick=melhorar;$('#btnChat').onclick=chat;
 $('#btnNovo').onclick=()=>{$('#conv').value='';$('#convNote').value='';$('#outAtend').innerHTML='<div class="empty"><div class="orb"></div>Pronta para o próximo atendimento.</div>';$('#conv').focus()};
 $('#btnChatClear').onclick=()=>{HIST=[];$('#chatlog').innerHTML=''};
@@ -731,9 +872,10 @@ $('#btnSaveCfg2').onclick=async()=>{CFG.name=$('#cfgName').value.trim();CFG.styl
 $('#cfgModel').onchange=()=>{CFG.model=$('#cfgModel').value;saveCfg(false);toast('Modelo: '+CFG.model)};
 $('#btnModels').onclick=async()=>{toast('Verificando modelos...');if(await listModels(true))toast('Modelo em uso: '+CFG.model)};
 $('#btnWipe').onclick=async()=>{if(!sure($('#btnWipe'),'Tem certeza? Clique de novo para apagar tudo'))return;localStorage.removeItem('eva-theme');await DB.clear('docs');await DB.clear('mem');await DB.clear('kv');location.reload()};
-$('#ovSave').onclick=async()=>{CFG.key=$('#ovKey').value.trim();if(!CFG.key)return;$('#ov').classList.remove('on');$('#cfgKey').value=CFG.key;await saveCfg()};
+$('#ovSave').addEventListener('click',()=>setTimeout(maybeSplash,300));$('#ovSave').onclick=async()=>{CFG.key=$('#ovKey').value.trim();if(!CFG.key)return;$('#ov').classList.remove('on');$('#cfgKey').value=CFG.key;await saveCfg()};
 (async()=>{await DB.open();const c=await DB.get('kv','cfg');if(c)CFG={...CFG,...c};if(/gemini-(1|2)\.|gemini-3\.8|argon|omni/.test(CFG.model))CFG.model=DEFAULT_MODEL;$('#cfgKey').value=CFG.key;$('#cfgKeys').value=(CFG.keys||[]).join('\n');$('#cfgGroq').value=CFG.groq||'';$('#cfgName').value=CFG.name;$('#cfgStyle').value=CFG.style;fillModels([]);const pr=await DB.get('kv','protos');if(pr)Object.keys(PROTOS).forEach(k=>{if(pr[k])PROTOS[k]=pr[k]});renderProtos();await refresh();
  COL=(await DB.get('kv','colinha'))||[];renderCol();const tu=await DB.get('kv','turno');if(tu)TURNO={...TURNO,...tu};fillTurno();tick();
+ FICHAS=(await DB.get('kv','fichas'))||[];renderF();buildIndex();renderHome();setInterval(()=>{if($('#v-inicio').classList.contains('on'))renderHome()},30000);if(sessionStorage.getItem('eva-ok')==='1'&&(CFG.key||CFG.groq))maybeSplash();
  PLOG=(await DB.get('kv','plog'))||[];$('#cfgMask').checked=CFG.mask!==false;clockTick();if(CFG.name)$('#termName').textContent=CFG.name;
  if(!CFG.key&&!CFG.groq){if(sessionStorage.getItem('eva-ok')==='1')openOv()}else availableModels().then(ms=>fillModels(ms));
  addBub('eva',md(`Oi${CFG.name?', '+CFG.name:''}! Eu sou a **E.V.A.** 💙\nCole um atendimento na aba Atendimento, ou me pergunte qualquer coisa do material.`))})();
