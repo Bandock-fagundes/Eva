@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="pt-BR">
+<script>document.documentElement.dataset.theme=localStorage.getItem('eva-theme')||'light'</script>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -9,6 +10,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f5f7fa;--side:#ffffff;--card:#ffffff;--card2:#f8fafc;--line:#e3e8ef;--tx:#1d2939;--mut:#667085;--pri:#0f766e;--pri2:#115e59;--priL:#e6f4f2;--warnB:#fffaeb;--warnL:#fedf89;--warnT:#93370d;--bad:#d92d20;--ok:#12b76a;--r:12px}
+:root[data-theme=dark]{--bg:#0f1419;--side:#151b23;--card:#1a212b;--card2:#141a22;--line:#2a3441;--tx:#e6e9ef;--mut:#98a2b3;--pri:#2bb3a3;--pri2:#5fd0c2;--priL:rgba(43,179,163,.14);--warnB:rgba(254,223,137,.08);--warnL:rgba(254,223,137,.35);--warnT:#fde68a}
+:root[data-theme=dark] textarea,:root[data-theme=dark] input,:root[data-theme=dark] select{background:#11171e;border-color:#2f3a48;color:var(--tx)}
+:root[data-theme=dark] .btn.ghost,:root[data-theme=dark] .chatbar,:root[data-theme=dark] .stat div,:root[data-theme=dark] .bub.eva,:root[data-theme=dark] .pill{background:var(--card);color:var(--tx);border-color:var(--line)}
+:root[data-theme=dark] .btn.danger{background:transparent}
+:root[data-theme=dark] .nav{color:#b4bccb}:root[data-theme=dark] .card h3,:root[data-theme=dark] label{color:#d0d5dd}
+:root[data-theme=dark] .msg{border-color:rgba(43,179,163,.4)}:root[data-theme=dark] .btn{color:#06201d}:root[data-theme=dark] .btn.ghost,:root[data-theme=dark] .btn.danger{color:var(--tx)}:root[data-theme=dark] .btn.danger{color:#f97066;border-color:#7a271a}
+.themeBtn{all:unset;cursor:pointer;font-size:12.5px;color:var(--mut);padding:8px 12px;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;text-align:center}.themeBtn:hover{color:var(--tx)}
+.chips{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}.chip{all:unset;cursor:pointer;font-size:13.5px;font-weight:600;padding:9px 16px;border-radius:8px;border:1px solid var(--line);color:var(--mut);background:var(--card)}.chip.on{border-color:var(--pri);color:var(--pri2);background:var(--priL)}
 *{box-sizing:border-box}html,body{height:100%}
 body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--tx);overflow:hidden;-webkit-font-smoothing:antialiased}
 .app{display:grid;grid-template-columns:248px 1fr;height:100vh}
@@ -80,10 +89,12 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
   <button class="nav" data-v="chat"><i>💬</i><span>Chat com a E.V.A.</span></button>
   <button class="nav" data-v="melhorar"><i>✨</i><span>Melhorar mensagem</span></button>
   
+  <button class="nav" data-v="protocolos"><i>📝</i><span>Protocolos</span></button>
   <button class="nav" data-v="aprender"><i>🧠</i><span>Memória</span></button>
   <button class="nav" data-v="material"><i>📚</i><span>Material (Auxílio)</span></button>
   <button class="nav" data-v="config"><i>⚙️</i><span>Configurações</span></button>
-  <div class="status" id="status"></div>
+  <button class="themeBtn" id="themeBtn" style="margin-top:auto"></button>
+  <div class="status" id="status" style="margin-top:0"></div>
 </aside>
 <main>
 
@@ -122,6 +133,31 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
   <div class="card chat">
     <div class="chatlog" id="chatlog"></div>
     <div class="chatbar"><textarea id="chatIn" rows="2" style="flex:1" placeholder="Converse com a E.V.A. para testar ou tirar dúvidas... (Enter envia)"></textarea><button class="btn" id="btnChat">Enviar</button><button class="btn ghost" id="btnChatClear">Limpar</button></div>
+  </div>
+</section>
+
+<section class="view" id="v-protocolos">
+  <h2>Protocolos</h2>
+  <p class="sub">Cada tipo aprende com os exemplos que você guardar. Depois é só passar as informações do atendimento e a E.V.A. escreve no mesmo formato.</p>
+  <div class="chips" id="protoChips"><button class="chip on" data-pt="informativo">Informativo</button><button class="chip" data-pt="prioridade">Prioridade</button><button class="chip" data-pt="rpa">Envio de RPA</button></div>
+  <div class="grid2">
+    <div class="card"><h3 id="protoTitle">Novo protocolo</h3>
+      <label>Informações deste atendimento</label>
+      <textarea id="protoInfo" rows="9" placeholder="Passe os dados: ticket, métricas, o que o cliente pediu, o que foi feito, nomes, datas, números..."></textarea>
+      <label>Conversa do atendimento (opcional)</label>
+      <textarea id="protoConv" rows="4" placeholder="Cole a conversa se quiser que ela use como base também"></textarea>
+      <div class="row"><button class="btn" id="btnProto">Gerar protocolo</button><button class="btn ghost" id="btnProtoClear">Limpar</button><span class="kbd">Ctrl + Enter</span></div>
+      <div class="out" id="outProto" style="margin-top:18px;min-height:0"></div>
+    </div>
+    <div class="card"><h3>Exemplos guardados deste tipo</h3>
+      <label>Colar um exemplo (preenchido, do jeito certo)</label>
+      <textarea id="protoEx" rows="7" placeholder="Cole aqui um protocolo/formulário de exemplo..."></textarea>
+      <div class="row"><button class="btn" id="btnProtoEx">Guardar exemplo</button></div>
+      <label>Regras fixas deste tipo (opcional)</label>
+      <textarea id="protoRules" rows="2" placeholder="Ex.: sempre em CAIXA ALTA, sempre terminar com o número do ticket"></textarea>
+      <div class="row"><button class="btn ghost sm" id="btnProtoRules">Salvar regras</button></div>
+      <div class="list" id="protoList"></div>
+    </div>
   </div>
 </section>
 
@@ -241,6 +277,7 @@ function busy(b){$('#orb').classList.toggle('busy',b)}
 // ---------- render ----------
 function md(s){let h=esc(s);
  h=h.replace(/&lt;msg&gt;([\s\S]*?)(&lt;\/msg&gt;|$)/g,(_,m)=>`<div class="msg"><span class="lbl">Mensagem sugerida</span><button class="btn ghost sm copy">Copiar</button><div class="mt">${m.trim()}</div></div>`)
+ .replace(/&lt;doc&gt;([\s\S]*?)(&lt;\/doc&gt;|$)/g,(_,m)=>`<div class="msg"><span class="lbl">Protocolo pronto</span><button class="btn ghost sm copy">Copiar</button><div class="mt">${m.replace(/^\n+|\n+$/g,'')}</div></div>`)
  .replace(/&lt;alerta&gt;([\s\S]*?)(&lt;\/alerta&gt;|$)/g,(_,m)=>`<div class="alert">⚠️ ${m.trim()}</div>`);
  const parts=h.split(/(<div class="msg">[\s\S]*?<\/div><\/div>|<div class="alert">[\s\S]*?<\/div>)/);
  return parts.map(p=>p.startsWith('<div')?p:p.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').split('\n').reduce((acc,l)=>{const t=l.trim();if(/^#{1,4} /.test(t))acc.push(`<h4>${t.replace(/^#+ /,'')}</h4>`);else if(/^[-*•] /.test(t))acc.push(`<li>${t.slice(2)}</li>`);else if(t)acc.push(`<p>${t}</p>`);return acc},[]).join('').replace(/(<li>[\s\S]*?<\/li>)(?!<li>)/g,'$1</ul>').replace(/(<\/ul>|^|<\/h4>|<\/p>)<li>/g,'$1<ul><li>').replace(/<\/li><\/ul><li>/g,'</li><li>')).join('')}
@@ -276,7 +313,7 @@ function renderDocs(){const q=$('#docSearch').value.trim();const L=$('#docList')
  $('#stDocs').textContent=DOCS.length;$('#stChunks').textContent=DOCS.reduce((a,d)=>a+d.chunks.length,0);const u=DOCS.map(d=>d.updated).sort().pop();$('#stUpd').textContent=u?new Date(u).toLocaleDateString('pt-BR'):'—'}
 function renderMem(){const q=norm($('#memSearch').value);const L=$('#memList');const items=MEM.filter(m=>!q||norm(m.q+' '+m.a).includes(q)).sort((a,b)=>b.id-a.id);
  L.innerHTML=items.length?items.map(m=>`<div class="item"><b>Situação:</b> ${esc(m.q)}<br><b>O que fazer:</b> ${esc(m.a)}<div class="row"><span class="pill">${new Date(m.id).toLocaleDateString('pt-BR')}</span><button class="btn ghost sm" data-editmem="${m.id}">Editar</button><button class="btn danger sm" data-delmem="${m.id}">Apagar</button></div></div>`).join(''):'<div class="empty">A memória cresce conforme você ensina.</div>'}
-function renderStatus(){$('#status').innerHTML=`<div><span class="dot ${CFG.key?'ok':''}"></span>${CFG.key?'IA conectada':'Sem chave da IA'}</div><div><span class="dot ${DOCS.length?'ok':''}"></span>${DOCS.length} doc(s) no material</div><div><span class="dot ${MEM.length?'ok':''}"></span>${MEM.length} aprendizado(s)</div><div class="kbd" style="margin-top:6px">${esc(CFG.model)}</div>`}
+function renderStatus(){$('#status').innerHTML=`<div><span class="dot ${CFG.key?'ok':''}"></span>${CFG.key?'IA conectada':'Sem chave da IA'}</div><div><span class="dot ${DOCS.length?'ok':''}"></span>${DOCS.length} doc(s) no material</div><div><span class="dot ${MEM.length?'ok':''}"></span>${MEM.length} aprendizado(s)</div><div><span class="dot ${Object.values(PROTOS).some(p=>p.ex.length)?'ok':''}"></span>${Object.values(PROTOS).reduce((a,p)=>a+p.ex.length,0)} exemplo(s) de protocolo</div><div class="kbd" style="margin-top:6px">${esc(CFG.model)}</div>`}
 async function refresh(){DOCS=await DB.all('docs');MEM=await DB.all('mem');buildIndex();renderDocs();renderMem();renderStatus()}
 document.addEventListener('click',async e=>{const t=e.target;
  if(t.dataset.deldoc&&confirm('Remover este documento?')){await DB.del('docs',t.dataset.deldoc);refresh()}
@@ -297,12 +334,35 @@ function fillModels(ms){const s=$('#cfgModel');const set=[...new Set([CFG.model,
 async function saveCfg(test=true){await DB.put('kv',CFG,'cfg');renderStatus();if(test){toast('Testando conexão...');const ok=await listModels(true);if(ok)toast('Tudo certo! E.V.A. conectada ✓')}}
 function openOv(){$('#ov').classList.add('on')}
 
+const ctrlEnter=(el,fn)=>el.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();fn()}});
+// ---------- protocolos ----------
+const PNAMES={informativo:'Informativo',prioridade:'Prioridade',rpa:'Envio de RPA'};
+let PROTOS={informativo:{ex:[],rules:''},prioridade:{ex:[],rules:''},rpa:{ex:[],rules:''}},PT='informativo';
+async function saveProtos(){await DB.put('kv',PROTOS,'protos');renderProtos();renderStatus()}
+function renderProtos(){const p=PROTOS[PT];$('#protoTitle').textContent='Novo protocolo • '+PNAMES[PT];$('#protoRules').value=p.rules||'';
+ $('#protoList').innerHTML=p.ex.length?p.ex.map((e,i)=>`<div class="item"><span class="pill">Exemplo ${i+1}</span><span class="pill">${new Date(e.id).toLocaleDateString('pt-BR')}</span><div style="white-space:pre-wrap;margin-top:8px;max-height:160px;overflow:auto">${esc(e.text)}</div><div class="row"><button class="btn danger sm" data-delex="${e.id}">Apagar</button></div></div>`).join(''):'<div class="empty">Nenhum exemplo de '+PNAMES[PT]+' ainda. Cole um modelo preenchido para ela aprender o formato.</div>'}
+async function gerarProto(){const info=$('#protoInfo').value.trim();if(!info)return toast('Passe as informações do atendimento');const p=PROTOS[PT];const out=$('#outProto');
+ if(!p.ex.length)return out.innerHTML='<div class="alert">Guarde pelo menos um exemplo de '+PNAMES[PT]+' para ela copiar o formato.</div>';
+ out.innerHTML=typing;
+ const exs=p.ex.slice(-6).map((e,i)=>`<EXEMPLO_${i+1}>\n${e.text}\n</EXEMPLO_${i+1}>`).join('\n\n');
+ const prompt=`Tarefa: escrever um protocolo do tipo "${PNAMES[PT]}".\n\nEXEMPLOS DE FORMATO (servem SOMENTE como modelo de estrutura, campos, ordem, rótulos, pontuação, tom e tamanho):\n${exs}\n\n${p.rules?'REGRAS FIXAS DESTE TIPO: '+p.rules+'\n\n':''}INFORMAÇÕES REAIS DESTE ATENDIMENTO (use apenas estas):\n"""${info}"""\n${$('#protoConv').value.trim()?'\nCONVERSA DO ATENDIMENTO:\n"""'+$('#protoConv').value.trim()+'"""\n':''}\nRegras:\n- Reproduza fielmente a estrutura e os rótulos dos exemplos, preenchendo cada campo com as informações reais acima.\n- NUNCA reaproveite dados dos exemplos (nomes, números, tickets, datas, métricas, situações). Tudo vem das informações reais.\n- Se faltar informação para um campo, escreva [PREENCHER] nesse campo.\n- Escreva a descrição geral do atendimento de forma clara, objetiva e profissional.\n- Responda com o protocolo inteiro entre <doc> e </doc>. Depois, se houver campos [PREENCHER], liste-os em uma linha começando com "Faltou:".`;
+ try{await gemini(prompt,t=>out.innerHTML=md(t))}catch(e){out.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}}
+document.querySelectorAll('#protoChips .chip').forEach(c=>c.onclick=()=>{document.querySelectorAll('#protoChips .chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');PT=c.dataset.pt;$('#outProto').innerHTML='';renderProtos()});
+$('#btnProtoEx').onclick=async()=>{const t=$('#protoEx').value.trim();if(!t)return toast('Cole um exemplo');PROTOS[PT].ex.push({id:Date.now(),text:t});$('#protoEx').value='';await saveProtos();toast('Exemplo de '+PNAMES[PT]+' guardado ✓')};
+$('#btnProtoRules').onclick=async()=>{PROTOS[PT].rules=$('#protoRules').value.trim();await saveProtos();toast('Regras salvas ✓')};
+$('#btnProto').onclick=gerarProto;$('#btnProtoClear').onclick=()=>{$('#protoInfo').value='';$('#protoConv').value='';$('#outProto').innerHTML=''};
+['#protoInfo','#protoConv'].forEach(s=>ctrlEnter($(s),gerarProto));
+document.addEventListener('click',async e=>{if(e.target.dataset.delex&&confirm('Apagar este exemplo?')){PROTOS[PT].ex=PROTOS[PT].ex.filter(x=>x.id!=e.target.dataset.delex);await saveProtos()}});
+// ---------- tema ----------
+function paintTheme(){const d=document.documentElement.dataset.theme==='dark';$('#themeBtn').textContent=d?'☀️ Tema claro':'🌙 Tema escuro'}
+$('#themeBtn').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('eva-theme',t);paintTheme()};paintTheme();
+
 // ---------- wire ----------
 document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$('#v-'+b.dataset.v).classList.add('on')});
 $('#btnAnalisar').onclick=analisar;$('#btnMelhorar').onclick=melhorar;$('#btnChat').onclick=chat;
 $('#btnNovo').onclick=()=>{$('#conv').value='';$('#convNote').value='';$('#outAtend').innerHTML='<div class="empty"><div class="orb"></div>Pronta para o próximo atendimento.</div>';$('#conv').focus()};
 $('#btnChatClear').onclick=()=>{HIST=[];$('#chatlog').innerHTML=''};
-const ctrlEnter=(el,fn)=>el.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();fn()}});
+const ctrlEnter2=(el,fn)=>el.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();fn()}});
 ['#conv','#convNote'].forEach(s=>ctrlEnter($(s),analisar));['#draft','#draftCtx'].forEach(s=>ctrlEnter($(s),melhorar));
 $('#chatIn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();chat()}});
 $('#btnMemAdd').onclick=async()=>{const q=$('#memQ').value.trim(),a=$('#memA').value.trim();if(!q||!a)return toast('Preencha situação e resposta');await DB.put('mem',{id:Date.now(),q,a});$('#memQ').value='';$('#memA').value='';await refresh();toast('Aprendido ✓')};
@@ -310,14 +370,14 @@ $('#memSearch').oninput=renderMem;$('#docSearch').oninput=renderDocs;
 $('#btnPaste').onclick=async()=>{const t=$('#pasteTxt').value.trim();if(!t)return toast('Cole o texto');await saveDoc($('#pasteName').value||'Texto colado',t);$('#pasteTxt').value=''};
 const drop=$('#drop');drop.onclick=()=>$('#fileIn').click();$('#fileIn').onchange=e=>handleFiles(e.target.files);
 drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};drop.ondragleave=()=>drop.classList.remove('over');drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');handleFiles(e.dataTransfer.files)};
-$('#btnExport').onclick=async()=>{const data={v:1,exported:new Date().toISOString(),mem:MEM,docs:DOCS.map(({chunks,...d})=>d)};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download='eva-atendimento-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
-$('#impFile').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());for(const m of d.mem||[])await DB.put('mem',m);for(const doc of d.docs||[])await DB.put('docs',{...doc,chunks:chunk(doc.text)});await refresh();toast('Backup importado ✓')}catch(err){toast('Arquivo inválido')}};
+$('#btnExport').onclick=async()=>{const data={v:2,exported:new Date().toISOString(),protos:PROTOS,mem:MEM,docs:DOCS.map(({chunks,...d})=>d)};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download='eva-atendimento-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
+$('#impFile').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());for(const m of d.mem||[])await DB.put('mem',m);if(d.protos){PROTOS=d.protos;await saveProtos()}for(const doc of d.docs||[])await DB.put('docs',{...doc,chunks:chunk(doc.text)});await refresh();toast('Backup importado ✓')}catch(err){toast('Arquivo inválido')}};
 $('#btnSaveCfg').onclick=()=>{CFG.key=$('#cfgKey').value.trim();CFG.model=$('#cfgModel').value||CFG.model;CFG.name=$('#cfgName').value.trim();CFG.style=$('#cfgStyle').value.trim();saveCfg()};
 $('#cfgModel').onchange=()=>{CFG.model=$('#cfgModel').value;saveCfg(false);toast('Modelo: '+CFG.model)};
 $('#btnModels').onclick=async()=>{toast('Verificando modelos...');if(await listModels(true))toast('Modelo em uso: '+CFG.model)};
 $('#btnWipe').onclick=async()=>{if(!confirm('Apagar chave, material e memória deste navegador? (Exporte um backup antes)'))return;await DB.clear('docs');await DB.clear('mem');await DB.clear('kv');location.reload()};
 $('#ovSave').onclick=async()=>{CFG.key=$('#ovKey').value.trim();if(!CFG.key)return;$('#ov').classList.remove('on');$('#cfgKey').value=CFG.key;await saveCfg()};
-(async()=>{await DB.open();const c=await DB.get('kv','cfg');if(c)CFG={...CFG,...c};if(/gemini-(1|2)\./.test(CFG.model))CFG.model=DEFAULT_MODEL;$('#cfgKey').value=CFG.key;$('#cfgName').value=CFG.name;$('#cfgStyle').value=CFG.style;fillModels([]);await refresh();
+(async()=>{await DB.open();const c=await DB.get('kv','cfg');if(c)CFG={...CFG,...c};if(/gemini-(1|2)\./.test(CFG.model))CFG.model=DEFAULT_MODEL;$('#cfgKey').value=CFG.key;$('#cfgName').value=CFG.name;$('#cfgStyle').value=CFG.style;fillModels([]);const pr=await DB.get('kv','protos');if(pr)Object.keys(PROTOS).forEach(k=>{if(pr[k])PROTOS[k]=pr[k]});renderProtos();await refresh();
  if(!CFG.key)openOv();else listModels();
  addBub('eva',md(`Oi${CFG.name?', '+CFG.name:''}! Eu sou a **E.V.A.** 💙\nCole um atendimento na aba Atendimento, ou me pergunte qualquer coisa do material.`))})();
 </script>
