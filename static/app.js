@@ -1,11 +1,12 @@
-// E.V.A. v1.0 — interface (chat em tempo real, aprovações, memórias, agenda, registro, ajustes)
+// E.V.A. v1.1 — interface (chat em tempo real, aprovações, memórias, agenda, registro, ajustes)
 'use strict';
 const $ = s => document.querySelector(s);
 const msgs = $('#msgs');
 const E = {
   ws: null, conectado: false, tentativas: 0, desligada: false, trabalhando: false,
   bolha: null, bolhaTexto: '', renderPendente: false, pronto: false, buffer: [],
-  acoes: {}, cards: {}, ultimaEva: '', pane: 'chat', logPagina: 1, tipos: false, timers: []
+  acoes: {}, cards: {}, ultimaEva: '', pane: 'chat', logPagina: 1, tipos: false, timers: [],
+  pc: null, pcSrcModo: '', telaWS: null, quadroTs: 0, parear: null
 };
 
 // ------------------------------------------------------------ utilidades
@@ -131,6 +132,7 @@ function tratar(ev) {
       break;
     case 'acao': {
       fecharBolha(true);
+      if ((ev.ferramenta || '').startsWith('computador_')) acaoPC(ev);
       status(`${ev.rotulo || ev.ferramenta}…`);
       const d = el('details', 'acao');
       d.innerHTML = `<summary><span class="st">⏳</span><span></span></summary><pre></pre>`;
@@ -156,7 +158,7 @@ function tratar(ev) {
     case 'erro':
       fecharBolha(true); addSis('⚠ ' + ev.texto, 'err'); break;
     case 'fim':
-      fecharBolha(false); status(null); setTrabalhando(false);
+      fecharBolha(false); status(null); setTrabalhando(false); acaoPC(null);
       if (ev.status === 'cancelada') addSis('⏹ Parei.');
       Object.entries(E.cards).forEach(([id, d]) => { if (!d.dataset.fim) resolverCard(id, 'encerrada'); });
       if (E.pane === 'log') carregarLog(true);
@@ -166,7 +168,8 @@ function tratar(ev) {
       addSis(ev.texto, 'lem'); notificar(ev.texto, true);
       if (E.pane === 'agenda') carregarLembretes(); break;
     case 'tela':
-      if (E.pane === 'tela' || matchMedia('(min-width:861px)').matches) carregarTela(); break;
+      if (telaVisivel() && !pcAoVivoAtivo()) carregarPrint(); break;
+    case 'computador': aplicarPC(ev); break;
     case 'ping': enviarWS({ tipo: 'pong' }); break;
   }
 }
@@ -179,6 +182,7 @@ function aplicarEstado(s) {
   k.querySelector('span').textContent = E.desligada ? 'Ligar' : 'Desligar';
   k.title = E.desligada ? 'Ligar a Eva de novo' : 'Desligar a Eva (para tudo na hora)';
   setTrabalhando(!!s.trabalhando);
+  if (s.computador) aplicarPC(s.computador);
   atualizarDot();
   if (s.chave_configurada === false) aviso('Falta configurar a chave da IA (EVA_LLM_API_KEY) no servidor.', true);
   else if (E.desligada) aviso('A Eva está DESLIGADA. Nada roda até você ligar de novo.', true);
@@ -296,15 +300,31 @@ const loaders = { tela: carregarTela, mem: carregarMem, agenda: carregarLembrete
 function abrir(p) {
   E.pane = p;
   document.querySelectorAll('.tabs button,nav button').forEach(b => b.classList.toggle('on', b.dataset.p === p));
-  if (p === 'chat') { document.body.classList.remove('lado'); rolar(true); return; }
+  if (p === 'chat') { document.body.classList.remove('lado'); rolar(true); sincronizarFrame(); return; }
   document.body.classList.add('lado');
   document.querySelectorAll('.pane').forEach(x => x.classList.toggle('on', x.id === p));
+  sincronizarFrame();
   loaders[p] && loaders[p]();
 }
 document.querySelectorAll('.tabs button,nav button').forEach(b => b.onclick = () => abrir(b.dataset.p));
 
-// Tela
-async function carregarTela() {
+// Tela: o computador AO VIVO — teu PC Windows (quadros pelo /ws/tela) ou o desktop da nuvem (noVNC num iframe);
+// sem nenhum, os prints do navegador reserva
+const desktop = () => matchMedia('(min-width:861px)').matches;
+function telaVisivel() { return $('#tela').classList.contains('on') && (desktop() || E.pane === 'tela') && !document.hidden; }
+const pcWindows = () => !!(E.pc && E.pc.backend === 'windows');
+function pcAoVivoAtivo() {
+  if (!E.pc || !E.pc.configurado || !E.pc.online) return false;
+  return pcWindows() ? true : !!(E.pc.ao_vivo && E.pc.vnc_url);
+}
+
+async function carregarTela(verificar) {
+  try { E.pc = Object.assign(E.pc || {}, await jget('/api/computador' + (verificar ? '?verificar=1' : ''))); } catch (_) { }
+  if (E.pc && E.pc.download_url) document.querySelectorAll('#pcBaixar,#dispBaixar').forEach(a => a.href = E.pc.download_url);
+  renderPC();
+  if (!pcAoVivoAtivo()) carregarPrint();
+}
+async function carregarPrint() {
   try {
     const r = await api('/api/tela');
     const img = $('#telaImg');
@@ -312,7 +332,265 @@ async function carregarTela() {
     else { img.hidden = true; $('#telaVazia').hidden = false; }
   } catch (_) { }
 }
-$('#atualizarTela').onclick = carregarTela;
+function aplicarPC(st) {
+  if (!st) return;
+  const chave = x => x ? `${x.configurado}|${x.online}|${x.controle_gabriel}|${x.backend}|${x.windows ? x.windows.pausado_no_pc + '|' + x.windows.conectado : ''}` : '';
+  const antes = chave(E.pc);
+  E.pc = Object.assign(E.pc || {}, st);
+  if (pcWindows() && E.pc.online && E.parear) pareamentoConcluido();
+  if (antes === chave(E.pc)) return;
+  // os links do iframe (com a senha da tela) vêm do /api/computador: busca de novo quando algo importante muda
+  if (E.pc.configurado && E.pc.online && !pcWindows() && !E.pc.vnc_url) carregarTela(); else renderPC();
+}
+function renderPC() {
+  const pc = E.pc || {};
+  const win = pcWindows();
+  const w = pc.windows || {};
+  const aoVivo = pcAoVivoAtivo();
+  $('#pcBox').hidden = !aoVivo;
+  $('#pcNao').hidden = !!pc.configurado || !E.pc || !!E.parear;
+  $('#pcOffline').hidden = !(pc.configurado && pc.verificado && !pc.online) || !!E.parear;
+  if (win) {
+    $('#pcOfflineTitulo').textContent = `🖥️ ${w.nome || 'Teu PC'} não está conectado agora`;
+    $('#pcOfflineTexto').textContent = 'Abra o EVA-Agente no PC (ícone roxo perto do relógio). Com o PC ligado e com internet, ele conecta sozinho em alguns segundos. Para trocar de PC ou cortar o acesso: Ajustes → Meu PC.';
+  } else {
+    $('#pcOfflineTitulo').textContent = '🖥️ O computador da Eva não está respondendo';
+    $('#pcOfflineTexto').textContent = 'Ele está configurado, mas não consegui falar com ele agora. Pode estar reiniciando (leva 1–2 minutos) ou a máquina na nuvem está desligada.';
+  }
+  $('#telaAntiga').hidden = aoVivo;
+  $('#telaAntigaDica').textContent = pc.configurado && pc.online && !pc.ao_vivo
+    ? 'Prints do computador da Eva (para ver ao vivo, configure EVA_PC_VNC_SENHA).'
+    : 'O navegador da Eva. Quando ela navega, o print aparece aqui.';
+  $('#pcFrame').hidden = win;
+  $('#pcImg').hidden = !win || !E.quadroTs;
+  $('#pcEsperando').hidden = !win || !!E.quadroTs || !!w.pausado_no_pc;
+  $('#pcPausado').hidden = !(win && w.pausado_no_pc);
+  $('#pcPausadoTexto').textContent = `A Eva está pausada no teu PC${w.motivo_pausa ? ' (' + w.motivo_pausa + ')' : ''}.`;
+  const controle = !!pc.controle_gabriel;
+  const b = $('#pcControle');
+  b.textContent = controle ? '🤖 Devolver pra Eva' : '🖐️ Assumir controle';
+  b.classList.toggle('ativo', controle);
+  $('#pcControleAviso').hidden = !controle;
+  $('#pcMoldura').classList.toggle('controle', controle && win);
+  $('#pcDigitar').hidden = !(controle && win);
+  $('#pcDica').textContent = controle
+    ? (win ? 'Você está no controle: toque/clique na imagem para clicar no PC (botão direito = menu, rodinha = rolar) e digite aqui embaixo ou no teclado. Quando terminar, devolva pra Eva.'
+      : 'Você está usando o computador (mouse e teclado). Quando terminar, devolva para a Eva continuar.')
+    : 'Você está só assistindo. Para fazer login ou mexer você mesmo, toque em “Assumir controle”.';
+  atualizarSeloAoVivo();
+  $('#pcStatus').textContent = !pc.configurado ? '' : !pc.online ? 'sem conexão' : (win && w.pausado_no_pc) ? 'pausada no PC' :
+    (controle ? 'você no controle' : (pc.acao_atual ? 'a Eva está usando' : (win ? (w.nome || 'conectado') : 'conectado')));
+  sincronizarFrame();
+}
+function atualizarSeloAoVivo() {
+  const vivo = pcAoVivoAtivo() && (!pcWindows() || (E.quadroTs && Date.now() - E.quadroTs < 8000));
+  $('#pcAoVivo').classList.toggle('off', !vivo);
+}
+setInterval(() => { if (pcWindows()) atualizarSeloAoVivo(); }, 1000);
+
+// liga a imagem ao vivo só quando a Tela está visível (economiza internet e bateria) e troca o modo assistir/controlar
+function sincronizarFrame() {
+  const f = $('#pcFrame');
+  const pc = E.pc || {};
+  const precisa = pcAoVivoAtivo() && telaVisivel();
+  // PC Windows: WebSocket de quadros (o PC só transmite enquanto alguém assiste)
+  if (pcWindows() && precisa) abrirTelaWS(); else fecharTelaWS();
+  if (!f) return;
+  if (pcWindows() || !precisa) {
+    if (f.getAttribute('src') && f.getAttribute('src') !== 'about:blank') f.src = 'about:blank';
+    E.pcSrcModo = '';
+    return;
+  }
+  const modo = pc.controle_gabriel ? 'controle' : 'assistir';
+  const url = modo === 'controle' ? pc.vnc_url_controle : pc.vnc_url;
+  if (url && E.pcSrcModo !== modo) { f.src = url; E.pcSrcModo = modo; }
+}
+function abrirTelaWS() {
+  if (E.telaWS && E.telaWS.readyState <= 1) return;
+  clearTimeout(E.telaWSRetry);
+  const ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/tela');
+  ws.binaryType = 'blob';
+  E.telaWS = ws;
+  ws.onmessage = ev => {
+    if (typeof ev.data === 'string') {
+      try { const m = JSON.parse(ev.data); if (m.tipo === 'erro') toast(m.texto, true); } catch (_) { }
+      return;
+    }
+    const img = $('#pcImg');
+    const antigo = img.src;
+    img.src = URL.createObjectURL(ev.data);
+    if (antigo && antigo.startsWith('blob:')) setTimeout(() => URL.revokeObjectURL(antigo), 1000);
+    const primeiro = !E.quadroTs;
+    E.quadroTs = Date.now();
+    if (primeiro) renderPC(); else atualizarSeloAoVivo();
+  };
+  ws.onclose = () => {
+    if (E.telaWS === ws) E.telaWS = null;
+    if (pcWindows() && pcAoVivoAtivo() && telaVisivel()) E.telaWSRetry = setTimeout(sincronizarFrame, 2500);
+  };
+}
+function fecharTelaWS() {
+  clearTimeout(E.telaWSRetry);
+  if (E.telaWS) { const ws = E.telaWS; E.telaWS = null; try { ws.close(); } catch (_) { } }
+}
+function enviarTela(o) { if (E.telaWS && E.telaWS.readyState === 1) { E.telaWS.send(JSON.stringify(o)); return true; } return false; }
+
+// controle remoto pela imagem (só com "Assumir controle")
+function pontoNaImagem(ev) {
+  const img = $('#pcImg');
+  const r = img.getBoundingClientRect();
+  const nw = img.naturalWidth || 16, nh = img.naturalHeight || 10;
+  const fator = Math.min(r.width / nw, r.height / nh);
+  const w = nw * fator, h = nh * fator, ox = r.left + (r.width - w) / 2, oy = r.top + (r.height - h) / 2;
+  const x = (ev.clientX - ox) / w, y = (ev.clientY - oy) / h;
+  if (x < 0 || x > 1 || y < 0 || y > 1) return null;
+  return { x: Math.round(x * 1000), y: Math.round(y * 1000) };
+}
+const podeControlar = () => pcWindows() && E.pc && E.pc.controle_gabriel;
+let cliqueT = null;
+$('#pcImg').addEventListener('click', ev => {
+  if (!podeControlar()) return;
+  const p = pontoNaImagem(ev); if (!p) return;
+  $('#pcMoldura').focus({ preventScroll: true });
+  if (cliqueT) { clearTimeout(cliqueT); cliqueT = null; enviarTela({ tipo: 'mouse', acao: 'duplo', ...p }); return; }
+  cliqueT = setTimeout(() => { cliqueT = null; enviarTela({ tipo: 'mouse', acao: 'clicar', ...p }); }, 260);
+});
+$('#pcImg').addEventListener('contextmenu', ev => {
+  if (!podeControlar()) return;
+  ev.preventDefault();
+  const p = pontoNaImagem(ev); if (p) enviarTela({ tipo: 'mouse', acao: 'direito', ...p });
+});
+let rodaT = 0;
+$('#pcImg').addEventListener('wheel', ev => {
+  if (!podeControlar()) return;
+  ev.preventDefault();
+  if (Date.now() - rodaT < 120) return; rodaT = Date.now();
+  const p = pontoNaImagem(ev) || { x: 500, y: 500 };
+  enviarTela({ tipo: 'rolar', dy: ev.deltaY > 0 ? 3 : -3, ...p });
+}, { passive: false });
+const TECLAS_PC = { Enter: 'enter', Backspace: 'backspace', Tab: 'tab', Escape: 'esc', Delete: 'delete', ArrowUp: 'up', ArrowDown: 'down',
+  ArrowLeft: 'left', ArrowRight: 'right', Home: 'home', End: 'end', PageUp: 'pageup', PageDown: 'pagedown', ' ': 'space' };
+let textoPend = '', textoT = null;
+function mandarTexto() { if (textoPend) { enviarTela({ tipo: 'texto', texto: textoPend }); textoPend = ''; } }
+$('#pcMoldura').addEventListener('keydown', ev => {
+  if (!podeControlar() || ev.target !== $('#pcMoldura')) return;
+  const mod = (ev.ctrlKey ? 'ctrl+' : '') + (ev.altKey ? 'alt+' : '') + (ev.metaKey ? 'win+' : '');
+  if (!mod && ev.key.length === 1 && ev.key !== ' ') {
+    textoPend += ev.key; clearTimeout(textoT); textoT = setTimeout(mandarTexto, 250); ev.preventDefault(); return;
+  }
+  const nome = TECLAS_PC[ev.key] || (/^F\d{1,2}$/.test(ev.key) ? ev.key.toLowerCase() : (mod && ev.key.length === 1 ? ev.key.toLowerCase() : null));
+  if (!nome) return;
+  ev.preventDefault(); mandarTexto();
+  enviarTela({ tipo: 'tecla', teclas: mod + nome });
+});
+$('#pcDigitarTxt').addEventListener('keydown', ev => {
+  if (ev.key !== 'Enter') return;
+  ev.preventDefault();
+  const t = ev.target.value; if (!t) { enviarTela({ tipo: 'tecla', teclas: 'enter' }); return; }
+  enviarTela({ tipo: 'texto', texto: t }); ev.target.value = '';
+});
+document.querySelectorAll('#pcDigitar [data-tecla]').forEach(b => b.onclick = () => {
+  const t = $('#pcDigitarTxt').value;
+  if (t) { enviarTela({ tipo: 'texto', texto: t }); $('#pcDigitarTxt').value = ''; }
+  enviarTela({ tipo: 'tecla', teclas: b.dataset.tecla });
+});
+
+function acaoPC(ev) {
+  const box = $('#pcAcao');
+  if (!ev) { box.hidden = true; if (E.pc) { E.pc.acao_atual = null; renderPC(); } return; }
+  const a = argsCurtos(ev.args);
+  $('#pcAcaoTexto').textContent = `${ev.rotulo || ev.ferramenta}${a ? ' — ' + a : ''}`;
+  box.hidden = false;
+  if (E.pc) { E.pc.acao_atual = ev.rotulo; $('#pcStatus').textContent = E.pc.controle_gabriel ? 'você no controle' : 'a Eva está usando'; }
+}
+async function trocarControle(gabriel) {
+  try {
+    const r = await (await api('/api/computador/controle', { method: 'POST', json: { gabriel } })).json();
+    E.pc = Object.assign(E.pc || {}, r);
+    await carregarTela();       // links novos e iframe no modo certo (assistir/controlar)
+    if (gabriel && pcWindows()) $('#pcMoldura').focus({ preventScroll: true });
+    toast(gabriel ? 'Você está no controle. A Eva espera você devolver.' : 'Controle devolvido pra Eva. 🤖');
+  } catch (_) { }
+}
+
+// Conectar meu PC (código de uso único que vale 10 minutos)
+async function parearPC() {
+  try {
+    const d = await (await api('/api/pc/parear', { method: 'POST' })).json();
+    E.parear = { fim: Date.now() + d.validade_s * 1000 };
+    $('#pcCodigo').textContent = d.codigo;
+    $('#pcEndereco').textContent = location.origin;
+    $('#pcParear').hidden = false;
+    abrir('tela');
+    clearInterval(E.parearT);
+    E.parearT = setInterval(async () => {
+      const resta = Math.max(0, Math.round((E.parear.fim - Date.now()) / 1000));
+      $('#pcTempo').textContent = `${Math.floor(resta / 60)}:${String(resta % 60).padStart(2, '0')}`;
+      if (resta % 3 === 0) { try { aplicarPC(await jget('/api/computador')); } catch (_) { } }
+      if (!resta) { cancelarPareamento(false); toast('O código venceu. Toque em “Conectar meu PC” para gerar outro.', true); }
+    }, 1000);
+    renderPC();
+  } catch (_) { }
+}
+function cancelarPareamento(avisarServidor) {
+  clearInterval(E.parearT); E.parear = null; $('#pcParear').hidden = true;
+  if (avisarServidor) api('/api/pc/parear', { method: 'DELETE' }).catch(() => { });
+  renderPC();
+}
+function pareamentoConcluido() {
+  cancelarPareamento(false);
+  toast(`Pronto! ${(E.pc.windows && E.pc.windows.nome) || 'Teu PC'} está conectado à Eva. 🎉`);
+  carregarTela();
+  if (E.pane === 'ajustes') carregarDispositivos();
+}
+$('#pcConectar').onclick = parearPC;
+$('#dispConectar').onclick = parearPC;
+$('#pcParearCancelar').onclick = () => cancelarPareamento(true);
+
+async function carregarDispositivos() {
+  const box = $('#dispLista');
+  let lista = [];
+  try { lista = await jget('/api/pc/dispositivos'); } catch (_) { return; }
+  box.innerHTML = lista.length ? '' : '<p class="hint">Nenhum PC conectado ainda.</p>';
+  lista.forEach(d => {
+    const row = el('div', 'disp');
+    const visto = d.ultimo_contato ? new Date(d.ultimo_contato).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : 'nunca';
+    row.innerHTML = `<span class="${d.conectado ? 'on' : 'off'}">●</span><div class="x">${esc(d.nome)}<small>${d.conectado ? 'conectado agora' : 'desligado · visto ' + esc(visto)}${d.versao ? ' · agente v' + esc(d.versao) : ''}</small></div>`;
+    const b = el('button', 'btn perigo'); b.textContent = 'Desconectar';
+    b.onclick = async () => {
+      if (!confirm(`Desconectar “${d.nome}”? A Eva perde o acesso a esse PC na hora (para voltar, precisa de um código novo).`)) return;
+      await api(`/api/pc/dispositivos/${d.id}`, { method: 'DELETE' });
+      toast('PC desconectado.'); carregarDispositivos(); carregarTela();
+    };
+    row.appendChild(b); box.appendChild(row);
+  });
+}
+
+$('#pcControle').onclick = () => trocarControle(!(E.pc && E.pc.controle_gabriel));
+$('#pcDevolver').onclick = () => trocarControle(false);
+$('#pcTentar').onclick = () => carregarTela(true);
+$('#pcGrande').onclick = () => document.body.classList.toggle('tela-grande');
+function sairCheia() {
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => { });
+  $('#pcMoldura').classList.remove('cheia'); $('#pcSairCheia').hidden = true;
+}
+$('#pcCheia').onclick = async () => {
+  const m = $('#pcMoldura');
+  try {
+    if (m.requestFullscreen) { await m.requestFullscreen(); return; }
+    if (m.webkitRequestFullscreen) { m.webkitRequestFullscreen(); return; }
+  } catch (_) { }
+  m.classList.add('cheia'); $('#pcSairCheia').hidden = false;   // iPhone: tela cheia "de mentirinha"
+};
+$('#pcSairCheia').onclick = sairCheia;
+$('#pcFrame').addEventListener('load', () => {
+  if (pcAoVivoAtivo() && E.pcSrcModo) $('#pcStatus').textContent = E.pc.controle_gabriel ? 'você no controle' : 'conectado';
+});
+document.addEventListener('visibilitychange', sincronizarFrame);
+window.addEventListener('resize', sincronizarFrame);
+setInterval(() => { if (telaVisivel() && E.pc && E.pc.configurado) carregarTela(); }, 20000);
+$('#atualizarTela').onclick = () => carregarTela(true);
+
 
 // Memórias
 let categorias = [];
@@ -434,6 +712,7 @@ async function carregarAjustes() {
     s.onchange = async () => { await api('/api/permissoes', { method: 'POST', json: { ferramenta: p.ferramenta, valor: s.value } }); s.className = 'v-' + s.value; toast('Permissão salva.'); };
     box.appendChild(d);
   });
+  carregarDispositivos();
   $('#persona').value = persona.texto;
   $('#personaInfo').textContent = persona.padrao ? '(usando a personalidade padrão)' : '(personalizada)';
   if (est) {
@@ -442,7 +721,8 @@ async function carregarAjustes() {
       'Modelos: ' + (est.modelos || []).map(m => `${m.modelo} (${m.status})`).join(', '),
       `Streaming: ${est.streaming ? 'sim' : 'não'} · Busca por significado (embeddings): ${est.embeddings ? 'sim' : 'não, usando palavras-chave'}`,
       `Banco: ${est.banco} · Chave da IA: ${est.chave_configurada ? 'configurada' : 'FALTANDO'}`,
-      `Navegador: ${est.navegador_aberto ? 'aberto' : 'fechado'}`
+      `Navegador: ${est.navegador_aberto ? 'aberto' : 'fechado'}`,
+      `Computador: ${!est.computador || !est.computador.configurado ? 'não configurado' : `${est.computador.backend === 'windows' ? 'teu PC (' + ((est.computador.windows || {}).nome || 'Windows') + ')' : 'desktop na nuvem'} — ${est.computador.online ? `ligado (${est.computador.largura}x${est.computador.altura})` : 'fora do ar'}`}`
     ].join('\n');
   }
 }
@@ -468,7 +748,7 @@ if ('serviceWorker' in navigator) {
 }
 conectar();
 estado();
-if (matchMedia('(min-width:861px)').matches) carregarTela();
+carregarTela();
 setInterval(() => { if (!document.hidden) estado(); }, 30000);
 
 $('#limparConversa').onclick = async () => {

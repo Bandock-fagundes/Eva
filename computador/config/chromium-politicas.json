@@ -1,0 +1,15 @@
+{
+  "BrowserSignin": 0,
+  "SyncDisabled": true,
+  "PasswordManagerEnabled": false,
+  "AutofillCreditCardEnabled": false,
+  "PaymentMethodQueryEnabled": false,
+  "MetricsReportingEnabled": false,
+  "PromotionalTabsEnabled": false,
+  "DefaultBrowserSettingEnabled": false,
+  "BackgroundModeEnabled": false,
+  "TranslateEnabled": false,
+  "ApplicationLocaleValue": "pt-BR",
+  "HomepageLocation": "https://www.google.com.br",
+  "RestoreOnStartup": 5
+}

@@ -34,6 +34,18 @@ PADRAO = {
     "listar_lembretes": "permitir",
     "cancelar_lembrete": "permitir",
     "perguntar_ao_gabriel": "permitir",
+    # Computador da Eva (PC Windows do Gabriel ou desktop na nuvem)
+    "computador_ver_tela": "permitir",
+    "computador_clicar": "permitir",    # vira 'perguntar' sozinho em tela de pagamento
+    "computador_digitar": "permitir",   # vira 'perguntar' sozinho em login/senha/pagamento ou cartão/CPF no texto
+    "computador_tecla": "permitir",     # Enter em tela de pagamento vira 'perguntar'
+    "computador_rolar": "permitir",
+    "computador_arrastar": "permitir",
+    "computador_abrir": "permitir",
+    "computador_comando": "perguntar",
+    "computador_janelas": "permitir",
+    "computador_area_transferencia": "permitir",  # ler vira 'perguntar' sozinho (pode ter senha copiada)
+    "computador_arquivo": "perguntar",
 }
 VALIDOS = ("permitir", "perguntar", "bloquear")
 

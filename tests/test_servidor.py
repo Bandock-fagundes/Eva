@@ -5,6 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from eva import server
+from eva.config import VERSAO
 from eva.memory import memory
 from tests.conftest import SENHA_TESTE
 
@@ -38,7 +39,7 @@ def test_saude_publica_sem_dados_sensiveis(cliente):
     r = cliente.get("/api/saude")
     assert r.status_code == 200
     d = r.json()
-    assert d == {"ok": True, "versao": "1.0", "banco": True, "chave_configurada": True}
+    assert d == {"ok": True, "versao": VERSAO, "banco": True, "chave_configurada": True, "computador_configurado": False}
     assert cliente.get("/api/saude?banco=0").json()["banco"] is None
 
 
@@ -140,7 +141,7 @@ def test_estado_mostra_modelo_em_uso(logado, fake):
     fake.adicionar({"texto": "ok"})
     logado.post("/api/chat", json={"texto": "oi"})
     e = logado.get("/api/estado").json()
-    assert e["modelo"] == "gemini-3.6-flash" and e["versao"] == "1.0"
+    assert e["modelo"] == "gemini-3.6-flash" and e["versao"] == VERSAO
     status = {m["modelo"]: m["status"] for m in e["modelos"]}
     assert status["gemini-3.8-flash"] == "indisponivel" and status["gemini-3.6-flash"] == "ok"
 

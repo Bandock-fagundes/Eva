@@ -4,3 +4,7 @@ __pycache__/
 data/
 workspace_eva/
 .pytest_cache/
+agente_windows/dist/
+agente_windows/pyi_build/
+agente_windows/empacotar/versao_windows.txt
+*.spec

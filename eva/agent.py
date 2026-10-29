@@ -16,7 +16,10 @@ from collections import deque
 from typing import Callable
 
 from . import audit, brain
-from .config import APROVACAO_TIMEOUT, FERRAMENTA_LIMITE_CHARS, MAX_STEPS, PERGUNTA_TIMEOUT, USER_NAME
+from .computador import mensagem_tela, pc, podar_telas
+from .pc_hub import hub
+from .config import (APROVACAO_TIMEOUT, FERRAMENTA_LIMITE_CHARS, MAX_STEPS, PC_ESPERA, PC_TELAS_CONTEXTO,
+                     PERGUNTA_TIMEOUT, USER_NAME)
 from .killswitch import kill_switch
 from .llm import LLMErro, cerebro
 from .memory import memory
@@ -175,6 +178,7 @@ class Gerenciador:
             await self.emitir({"tipo": "fim", "status": "erro"}, t)
         finally:
             self._resolver_pendentes(t)
+            pc.acao_atual = None
             t.fim.set()
 
     def _resolver_pendentes(self, t: Tarefa):
@@ -309,6 +313,7 @@ class Gerenciador:
             "tarefa": self.atual.resumo() if self.atual else None,
             "fila": [{"id": t.id, "texto": t.texto} for t in self.fila if t.status == "na_fila"],
             "modelo": cerebro.estado()["modelo_em_uso"],
+            "computador": pc.estado(),
         }
 
     def estado_evento(self) -> dict:
@@ -316,6 +321,21 @@ class Gerenciador:
 
 
 ger = Gerenciador()
+
+
+def _pc_mudou():
+    """O PC Windows conectou/desconectou/pausou: atualiza as telas abertas."""
+    ger.transmitir({"tipo": "computador", **pc.estado()})
+
+
+def _pc_emergencia(motivo: str):
+    """Ctrl+Alt+Shift+P (ou 'Pausar Eva' no ícone) no PC: para a tarefa da Eva na hora."""
+    audit.log("pc_emergencia", motivo=motivo)
+    ger.parar(f"pausa no PC: {motivo}")
+
+
+hub.ao_mudar = _pc_mudou
+hub.ao_emergencia = _pc_emergencia
 
 
 class Agente:
@@ -331,8 +351,14 @@ class Agente:
         if t.origem != "continuacao":
             memory.add_message("user", t.texto)
         audit.log("mensagem_usuario", tarefa=t.id, texto=t.texto, origem=t.origem)
-        msgs = await brain.montar_mensagens(t.texto)
-        ferramentas = schemas()
+        # Computador da Eva: se está configurado e respondendo, ele substitui o navegador headless antigo
+        # (Playwright); se está configurado mas fora do ar, o navegador antigo volta como reserva.
+        modo_pc, pc_tipo = None, None
+        if pc.configurado:
+            modo_pc = "online" if await pc.disponivel() else "offline"
+            pc_tipo = pc.backend()
+        msgs = await brain.montar_mensagens(t.texto, computador=modo_pc, pc_tipo=pc_tipo)
+        ferramentas = schemas(("navegador_",) if modo_pc == "online" else ("computador_",))
         resposta_vazia = 0
 
         async def ao_token(txt):
@@ -381,9 +407,17 @@ class Agente:
 
             if r.texto and r.texto.strip():
                 await emit({"tipo": "narracao", "texto": r.texto.strip()})
+            capturar, espera = False, 0.0
             for tc in r.tool_calls:
                 resultado = await self.executar_ferramenta(tc, t, g)
                 msgs.append({"role": "tool", "tool_call_id": tc["id"], "content": resultado})
+                spec = TOOLS.get((tc.get("function") or {}).get("name") or "")
+                if spec and spec.get("captura") and not resultado.startswith(("NEGADO", "BLOQUEADO")):
+                    capturar = True
+                    espera = max(espera, float(spec.get("espera") or 0))
+            if capturar and modo_pc == "online":
+                # o print vai DEPOIS de todas as respostas de ferramenta (a ordem que a API exige)
+                await self._anexar_tela(msgs, t, g, espera)
 
         # limite de passos: resume e pergunta se continua
         await emit({"tipo": "pensando", "passo": passo + 1, "limite": True})
@@ -402,6 +436,26 @@ class Agente:
         audit.log("limite_passos", tarefa=t.id, passos=MAX_STEPS)
         await emit({"tipo": "resposta", "texto": texto, "modelo": t.modelo, "limite": True})
         return texto
+
+    async def _anexar_tela(self, msgs: list[dict], t: Tarefa, g: Gerenciador, espera: float):
+        """Tira um print do computador e mostra ao modelo (mensagem de usuário com imagem), mantendo só os
+        prints mais recentes na conversa para economizar tokens."""
+        if pc.controle_gabriel or kill_switch.off:
+            return
+        espera = espera * (PC_ESPERA / 0.8)  # EVA_PC_ESPERA ajusta todas as esperas proporcionalmente
+        if espera > 0:
+            await asyncio.sleep(espera)
+        try:
+            img = await pc.capturar()
+        except Exception as e:  # noqa: BLE001 — sem print não é motivo para derrubar a tarefa
+            audit.log("tela_computador_falhou", tarefa=t.id, erro=str(e)[:300])
+            msgs.append({"role": "user", "content": f"[sistema] Não consegui tirar o print do computador agora "
+                                                    f"({str(e)[:200]}). Use computador_ver_tela para tentar de novo."})
+            return
+        podar_telas(msgs, max(0, PC_TELAS_CONTEXTO - 1))
+        msgs.append(mensagem_tela(img, pc.largura, pc.altura))
+        audit.log("tela_computador", tarefa=t.id, versao=pc.tela_versao, bytes=len(img))
+        await g.emitir({"tipo": "tela", "versao": pc.tela_versao, "fonte": "computador"}, t)
 
     @staticmethod
     def _somar_uso(t: Tarefa, uso: dict | None):
@@ -509,6 +563,11 @@ async def desligar_tudo(motivo: str = "botão de desligar") -> int:
     """Killswitch completo: bloqueia novas tarefas, cancela as atuais, fecha o navegador."""
     kill_switch.kill(motivo)
     n = ger.parar_tudo(motivo)
+    pc.acao_atual = None
+    try:
+        await pc.parar()  # para comandos em andamento no computador e solta mouse/teclas
+    except Exception as e:  # noqa: BLE001
+        log.warning("Falha ao parar o computador: %s", e)
     try:
         from .tools.browser import fechar_navegador
         await fechar_navegador()
@@ -521,4 +580,8 @@ async def desligar_tudo(motivo: str = "botão de desligar") -> int:
 def ligar():
     kill_switch.revive()
     cerebro.reset()
+    try:
+        asyncio.get_running_loop().create_task(hub.liberar())  # tira a pausa remota do PC Windows
+    except RuntimeError:
+        pass
     ger.transmitir(ger.estado_evento())

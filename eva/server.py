@@ -16,8 +16,10 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Resp
 from itsdangerous import BadSignature, URLSafeTimedSerializer
 from pydantic import BaseModel, Field
 
-from . import audit, brain, config, lembretes
+from . import audit, brain, config, lembretes, pc_hub
 from .agent import desligar_tudo, ger, ligar
+from .computador import ComputadorErro, pc
+from .pc_hub import hub
 from .config import HOST, ROOT, SENHA, USER_NAME, VERSAO
 from .db import db
 from .killswitch import kill_switch
@@ -33,7 +35,8 @@ log = logging.getLogger("eva.servidor")
 STATIC = ROOT / "static"
 COOKIE = "eva_sessao"
 COOKIE_IDADE = 60 * 60 * 24 * 365
-LIVRES = {"/login", "/manifest.json", "/sw.js", "/icon-192.png", "/icon-512.png", "/api/saude", "/favicon.ico"}
+LIVRES = {"/login", "/manifest.json", "/sw.js", "/icon-192.png", "/icon-512.png", "/api/saude", "/favicon.ico",
+          "/api/pc/parear/confirmar"}   # o agente do PC troca o código de pareamento pelo token (tem freio próprio)
 LOCAL = HOST in ("127.0.0.1", "localhost", "::1")
 
 _assinador = URLSafeTimedSerializer(
@@ -87,6 +90,7 @@ def _registrar_falha(ip: str):
 def zerar_limites():
     _falhas_ip.clear()
     _falhas_global.clear()
+    pc_hub.limite.zerar()
 
 
 # ---------------------------------------------------------------- ciclo de vida
@@ -229,18 +233,20 @@ async def saude(banco: int = 1):
         banco = await asyncio.to_thread(db.ok, 300)
     else:
         banco = None
-    return {"ok": banco is not False, "versao": VERSAO, "banco": banco, "chave_configurada": cerebro.configurado}
+    return {"ok": banco is not False, "versao": VERSAO, "banco": banco, "chave_configurada": cerebro.configurado,
+            "computador_configurado": pc.configurado}
 
 
 # ---------------------------------------------------------------- API
 
 @app.get("/api/estado")
 async def estado():
+    pc.checar_em_fundo()  # atualiza o status do computador sem travar a resposta
     e = ger.estado()
     llm = cerebro.estado()
     return {**e, "versao": VERSAO, "usuario": USER_NAME, "modelo": llm["modelo_em_uso"], "modelos": llm["cadeia"],
             "streaming": llm["streaming"], "embeddings": llm["embeddings"], "chave_configurada": cerebro.configurado,
-            "banco": "postgres" if db.pg else "sqlite", "navegador_aberto": nav.aberto}
+            "banco": "postgres" if db.pg else "sqlite", "navegador_aberto": nav.aberto}  # inclui "computador"
 
 
 @app.get("/api/historico")
@@ -427,10 +433,100 @@ async def apagar_memoria(mid: int):
 
 @app.get("/api/tela")
 async def tela():
+    """Último print: do computador da Eva (se houver um mais novo) ou do navegador antigo."""
+    if pc.tela and (not nav.tela or pc.configurado):
+        return Response(pc.tela, media_type="image/jpeg",
+                        headers={"Cache-Control": "no-store", "X-Versao": f"pc-{pc.tela_versao}", "X-Fonte": "computador"})
     img = nav.tela
     if not img:
         return Response(status_code=204)
     return Response(img, media_type="image/jpeg", headers={"Cache-Control": "no-store", "X-Versao": str(nav.tela_versao)})
+
+
+# ---------------------------------------------------------------- Computador da Eva
+
+@app.get("/api/computador")
+async def computador(verificar: bool = False):
+    """Status do computador + links da tela ao vivo (com a senha da tela; só para quem está logado)."""
+    if verificar and pc.configurado:
+        await pc.disponivel(forcar=True)
+    else:
+        pc.checar_em_fundo()
+    dispositivos = await asyncio.to_thread(pc_hub.listar_dispositivos)
+    return {**pc.estado(), "vnc_url": pc.vnc_link(controle=False), "vnc_url_controle": pc.vnc_link(controle=True),
+            "dispositivos": dispositivos, "download_url": config.PC_AGENTE_URL}
+
+
+class ControleIn(BaseModel):
+    gabriel: bool
+
+
+@app.post("/api/computador/controle")
+async def computador_controle(c: ControleIn):
+    """'Assumir controle' (gabriel=true): a Eva para de mexer no computador até ele devolver."""
+    if not pc.configurado:
+        raise HTTPException(400, "O computador da Eva não está configurado.")
+    pc.controle_gabriel = bool(c.gabriel)
+    await hub.controle(pc.controle_gabriel)   # o ícone no PC mostra quem está no controle
+    audit.log("computador_controle", quem=USER_NAME if c.gabriel else "Eva")
+    ger.transmitir({"tipo": "computador", **pc.estado()})
+    ger.transmitir(ger.estado_evento())
+    return {"ok": True, **pc.estado()}
+
+
+# ---------------------------------------------------------------- PC Windows do Gabriel (EVA-Agente)
+
+@app.post("/api/pc/parear")
+async def pc_parear():
+    """'Conectar meu PC': gera um código de uso único (vale 10 minutos) para digitar no EVA-Agente."""
+    d = await asyncio.to_thread(pc_hub.criar_codigo)
+    ger.transmitir({"tipo": "computador", **pc.estado()})
+    return {"ok": True, **d, "download_url": config.PC_AGENTE_URL}
+
+
+@app.delete("/api/pc/parear")
+async def pc_parear_cancelar():
+    await asyncio.to_thread(pc_hub.cancelar_codigo)
+    return {"ok": True}
+
+
+class ParearIn(BaseModel):
+    codigo: str = Field(min_length=4, max_length=20)
+    nome: str = Field(default="", max_length=100)
+    versao: str = Field(default="", max_length=40)
+
+
+@app.post("/api/pc/parear/confirmar")
+async def pc_parear_confirmar(p: ParearIn, request: Request):
+    """Público (o agente ainda não tem token). Troca o código pelo token do dispositivo."""
+    ip = _ip(request)
+    if pc_hub.limite.bloqueado(ip):
+        audit.log("pc_pareamento_bloqueado", ip=ip)
+        return JSONResponse({"ok": False, "erro": "Muitas tentativas erradas. Espere 10 minutos e gere um código novo."},
+                            status_code=429)
+    r = await asyncio.to_thread(pc_hub.confirmar_codigo, p.codigo, p.nome, p.versao)
+    if not r:
+        pc_hub.limite.falhou(ip)
+        audit.log("pc_pareamento_falhou", ip=ip)
+        await asyncio.sleep(0.5)
+        return JSONResponse({"ok": False, "erro": "Código errado ou vencido. Gere um novo no app da Eva (aba Tela → "
+                                                  "Conectar meu PC)."}, status_code=401)
+    ger.transmitir({"tipo": "computador", **pc.estado()})
+    return {"ok": True, "token": r["token"], "dispositivo_id": r["id"], "nome": r["nome"], "usuario": USER_NAME}
+
+
+@app.get("/api/pc/dispositivos")
+async def pc_dispositivos():
+    return await asyncio.to_thread(pc_hub.listar_dispositivos)
+
+
+@app.delete("/api/pc/dispositivos/{did}")
+async def pc_desconectar(did: int):
+    """'Desconectar': revoga o token do PC (o agente precisa de um código novo para voltar)."""
+    ok = await asyncio.to_thread(pc_hub.revogar_dispositivo, did)
+    await hub.fechar_dispositivo(did, 4401, "Desconectado pelo app da Eva")
+    ger.transmitir({"tipo": "computador", **pc.estado()})
+    return {"ok": ok}
 
 
 @app.get("/api/lembretes")
@@ -530,3 +626,182 @@ async def ws(sock: WebSocket):
         ger.remover_ouvinte(ouvinte)
         t_enviar.cancel()
         t_ping.cancel()
+
+
+# ---------------------------------------------------------------- WebSocket do PC Windows (EVA-Agente)
+
+class _ConexaoWS(pc_hub.Conexao):
+    def __init__(self, sock: WebSocket):
+        self.sock = sock
+        self.fechada = False
+
+    async def enviar_texto(self, texto: str):
+        await self.sock.send_text(texto)
+
+    async def enviar_bytes(self, dados: bytes):
+        await self.sock.send_bytes(dados)
+
+    async def fechar(self, codigo: int = 1000, motivo: str = ""):
+        if self.fechada:
+            return
+        self.fechada = True
+        try:
+            await self.sock.close(code=codigo, reason=(motivo or "")[:120])
+        except Exception:  # noqa: BLE001
+            pass
+
+
+def _ip_ws(sock: WebSocket) -> str:
+    xff = sock.headers.get("x-forwarded-for")
+    if xff:
+        return xff.split(",")[-1].strip()
+    return sock.client.host if sock.client else "?"
+
+
+@app.websocket("/ws/pc")
+async def ws_pc(sock: WebSocket):
+    """O EVA-Agente conecta aqui (conexão de SAÍDA do PC) com 'Authorization: Bearer <token do dispositivo>'."""
+    ip = _ip_ws(sock)
+    auth = sock.headers.get("authorization", "")
+    token = auth[7:].strip() if auth.lower().startswith("bearer ") else ""
+    await sock.accept()
+    if pc_hub.limite.bloqueado(ip):
+        await sock.close(code=4429, reason="muitas tentativas")
+        return
+    disp = await asyncio.to_thread(pc_hub.dispositivo_por_token, token)
+    if not disp:
+        pc_hub.limite.falhou(ip)
+        audit.log("pc_token_recusado", ip=ip)
+        await asyncio.sleep(0.3)
+        await sock.close(code=4401, reason="token invalido ou revogado")
+        return
+    try:
+        ola = json.loads(await asyncio.wait_for(sock.receive_text(), timeout=20))
+        if not isinstance(ola, dict) or ola.get("tipo") != "ola":
+            raise ValueError("primeira mensagem precisa ser 'ola'")
+    except (asyncio.TimeoutError, ValueError, WebSocketDisconnect, RuntimeError, KeyError):
+        try:
+            await sock.close(code=4400, reason="protocolo")
+        except Exception:  # noqa: BLE001
+            pass
+        return
+    conn = _ConexaoWS(sock)
+    await hub.conectar(conn, disp, ola)
+    motivo = "conexão caiu"
+    try:
+        while not conn.fechada:
+            msg = await asyncio.wait_for(sock.receive(), timeout=pc_hub.SEM_CONTATO_MAX)
+            if msg.get("type") == "websocket.disconnect":
+                motivo = f"agente saiu ({msg.get('code')})"
+                break
+            if msg.get("bytes") is not None:
+                await hub.receber_bytes(conn, msg["bytes"])
+            elif msg.get("text") is not None:
+                try:
+                    d = json.loads(msg["text"])
+                except ValueError:
+                    continue
+                if isinstance(d, dict):
+                    await hub.receber_texto(conn, d)
+    except asyncio.TimeoutError:
+        motivo = "sem sinal do PC"
+        await conn.fechar(4408, "sem sinal")
+    except WebSocketDisconnect:
+        pass
+    except Exception as e:  # noqa: BLE001
+        log.info("WebSocket do PC encerrado: %s", type(e).__name__)
+    finally:
+        await hub.desconectar(conn, motivo)
+
+
+# ---------------------------------------------------------------- tela ao vivo do PC Windows (para o navegador)
+
+async def _controle_remoto(msg: dict) -> str | None:
+    """Cliques/teclas do Gabriel na imagem ao vivo (só com 'Assumir controle' ligado). Devolve erro ou None."""
+    if not pc.controle_gabriel:
+        return "Toque em “Assumir controle” antes de mexer no PC pela tela."
+    if pc.backend() != "windows" or not hub.conectado:
+        return "O PC não está conectado."
+    if hub.largura and hub.altura:
+        pc.largura, pc.altura = hub.largura, hub.altura
+    tipo = msg.get("tipo")
+    try:
+        if tipo == "mouse":
+            acao = str(msg.get("acao") or "clicar")
+            if acao not in ("clicar", "duplo", "direito", "mover"):
+                return "ação inválida"
+            x, y = pc.para_pixels(msg.get("x"), msg.get("y"))
+            await hub.pedir("mouse", {"acao": acao, "x": x, "y": y, "origem": "gabriel"}, timeout=10)
+        elif tipo == "rolar":
+            x, y = pc.para_pixels(msg.get("x", 500), msg.get("y", 500))
+            dy = max(-10, min(10, int(msg.get("dy") or 0)))
+            if dy:
+                await hub.pedir("mouse", {"acao": "rolar", "x": x, "y": y, "dy": dy, "origem": "gabriel"}, timeout=10)
+        elif tipo == "texto":
+            texto = str(msg.get("texto") or "")[:2000]
+            if texto:
+                await hub.pedir("teclado", {"texto": texto, "origem": "gabriel"}, timeout=30)
+        elif tipo == "tecla":
+            teclas = str(msg.get("teclas") or "")[:60]
+            if teclas:
+                await hub.pedir("teclado", {"teclas": teclas, "origem": "gabriel"}, timeout=10)
+        else:
+            return None
+    except ComputadorErro as e:
+        return str(e).replace("ERRO: ", "").replace("ERRO do PC: ", "")
+    except (TypeError, ValueError):
+        return "dados inválidos"
+    audit.log("pc_controle_remoto", tipo=tipo, acao=msg.get("acao"))
+    return None
+
+
+@app.websocket("/ws/tela")
+async def ws_tela(sock: WebSocket):
+    """A aba Tela abre esta conexão só enquanto está visível; o PC só manda quadros enquanto alguém assiste."""
+    if not token_valido(sock.cookies.get(COOKIE)) or not _origem_ok(sock):
+        await sock.close(code=4401)
+        return
+    await sock.accept()
+    fila: asyncio.Queue = asyncio.Queue(maxsize=1)
+
+    def novo_quadro(dados: bytes):
+        if fila.full():  # internet lenta: descarta o quadro velho, manda só o mais novo
+            try:
+                fila.get_nowait()
+            except asyncio.QueueEmpty:
+                pass
+        try:
+            fila.put_nowait(("b", dados))
+        except asyncio.QueueFull:
+            pass
+
+    trava = asyncio.Lock()
+
+    async def enviar():
+        while True:
+            _, dados = await fila.get()
+            async with trava:
+                await sock.send_bytes(dados)
+
+    eid = await hub.adicionar_espectador(novo_quadro)
+    t_enviar = asyncio.create_task(enviar())
+    try:
+        while True:
+            bruto = await sock.receive_text()
+            try:
+                msg = json.loads(bruto)
+            except ValueError:
+                continue
+            if not isinstance(msg, dict):
+                continue
+            erro = await _controle_remoto(msg)
+            if erro:
+                async with trava:
+                    await sock.send_text(json.dumps({"tipo": "erro", "texto": erro}, ensure_ascii=False))
+    except WebSocketDisconnect:
+        pass
+    except Exception as e:  # noqa: BLE001
+        log.info("WebSocket da tela encerrado: %s", type(e).__name__)
+    finally:
+        t_enviar.cancel()
+        await hub.remover_espectador(eid)

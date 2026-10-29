@@ -1,0 +1,3 @@
+# Opções do Chromium dentro do container (sem GPU, sem sandbox do kernel — o container já isola).
+# --test-type esconde a faixa amarela de "opção não suportada".
+export CHROMIUM_FLAGS="$CHROMIUM_FLAGS --no-sandbox --test-type --disable-gpu --disable-dev-shm-usage --no-first-run --no-default-browser-check --password-store=basic --lang=pt-BR --start-maximized --force-dark-mode --disable-features=TranslateUI,MediaRouter"

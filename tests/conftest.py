@@ -23,6 +23,7 @@ def _porta_livre() -> int:
 
 
 PORTA_FAKE = _porta_livre()
+PORTA_PC = _porta_livre()
 SENHA_TESTE = "senha-de-teste-123"
 
 # precisa vir ANTES de importar a eva (config lê o ambiente na importação)
@@ -39,6 +40,12 @@ os.environ.update({
     "EVA_HOST": "127.0.0.1",
     "EVA_LEMBRETE_INTERVALO": "3600",
     "EVA_USER_NAME": "Gabriel",
+    # computador da Eva: desligado por padrão nos testes (os testes do computador ligam o falso)
+    "EVA_PC_URL": "",
+    "EVA_PC_TOKEN": "",
+    "EVA_PC_VNC_URL": "",
+    "EVA_PC_VNC_SENHA": "",
+    "EVA_PC_ESPERA": "0",
     # o servidor falso é local: nunca passar por proxy
     "NO_PROXY": "127.0.0.1,localhost",
     "no_proxy": "127.0.0.1,localhost",
@@ -46,9 +53,10 @@ os.environ.update({
 os.environ.pop("DATABASE_URL", None)
 os.environ.pop("EVA_LLM_FALLBACKS", None)
 
-from tests import fake_llm  # noqa: E402
+from tests import fake_llm, fake_pc  # noqa: E402
 
 _servidor_fake = fake_llm.iniciar(PORTA_FAKE)
+_servidor_pc = fake_pc.iniciar(PORTA_PC)
 
 from eva import agent as agent_mod  # noqa: E402
 from eva.db import db  # noqa: E402
@@ -56,6 +64,7 @@ from eva.killswitch import kill_switch  # noqa: E402
 from eva.lembretes import agendador  # noqa: E402
 from eva.llm import cerebro  # noqa: E402
 from eva.permissions import permissions  # noqa: E402
+from eva.computador import pc  # noqa: E402
 
 
 @pytest.fixture
@@ -65,8 +74,10 @@ def fake():
 
 @pytest.fixture(autouse=True)
 def ambiente_limpo():
-    for tabela in ("conversa", "memorias", "audit", "config", "resumos", "lembretes"):
+    for tabela in ("conversa", "memorias", "audit", "config", "resumos", "lembretes", "dispositivos"):
         db.run(f"DELETE FROM {tabela}")
+    from eva.pc_hub import hub
+    hub.reset()
     fake_llm.roteiro.reset()
     from eva.memory import memory
     memory._invalidar()
@@ -79,8 +90,12 @@ def ambiente_limpo():
     agendador.ao_disparar = None
     from eva import server
     server.zerar_limites()
+    pc.configurar(url="", token="", vnc_url="", vnc_senha="")
+    pc.controle_gabriel = False
+    fake_pc.estado.reset()
     yield
     agent_mod.ger.reset()
+    hub.reset()
 
 
 @pytest.fixture
@@ -100,3 +115,13 @@ async def rodar(texto: str, politica: str = "perguntar", timeout: float = 15):
 @pytest.fixture
 def rodar_tarefa():
     return rodar
+
+
+@pytest.fixture
+def pc_fake():
+    """Liga a Eva no agente do PC falso (tests/fake_pc.py)."""
+    pc.configurar(url=f"http://127.0.0.1:{PORTA_PC}", token=fake_pc.TOKEN,
+                  vnc_url="https://1-2-3-4.sslip.io/vnc/", vnc_senha="senhaVnc0123456789abcdef")
+    fake_pc.estado.reset()
+    yield fake_pc.estado
+    pc.configurar(url="", token="", vnc_url="", vnc_senha="")

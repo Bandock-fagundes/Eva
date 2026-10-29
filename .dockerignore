@@ -7,3 +7,5 @@ __pycache__
 *.zip
 .pytest_cache
 tests/__pycache__
+agente_windows
+.github

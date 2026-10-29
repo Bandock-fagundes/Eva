@@ -1,0 +1,6 @@
+# Agente do PC (roda dentro do container do desktop). Mesmas versões testadas da Eva.
+fastapi==0.162.0
+starlette==0.52.1
+uvicorn==0.41.0
+pydantic==2.14.1
+pillow==13.0.0

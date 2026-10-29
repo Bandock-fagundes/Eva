@@ -45,6 +45,70 @@ O `Dockerfile` já usa a imagem com Chromium. No Render, crie o serviço a parti
   (ex.: UptimeRobot) pode chamar `https://SEU-APP.onrender.com/api/saude?banco=0` a cada 10 min.
 - `GET /api/saude` é público e não mostra nada sensível (só se está ok, versão, banco e se a chave existe).
 
+## Conectar meu PC (a Eva usando o teu computador Windows)
+
+A Eva pode usar o **teu próprio PC** (Windows 10 ou 11): ver a tela, mexer o mouse, digitar, abrir programas e sites
+— sempre com você podendo assistir, pausar e desconectar. Nenhuma porta é aberta no PC: é o próprio PC que se liga
+na Eva (conexão segura de saída, como um navegador).
+
+### Instalar (uma vez só)
+1. No PC, abra o app da Eva, vá na aba **Tela** e clique em **⬇️ Baixar o EVA-Agente**
+   (ou baixe direto: https://github.com/Bandock-fagundes/Eva/releases/latest/download/EVA-Agente.exe).
+2. Dê dois cliques no `EVA-Agente.exe`. Se aparecer a tela azul **“O Windows protegeu o computador”**, clique em
+   **Mais informações** e depois em **Executar assim mesmo**. Isso é normal: o programa é novo e não tem uma
+   assinatura paga da Microsoft. (Se o antivírus reclamar, veja “Problemas comuns”.)
+3. Abre uma janelinha pedindo **Endereço da Eva** (já vem preenchido com `https://eva-hldw.onrender.com`) e um
+   **código**. No app da Eva (pode ser no celular), aba **Tela** → **🔗 Conectar meu PC**: aparece um código tipo
+   `K7PX-4MQ2`. Digite no EVA-Agente e clique **Conectar**. O código vale 10 minutos e só funciona uma vez.
+4. Pronto: a tela do PC aparece AO VIVO na aba Tela. Peça no chat, por exemplo: *“abre o Excel no meu PC e cria
+   uma planilha de gastos”*.
+
+### O ícone perto do relógio
+Um ícone roxo com “E” fica perto do relógio (talvez escondido na setinha **^**). A bolinha mostra o estado:
+🟢 conectado · 🟡 a Eva está usando o PC agora · 🔴 Eva pausada · ⚪ sem conexão (tentando de novo sozinho).
+Clique com o botão direito para: **Pausar Eva**, **Retomar Eva**, **Ver registro** (tudo que ela fez no PC, com hora),
+**Iniciar com o Windows** (liga/desliga), **Desconectar este PC da Eva** e **Sair**.
+Enquanto a Eva mexe, aparece embaixo da tela a faixa **“Eva está usando o computador”** (ela não atrapalha teus
+cliques e não aparece nos prints da Eva).
+
+### Parar na hora (emergência)
+- Aperte **Ctrl + Alt + Shift + P** → para TUDO na hora (o que ela estava fazendo é interrompido) e a Eva fica
+  pausada até você clicar em **Retomar Eva** no ícone.
+- Ou jogue o mouse com força para **um canto da tela** enquanto ela mexe → mesma coisa.
+- O botão **Desligar** do app também pausa o PC.
+
+### Assumir o controle pelo app
+Na aba Tela, **🖐️ Assumir controle**: a Eva para de mexer e você pode clicar na imagem do PC (botão direito =
+menu, rodinha = rolar) e digitar pela caixinha “Digitar no PC…”. Use isso para fazer login em sites (a Eva nunca
+digita senhas). Depois, **🤖 Devolver pra Eva**.
+
+### O que a Eva faz sozinha e o que ela pergunta
+Ela segue as **Permissões** (Ajustes): rodar comandos no PowerShell, copiar arquivos e ler a área de transferência
+**pedem tua aprovação**; telas de login/pagamento e números de cartão/CPF também. E ela foi instruída a **perguntar
+antes** de apagar arquivos, instalar programas, enviar mensagens ou comprar, e a nunca fechar trabalho não salvo.
+
+### Desconectar
+- No app: **Ajustes → Meu PC → Desconectar** (corta o acesso na hora, mesmo se o PC estiver longe de você).
+- Ou no PC: ícone → **Desconectar este PC da Eva**.
+Para voltar, é só gerar um código novo. (O token do PC fica guardado cifrado pela tua conta do Windows, e na Eva só
+fica uma “impressão digital” dele.)
+
+### Problemas comuns
+- **Antivírus apagou/bloqueou o EVA-Agente**: programas que controlam mouse e teclado às vezes são confundidos com
+  vírus. Baixe de novo pelo link oficial acima e, se precisar, marque como permitido no antivírus.
+- **Janelas de “Controle de Conta de Usuário” (UAC)** — aquela tela escurecida perguntando “Deseja permitir…?” — e a
+  tela de bloqueio: o Windows não deixa nenhum programa ver nem clicar nelas. Responda você mesmo no PC.
+- **A Eva estava dormindo** (Render grátis): o EVA-Agente espera e conecta sozinho quando ela acordar (pode levar
+  ~1 minuto). Enquanto o PC está conectado, ele dá um “oi” leve na Eva a cada 10 min para ela não dormir.
+- **Zoom do Windows (125%, 150%)**: tudo bem, o agente usa os pixels reais da tela.
+- **Mais de um monitor**: a Eva vê e usa só o monitor principal.
+
+Para desenvolvedores: o código do agente fica em `agente_windows/` (testes em `agente_windows/testes`, rodam no
+Linux com uma tela falsa). O `.exe` é gerado pelo GitHub Actions (`.github/workflows/agente-windows.yml`): para
+publicar uma versão nova, mude `VERSAO` em `agente_windows/eva_agente/__init__.py` e crie a tag `agente-vX.Y.Z`
+(ex.: `git tag agente-v1.0.0 && git push origin agente-v1.0.0`). O link “latest” do app passa a baixar essa versão.
+Variável opcional na Eva: `EVA_PC_AGENTE_URL` (outro link de download).
+
 ## Testar
 ```bash
 pip install -r requirements-dev.txt
@@ -63,7 +127,9 @@ python tests/teste_ao_vivo.py https://SEU-APP.onrender.com SUA_SENHA
 | Prompt | `eva/brain.py` + `eva/persona_padrao.md` | Personalidade + hora + regras + memórias + resumo |
 | Memória | `eva/memory.py` | Conversa, fatos duradouros (busca por significado), resumos |
 | Lembretes | `eva/lembretes.py` | Agenda e dispara lembretes |
-| Ferramentas | `eva/tools/` | web, navegador, arquivos, terminal, memória, lembretes, perguntar |
+| Ferramentas | `eva/tools/` | web, navegador, computador (`computador_*`), arquivos, terminal, memória, lembretes, perguntar |
+| Computador | `eva/computador.py` + `eva/pc_hub.py` | Transporte das ferramentas `computador_*`: teu PC Windows (WebSocket) ou desktop na nuvem (HTTP) |
+| EVA-Agente | `agente_windows/` | Programa do PC Windows: tela, mouse, teclado, ícone, atalho de emergência |
 | Permissões | `eva/permissions.py` | permitir / perguntar / bloquear por ferramenta |
 | Registro | `eva/audit.py` | Tudo que ela faz, com hora (aba Registro) |
 | Servidor | `eva/server.py` | Login, API, WebSocket |

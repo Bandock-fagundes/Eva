@@ -1,6 +1,6 @@
 // Service worker da E.V.A. — deixa instalável (Android/Windows), mostra notificações e nunca prende versão velha.
-const VERSAO = 'eva-v1.0.1';
-const CASCA = ['/', '/static/app.css?v=1.0.0', '/static/app.js?v=1.0.0', '/static/md.js?v=1.0.0', '/icon-192.png', '/manifest.json'];
+const VERSAO = 'eva-v1.1.1';
+const CASCA = ['/', '/static/app.css?v=1.1.1', '/static/app.js?v=1.1.1', '/static/md.js?v=1.1.1', '/icon-192.png', '/manifest.json'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -16,7 +16,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   const url = new URL(req.url);
-  if (req.method !== 'GET' || url.origin !== location.origin || url.pathname.startsWith('/api') || url.pathname === '/ws') return;
+  if (req.method !== 'GET' || url.origin !== location.origin || url.pathname.startsWith('/api') || url.pathname.startsWith('/ws')) return;
   e.respondWith((async () => {
     try {
       const r = await fetch(req, {cache: 'no-store'});

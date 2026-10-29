@@ -5,7 +5,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-VERSAO = "1.0"
+VERSAO = "1.1"
 
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
@@ -69,6 +69,22 @@ BROWSER_OCIOSO_MIN = _float("EVA_BROWSER_OCIOSO_MIN", 5.0)  # fecha o Chromium d
 BROWSER_LEVE = _bool("EVA_BROWSER_LEVE", False)            # --single-process etc. (servidor com pouca RAM)
 # por segurança, ler_pagina/navegador não acessam endereços internos (localhost, 10.x, 192.168.x...)
 PERMITIR_ENDERECOS_LOCAIS = _bool("EVA_PERMITIR_ENDERECOS_LOCAIS", False)
+
+# ===== Computador da Eva (desktop Linux na nuvem, controlado por print + mouse/teclado) =====
+# EVA_PC_URL: endereço do agente do PC, ex.: https://129-146-10-20.sslip.io/pc  (vazio = sem computador)
+PC_URL = os.getenv("EVA_PC_URL", "").strip().rstrip("/")
+PC_TOKEN = os.getenv("EVA_PC_TOKEN", "").strip()
+# tela ao vivo (noVNC). Se vazio, é deduzido do EVA_PC_URL (.../pc -> .../vnc/)
+PC_VNC_URL = os.getenv("EVA_PC_VNC_URL", "").strip()
+PC_VNC_SENHA = os.getenv("EVA_PC_VNC_SENHA", "").strip()
+PC_TIMEOUT = _float("EVA_PC_TIMEOUT", 30.0)            # segundos por chamada ao agente do PC
+PC_ESPERA = _float("EVA_PC_ESPERA", 0.8)              # espera depois de uma ação antes do print
+PC_TELAS_CONTEXTO = max(1, _int("EVA_PC_TELAS_CONTEXTO", 2))  # quantos prints ficam na conversa com o modelo
+PC_TELA_LARGURA = _int("EVA_PC_TELA_LARGURA", 1280)   # largura máxima do print mandado ao modelo
+PC_TELA_QUALIDADE = _int("EVA_PC_TELA_QUALIDADE", 60)  # qualidade JPEG do print
+# PC Windows do Gabriel (programa EVA-Agente): link de download mostrado no app
+PC_AGENTE_URL = os.getenv("EVA_PC_AGENTE_URL",
+                          "https://github.com/Bandock-fagundes/Eva/releases/latest/download/EVA-Agente.exe").strip()
 
 # ===== Servidor =====
 PORT = _int("PORT", _int("EVA_PORT", 8000))

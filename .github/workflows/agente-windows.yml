@@ -1,0 +1,97 @@
+# Constrói o EVA-Agente.exe (o programa que deixa a Eva usar o PC Windows do Gabriel).
+# - Em todo push que mexe em agente_windows/: roda os testes no Windows e guarda o .exe como "artifact".
+# - Numa tag agente-vX.Y.Z (igual a VERSAO em agente_windows/eva_agente/__init__.py): publica um Release com o
+#   EVA-Agente.exe, que o app da Eva baixa por
+#   https://github.com/Bandock-fagundes/Eva/releases/latest/download/EVA-Agente.exe
+name: EVA-Agente (Windows)
+
+on:
+  push:
+    tags: ["agente-v*"]
+    branches: [main, master]
+    paths: ["agente_windows/**", ".github/workflows/agente-windows.yml"]
+  pull_request:
+    paths: ["agente_windows/**", ".github/workflows/agente-windows.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # para criar o Release
+
+concurrency:
+  group: agente-windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: agente_windows
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: agente_windows/requirements-dev.txt
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Testes do agente (no Windows de verdade)
+        run: python -m pytest -q -rs testes
+
+      - name: Informações de versão (e conferir a tag)
+        run: python empacotar/gerar_versao.py "${{ github.ref }}"
+
+      - name: Empacotar EVA-Agente.exe (PyInstaller)
+        run: >
+          pyinstaller --noconfirm --clean --onefile --windowed --name EVA-Agente
+          --icon recursos/eva.ico --add-data "recursos/eva.ico;recursos"
+          --version-file empacotar/versao_windows.txt
+          --hidden-import pystray._win32 --hidden-import websockets.asyncio.client
+          --collect-submodules websockets
+          --workpath pyi_build --distpath dist
+          main.py
+
+      - name: Conferir o .exe
+        run: |
+          $exe = Get-Item dist/EVA-Agente.exe
+          "Tamanho: {0:N1} MB" -f ($exe.Length / 1MB)
+          (Get-Item dist/EVA-Agente.exe).VersionInfo | Format-List FileDescription, FileVersion, ProductName
+          $hash = (Get-FileHash $exe -Algorithm SHA256).Hash
+          "$hash  EVA-Agente.exe" | Out-File -Encoding ascii dist/EVA-Agente.exe.sha256
+          "SHA256: $hash"
+
+      - name: Guardar como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EVA-Agente
+          path: |
+            agente_windows/dist/EVA-Agente.exe
+            agente_windows/dist/EVA-Agente.exe.sha256
+          retention-days: 30
+
+      - name: Publicar Release
+        if: startsWith(github.ref, 'refs/tags/agente-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: EVA-Agente ${{ github.ref_name }}
+          make_latest: true
+          files: |
+            agente_windows/dist/EVA-Agente.exe
+            agente_windows/dist/EVA-Agente.exe.sha256
+          body: |
+            **EVA-Agente** — deixa a E.V.A. usar o teu PC Windows 10/11 (com teu controle total).
+
+            1. Baixe o `EVA-Agente.exe` aqui embaixo e dê dois cliques.
+            2. Se aparecer "O Windows protegeu o computador": **Mais informações → Executar assim mesmo**
+               (o programa não tem assinatura paga; o SHA256 está em `EVA-Agente.exe.sha256`).
+            3. No app da Eva: aba **Tela → Conectar meu PC** e digite o código no EVA-Agente.
+
+            Para parar a Eva na hora: **Ctrl+Alt+Shift+P** (ou jogue o mouse num canto da tela).

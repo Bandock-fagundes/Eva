@@ -1,0 +1,91 @@
+# O Computador da Eva — sobe com:  docker compose up -d --build
+# (o instalar.sh faz tudo isso sozinho e escreve o arquivo .env com as senhas)
+#
+#   desktop : área de trabalho Linux (XFCE + Chromium + LibreOffice) + VNC + noVNC + agente do PC
+#   caddy   : HTTPS automático em https://<ip-com-tracos>.sslip.io
+#               /pc/*  -> agente do PC (precisa do EVA_PC_TOKEN)
+#               /vnc/* -> tela ao vivo (noVNC; conexão protegida pela EVA_PC_VNC_SENHA)
+#               /      -> a Eva (se o serviço "eva" estiver ligado)
+#   eva     : OPCIONAL (perfil "eva"): a própria Eva rodando 24h nesta máquina
+#               docker compose --profile eva up -d --build
+name: eva-computador
+
+services:
+  desktop:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: eva-computador:latest
+    hostname: computador-da-eva
+    restart: unless-stopped
+    shm_size: "1gb"
+    mem_limit: ${EVA_PC_MEMORIA:-6g}
+    environment:
+      EVA_PC_TOKEN: ${EVA_PC_TOKEN:?rode o instalar.sh (falta EVA_PC_TOKEN no .env)}
+      EVA_PC_VNC_SENHA: ${EVA_PC_VNC_SENHA:?rode o instalar.sh (falta EVA_PC_VNC_SENHA no .env)}
+      EVA_PC_RESOLUCAO: ${EVA_PC_RESOLUCAO:-1280x800}
+      EVA_PC_SUDO: ${EVA_PC_SUDO:-nao}
+      TZ: America/Sao_Paulo
+    volumes:
+      - casa:/home/eva
+    expose:
+      - "6080"
+      - "8765"
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - desktop
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMINIO: ${DOMINIO:?rode o instalar.sh (falta DOMINIO no .env)}
+      EVA_PC_VNC_SENHA: ${EVA_PC_VNC_SENHA}
+      PERMITIR_IFRAME_DE: ${PERMITIR_IFRAME_DE:-https://*.onrender.com http://localhost:8000 http://127.0.0.1:8000}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_dados:/data
+      - caddy_config:/config
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  eva:
+    profiles: ["eva"]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: eva-app:latest
+    restart: unless-stopped
+    depends_on:
+      - desktop
+    env_file:
+      - .env
+    environment:
+      EVA_HOST: 0.0.0.0
+      PORT: "8000"
+      EVA_PC_URL: http://desktop:8765
+      EVA_PC_VNC_URL: https://${DOMINIO}/vnc/
+      EVA_DATA_DIR: /dados
+      EVA_WORKSPACE: /dados/workspace_eva
+      # máquina com bastante memória: o navegador reserva (Playwright) não precisa do modo econômico
+      EVA_BROWSER_LEVE: "false"
+    volumes:
+      - eva_dados:/dados
+    expose:
+      - "8000"
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  casa:
+  caddy_dados:
+  caddy_config:
+  eva_dados:

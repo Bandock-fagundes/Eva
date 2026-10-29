@@ -149,6 +149,53 @@ input:focus,select:focus,textarea:focus{border-color:var(--acc)}
 #toast.erro{border-color:var(--red)}
 nav{display:none}
 
+/* Computador da Eva (tela ao vivo) */
+.pc-barra{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.ao-vivo{font-size:11px;font-weight:800;letter-spacing:1px;color:#fff;background:var(--red);border-radius:6px;padding:2px 8px;animation:pulso 1.6s infinite}
+.ao-vivo.off{background:var(--card2);color:var(--mut);animation:none}
+.pc-status{font-size:12.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}
+.btn.icone{padding:8px 10px;line-height:1}
+.pc-moldura{position:relative;width:100%;aspect-ratio:16/10;background:#000;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.pc-moldura iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.pc-moldura.cheia{position:fixed;inset:0;z-index:60;border-radius:0;aspect-ratio:auto;border:0}
+.pc-moldura:fullscreen{border-radius:0;border:0}
+.pc-acao{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);display:flex;gap:8px;align-items:center;
+  background:rgba(11,13,18,.82);border:1px solid var(--line);color:var(--txt);font-size:12.5px;padding:6px 10px;border-radius:10px;
+  pointer-events:none;backdrop-filter:blur(4px)}
+.pc-acao span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-controle{position:absolute;left:50%;top:10px;transform:translateX(-50%);display:flex;gap:10px;align-items:center;
+  background:rgba(36,29,13,.92);border:1px solid var(--warn);color:#ffe0a3;font-size:12.5px;padding:6px 8px 6px 12px;border-radius:12px;max-width:94%}
+.pc-controle .btn{padding:5px 10px;font-size:12.5px}
+.pc-sair{position:absolute;right:10px;top:10px;z-index:2}
+.pc-moldura img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;user-select:none;-webkit-user-select:none}
+.pc-moldura.controle img{cursor:crosshair;outline:2px solid var(--warn);outline-offset:-2px}
+.pc-moldura:focus{outline:none}
+.pc-esperando,.pc-pausado{position:absolute;inset:0;display:grid;place-content:center;text-align:center;gap:6px;color:var(--mut);font-size:13px;padding:16px}
+.pc-esperando{display:flex;align-items:center;justify-content:center;gap:8px}
+.pc-pausado{background:rgba(40,8,12,.82);color:#ffd0d5;font-weight:600}
+.pc-pausado small{font-weight:400;color:#f3b4bb}
+.pc-digitar{display:flex;gap:6px;margin-top:8px}
+.pc-digitar input{flex:1;min-width:0}
+.pc-digitar .btn{padding:8px 10px}
+.pc-passos{margin:8px 0 12px;padding-left:20px}
+.pc-passos li{margin:8px 0}
+.pc-passos .btn{display:inline-block;text-decoration:none;margin-right:4px}
+.pc-parear{text-align:center;border-color:var(--acc)}
+.pc-codigo{font:700 38px/1.2 ui-monospace,Consolas,monospace;letter-spacing:5px;color:#fff;background:#0b0d12;border:1px dashed var(--acc);
+  border-radius:12px;padding:12px 8px;margin:10px auto;max-width:360px;user-select:all}
+.disp{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.disp .x{flex:1}.disp small{display:block;color:var(--mut);font-size:11.5px}
+.disp .on{color:var(--ok)}.disp .off{color:var(--mut)}
+a.btn{text-decoration:none;display:inline-block}
+.pc-card h3{margin:0 0 6px}
+.pc-card p{margin:6px 0}
+#pcControle.ativo{background:var(--warn);color:#241d0d;border-color:var(--warn);font-weight:700}
+body.tela-grande main{grid-template-columns:minmax(320px,1fr) min(64vw,1180px)}
+@media (max-width:860px){
+  body.tela-grande main{display:block}
+  .pc-status{max-width:30%}
+}
+
 /* celular */
 @media (max-width:860px){
   main{display:block;position:relative}

@@ -9,13 +9,13 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/icon-192.png">
-<link rel="stylesheet" href="/static/app.css?v=1.0.0">
+<link rel="stylesheet" href="/static/app.css?v=1.1.1">
 <title>E.V.A.</title>
 </head>
 <body>
 <header id="topo">
   <div id="dot" title="status"></div>
-  <div class="marca"><h1>E.V.A.</h1><span id="versao">v1.0</span></div>
+  <div class="marca"><h1>E.V.A.</h1><span id="versao">v1.1</span></div>
   <span id="modelo" class="chip" title="modelo de IA em uso">…</span>
   <div class="sp"></div>
   <button id="kill" class="kill" title="Desligar a Eva (para tudo na hora)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg><span>Desligar</span></button>
@@ -37,10 +37,67 @@
       <button data-p="agenda">Agenda</button><button data-p="log">Registro</button><button data-p="ajustes">Ajustes</button>
     </div>
     <div id="tela" class="pane on">
-      <div class="barra"><p class="hint">O computador virtual da Eva. Quando ela navega, a tela aparece aqui.</p>
-        <button class="btn sec" id="atualizarTela">Atualizar</button></div>
-      <img id="telaImg" alt="Tela do navegador da Eva" hidden>
-      <p id="telaVazia" class="vazio">Nada aberto no navegador agora.</p>
+      <!-- Computador AO VIVO: teu PC Windows (quadros JPEG por /ws/tela) ou o desktop da nuvem (noVNC) -->
+      <div id="pcBox" hidden>
+        <div class="pc-barra">
+          <span id="pcAoVivo" class="ao-vivo off">● AO VIVO</span>
+          <span id="pcStatus" class="pc-status">conectando…</span>
+          <span class="sp"></span>
+          <button class="btn sec" id="pcControle" title="Você passa a usar o mouse e o teclado; a Eva espera">🖐️ Assumir controle</button>
+          <button class="btn sec icone" id="pcGrande" title="Tela maior">⤢</button>
+          <button class="btn sec icone" id="pcCheia" title="Tela cheia">⛶</button>
+        </div>
+        <div id="pcMoldura" class="pc-moldura" tabindex="0">
+          <iframe id="pcFrame" title="Computador da Eva ao vivo" allow="clipboard-read; clipboard-write; fullscreen" referrerpolicy="no-referrer"></iframe>
+          <img id="pcImg" alt="Tela do teu PC ao vivo" hidden draggable="false">
+          <div id="pcEsperando" class="pc-esperando" hidden><span class="spin"></span> Esperando a imagem do teu PC…</div>
+          <div id="pcPausado" class="pc-pausado" hidden>⏸ <span id="pcPausadoTexto">A Eva está pausada no teu PC.</span><br><small>Para liberar: no PC, ícone da Eva perto do relógio → Retomar.</small></div>
+          <div id="pcAcao" class="pc-acao" hidden><span class="spin"></span><span id="pcAcaoTexto"></span></div>
+          <div id="pcControleAviso" class="pc-controle" hidden>🖐️ Você está no controle — a Eva espera você devolver.
+            <button class="btn" id="pcDevolver">Devolver pra Eva</button></div>
+          <button id="pcSairCheia" class="btn sec pc-sair" hidden>✕ Sair da tela cheia</button>
+        </div>
+        <div id="pcDigitar" class="pc-digitar" hidden>
+          <input id="pcDigitarTxt" placeholder="Digitar no PC…" autocomplete="off" enterkeyhint="send">
+          <button class="btn sec" data-tecla="enter" title="Enter">⏎</button><button class="btn sec" data-tecla="backspace" title="Apagar">⌫</button>
+          <button class="btn sec" data-tecla="tab" title="Tab">⇥</button><button class="btn sec" data-tecla="esc" title="Esc">Esc</button>
+        </div>
+        <p class="hint" id="pcDica">Você está só assistindo. Para fazer login ou mexer você mesmo, toque em “Assumir controle”.</p>
+      </div>
+      <!-- Código de pareamento (Conectar meu PC) -->
+      <div id="pcParear" class="card pc-card pc-parear" hidden>
+        <h3>🔗 Digite este código no EVA-Agente</h3>
+        <div id="pcCodigo" class="pc-codigo">····-····</div>
+        <p class="hint">Endereço da Eva: <code id="pcEndereco"></code> · vale por <b id="pcTempo">10:00</b></p>
+        <p class="hint">Assim que o PC conectar, a tela dele aparece aqui sozinha.</p>
+        <button class="btn sec" id="pcParearCancelar">Cancelar</button>
+      </div>
+      <!-- Computador configurado mas fora do ar -->
+      <div id="pcOffline" class="card pc-card" hidden>
+        <h3 id="pcOfflineTitulo">🖥️ O computador da Eva não está respondendo</h3>
+        <p id="pcOfflineTexto">Ele está configurado, mas não consegui falar com ele agora. Pode estar reiniciando (leva 1–2 minutos) ou a máquina na nuvem está desligada.</p>
+        <p class="hint">Enquanto isso a Eva usa o navegador reserva, e os prints aparecem aqui embaixo.</p>
+        <button class="btn sec" id="pcTentar">Tentar de novo</button>
+      </div>
+      <!-- Ainda não configurado -->
+      <div id="pcNao" class="card pc-card" hidden>
+        <h3>🖥️ O teu PC ainda não está conectado à Eva</h3>
+        <p>Conectando o teu PC (Windows 10 ou 11), a Eva passa a usar ele de verdade quando você pedir — e você assiste tudo ao vivo aqui, podendo assumir o controle quando quiser.</p>
+        <ol class="pc-passos">
+          <li><a id="pcBaixar" class="btn" href="https://github.com/Bandock-fagundes/Eva/releases/latest/download/EVA-Agente.exe" rel="noopener">⬇️ Baixar o EVA-Agente</a> no teu PC e dar dois cliques nele.</li>
+          <li>Se aparecer <b>“O Windows protegeu o computador”</b>, clique em <b>Mais informações</b> → <b>Executar assim mesmo</b>. (É normal: o programa é novo e não tem assinatura paga.)</li>
+          <li>Toque em <b>Conectar meu PC</b> aqui embaixo e digite o código que aparecer no EVA-Agente.</li>
+        </ol>
+        <button class="btn" id="pcConectar">🔗 Conectar meu PC</button>
+        <p class="hint">Depois disso aparece um ícone roxo perto do relógio. Para parar a Eva na hora: <b>Ctrl+Alt+Shift+P</b> (ou jogue o mouse num canto da tela).</p>
+      </div>
+      <!-- Prints (navegador reserva / sem tela ao vivo) -->
+      <div id="telaAntiga">
+        <div class="barra"><p class="hint" id="telaAntigaDica">O navegador da Eva. Quando ela navega, o print aparece aqui.</p>
+          <button class="btn sec" id="atualizarTela">Atualizar</button></div>
+        <img id="telaImg" alt="Print da tela da Eva" hidden>
+        <p id="telaVazia" class="vazio">Nada aberto no navegador agora.</p>
+      </div>
     </div>
     <div id="mem" class="pane">
       <div class="barra"><input id="memBusca" type="search" placeholder="Buscar nas memórias…"><button class="btn" id="memNovaBtn">+ Nova</button></div>
@@ -71,6 +128,10 @@
       <p class="hint">O que a Eva faz sozinha, o que ela pergunta antes, e o que é proibido. ⚡ = pede aprovação sozinha em situações sensíveis (compra, senha, cartão).</p>
       <div id="permLista"></div>
       <button class="btn sec" id="permRestaurar">Restaurar padrões</button>
+      <h3>Meu PC</h3>
+      <p class="hint">Computadores que a Eva pode usar. “Desconectar” corta o acesso na hora (para voltar, precisa de um código novo).</p>
+      <div id="dispLista"></div>
+      <div class="linha"><button class="btn sec" id="dispConectar">🔗 Conectar meu PC</button><a class="btn sec" id="dispBaixar" href="https://github.com/Bandock-fagundes/Eva/releases/latest/download/EVA-Agente.exe" rel="noopener">⬇️ Baixar EVA-Agente</a></div>
       <h3>Personalidade</h3>
       <p class="hint">Quem a Eva é e como ela fala. <code>{usuario}</code> vira o teu nome.</p>
       <textarea id="persona" spellcheck="false"></textarea>
@@ -87,7 +148,7 @@
   <button data-p="log"><i>📜</i>Registro</button><button data-p="ajustes"><i>⚙️</i>Ajustes</button>
 </nav>
 <div id="toast" role="status"></div>
-<script src="/static/md.js?v=1.0.0"></script>
-<script src="/static/app.js?v=1.0.0"></script>
+<script src="/static/md.js?v=1.1.1"></script>
+<script src="/static/app.js?v=1.1.1"></script>
 </body>
 </html>

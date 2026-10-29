@@ -25,6 +25,9 @@ TABELAS = [
     ("resumos", "CREATE TABLE IF NOT EXISTS resumos(id {pk}, ts TEXT, ate_id INTEGER, texto TEXT)"),
     ("lembretes", "CREATE TABLE IF NOT EXISTS lembretes(id {pk}, criado TEXT, quando TEXT, texto TEXT, "
                   "status TEXT DEFAULT 'pendente', disparado_em TEXT)"),
+    # PCs do Gabriel pareados com a Eva (agente do Windows). Só o hash do token fica guardado.
+    ("dispositivos", "CREATE TABLE IF NOT EXISTS dispositivos(id {pk}, nome TEXT, token_hash TEXT, criado TEXT, "
+                     "ultimo_contato TEXT, versao TEXT, revogado INTEGER DEFAULT 0)"),
 ]
 
 # colunas adicionadas na v1.0 (ALTER TABLE ... ADD COLUMN IF NOT EXISTS)
@@ -38,6 +41,7 @@ COLUNAS_NOVAS = [
 INDICES = [
     "CREATE INDEX IF NOT EXISTS idx_audit_tipo ON audit(tipo)",
     "CREATE INDEX IF NOT EXISTS idx_lembretes_status ON lembretes(status)",
+    "CREATE INDEX IF NOT EXISTS idx_dispositivos_token ON dispositivos(token_hash)",
 ]
 
 

@@ -1,0 +1,6 @@
+# EVA-Agente (Windows). Versões fixadas e testadas juntas (Python 3.12).
+websockets==17.2
+mss==10.2.0
+pillow==13.0.0
+pystray==0.19.5
+certifi
