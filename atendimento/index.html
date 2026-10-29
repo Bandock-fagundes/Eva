@@ -195,6 +195,7 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
   <p class="sub">A chave fica salva só neste navegador. Crie grátis em aistudio.google.com → Get API key.</p>
   <div class="card" style="max-width:640px">
     <label>Chave da API Gemini</label><input id="cfgKey" type="password" placeholder="AIza...">
+    <label>Chaves extras (opcional, uma por linha) — de outros projetos do Google, a E.V.A. alterna sozinha quando uma atinge o limite</label><textarea id="cfgKeys" rows="3" placeholder="AIza...\nAIza..."></textarea>
     <label>Modelo</label><select id="cfgModel"></select>
     <div class="row"><button class="btn" id="btnSaveCfg">Salvar e testar</button><button class="btn ghost" id="btnModels">Atualizar lista de modelos</button></div>
     <label>Seu nome (para assinar mensagens, opcional)</label><input id="cfgName" placeholder="Gabriel">
@@ -235,10 +236,10 @@ function retrieve(query,k=12){if(!INDEX||!INDEX.N)return[];const hits=search(que
  hits.forEach(h=>{[h.j-1,h.j,h.j+1].forEach(j=>{const d=DOCS.find(x=>x.name===h.name);if(d&&j>=0&&j<d.chunks.length)want.set(h.name+'|'+j,{name:h.name,j,text:d.chunks[j]})})});
  return [...want.values()].sort((a,b)=>a.name.localeCompare(b.name)||a.j-b.j)}
 let LASTSRC=[];
-function context(query){const full=totalChars()<200000;let docPart='';let src=[];
+function context(query){const full=totalChars()<24000;let docPart='';let src=[];
  if(full&&DOCS.length){docPart=DOCS.map(d=>`=== DOCUMENTO: ${d.name} ===\n${d.text}`).join('\n\n');src=DOCS.map(d=>d.name);
-  const top=retrieve(query,4);if(top.length)docPart=`<TRECHOS_MAIS_RELEVANTES (confira primeiro)>\n${top.map(t=>`[${t.name} • trecho ${t.j+1}]\n${t.text}`).join('\n\n')}\n</TRECHOS_MAIS_RELEVANTES>\n\n`+docPart}
- else if(DOCS.length){const hits=retrieve(query,14);docPart=hits.map(h=>`=== ${h.name} (trecho ${h.j+1}) ===\n${h.text}`).join('\n\n');src=[...new Set(hits.map(h=>h.name))]}
+  const top=[];if(top.length)docPart=`<TRECHOS_MAIS_RELEVANTES (confira primeiro)>\n${top.map(t=>`[${t.name} • trecho ${t.j+1}]\n${t.text}`).join('\n\n')}\n</TRECHOS_MAIS_RELEVANTES>\n\n`+docPart}
+ else if(DOCS.length){let hits=retrieve(query,8);let acc=0;hits=hits.filter(h=>(acc+=h.text.length)<26000);docPart=hits.map(h=>`=== ${h.name} (trecho ${h.j+1}) ===\n${h.text}`).join('\n\n');src=[...new Set(hits.map(h=>h.name))]}
  const mem=(MEM.length<=80?MEM:search(query,15).filter(h=>h.kind==='mem').map(h=>MEM.find(m=>m.id===h.id)).filter(Boolean));
  const memPart=mem.map(m=>`- Situação: ${m.q}\n  O que fazer: ${m.a}`).join('\n');
  return {text:`<MATERIAL_AUXILIO>\n${docPart||'(nenhum material carregado ainda — avise o atendente que não há material para consultar)'}\n</MATERIAL_AUXILIO>\n\n<MEMORIA_APRENDIDA (confirmada pela supervisão, tem prioridade sobre o material)>\n${memPart||'(vazia)'}\n</MEMORIA_APRENDIDA>`,src:[...src,...(mem.length?['Memória']:[])]}}
@@ -258,29 +259,33 @@ function friendly(code,t){let m=t;try{m=JSON.parse(t).error.message}catch(e){}
  return String(m).slice(0,300)}
 const BASE='https://generativelanguage.googleapis.com/v1beta/models/';
 function partsText(j){return (j.candidates?.[0]?.content?.parts||[]).filter(p=>!p.thought).map(p=>p.text||'').join('')}
-async function tryStream(model,body,onText){const ac=new AbortController();let got=false;const t0=setTimeout(()=>{if(!got)ac.abort()},20000);
- try{const r=await fetch(BASE+model+':streamGenerateContent?alt=sse',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':CFG.key},body:JSON.stringify(body),signal:ac.signal});
+async function tryStream(model,key,body,onText){const ac=new AbortController();let got=false;const t0=setTimeout(()=>{if(!got)ac.abort()},15000);
+ try{const r=await fetch(BASE+model+':streamGenerateContent?alt=sse',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body),signal:ac.signal});
   if(!r.ok)return {err:r.status,text:await r.text()};
   const rd=r.body.getReader(),dec=new TextDecoder();let buf='',all='';let idle;
-  const arm=()=>{clearTimeout(idle);idle=setTimeout(()=>ac.abort(),30000)};arm();
+  const arm=()=>{clearTimeout(idle);idle=setTimeout(()=>ac.abort(),25000)};arm();
   while(true){const {done,value}=await rd.read();if(done)break;arm();buf+=dec.decode(value,{stream:true});let i;while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith('data:'))continue;try{const j=JSON.parse(line.slice(5));if(j.error)return {err:j.error.code||500,text:JSON.stringify(j)};const t=partsText(j);if(t){got=true;all+=t;onText(all)}}catch(e){}}}
   clearTimeout(idle);return all?{ok:all}:{err:'empty',text:'sem resposta'}}
- catch(e){return {err:'timeout',text:'tempo esgotado'}}finally{clearTimeout(t0)}}
-async function tryPlain(model,body,onText){const ac=new AbortController();const t0=setTimeout(()=>ac.abort(),45000);
- try{const r=await fetch(BASE+model+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':CFG.key},body:JSON.stringify(body),signal:ac.signal});const tx=await r.text();
-  if(!r.ok)return {err:r.status,text:tx};const t=partsText(JSON.parse(tx));if(!t)return {err:'empty',text:'sem resposta'};onText(t);return {ok:t}}
- catch(e){return {err:'timeout',text:'tempo esgotado'}}finally{clearTimeout(t0)}}
+ catch(e){return {err:got?'cut':'timeout',text:'tempo esgotado'}}finally{clearTimeout(t0)}}
+const COOL={};let NOTHINK=JSON.parse(localStorage.getItem('eva-nothink')||'{}');
+function retryAfter(t){const m=String(t).match(/retry(?:Delay)?["\s:]*["']?(\d+(?:\.\d+)?)s/i)||String(t).match(/in (\d+(?:\.\d+)?)s/i);return m?Math.min(90,parseFloat(m[1])+1)*1000:60000}
 async function gemini(prompt,onText,history=[]){if(!CFG.key){openOv();throw new Error('Configure a chave da API em Configurações.')}
- busy(1);const body={systemInstruction:{parts:[{text:SYS()}]},contents:[...history,{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:.4,maxOutputTokens:4096}};
- try{const tried=new Set();let model=CFG.model,last=null;
-  for(let n=0;n<5&&model;n++){tried.add(model);
-   let r=await tryStream(model,body,onText);
-   if(!r.ok&&r.err!==429&&!/API key/i.test(r.text))r=await tryPlain(model,body,onText);
-   if(r.ok){if(CFG.model!==model){CFG.model=model;await DB.put('kv',CFG,'cfg');fillModels(MODELS);renderStatus();toast('Modelo em uso: '+model)}return r.ok}
-   last=r;if(r.err===429||/API key/i.test(r.text))break;
-   const sug=(r.text.match(/models\/(gemini-[\w.\-]+)/g)||[]).map(x=>x.slice(7)).find(m=>!tried.has(m));
-   model=sug||(await availableModels()).find(m=>!tried.has(m))}
-  throw new Error(last?friendly(last.err,last.text):'Não consegui conectar ao modelo.')}finally{busy(-1)}}
+ busy(1);const base={systemInstruction:{parts:[{text:SYS()}]},contents:[...history,{role:'user',parts:[{text:prompt}]}]};
+ try{const keys=[CFG.key,...(CFG.keys||[])].filter(Boolean);const ms=await availableModels();const models=[CFG.model,...ms.filter(m=>m!==CFG.model)].slice(0,6);
+  const combos=[];models.forEach(m=>keys.forEach(k=>combos.push([m,k])));let last=null,tries=0;
+  for(let round=0;round<2;round++){
+   for(const [m,k] of combos){const id=m+'|'+k.slice(-6);if(COOL[id]>Date.now()||COOL['dead|'+m])continue;if(++tries>8)break;
+    const gc={temperature:.4,maxOutputTokens:3000};if(!NOTHINK[m])gc.thinkingConfig={thinkingBudget:0};
+    let r=await tryStream(m,k,{...base,generationConfig:gc},onText);
+    if(!r.ok&&r.err===400&&gc.thinkingConfig&&/thinking/i.test(r.text)){NOTHINK[m]=1;localStorage.setItem('eva-nothink',JSON.stringify(NOTHINK));delete gc.thinkingConfig;r=await tryStream(m,k,{...base,generationConfig:gc},onText)}
+    if(r.ok){if(CFG.model!==m){CFG.model=m;await DB.put('kv',CFG,'cfg');fillModels(MODELS);renderStatus()}return r.ok}
+    last=r;if(/API key not valid|API_KEY_INVALID/i.test(r.text)){COOL[id]=Date.now()+864e5;continue}
+    if(r.err===429||/RESOURCE_EXHAUSTED|quota/i.test(r.text)){COOL[id]=Date.now()+retryAfter(r.text);continue}
+    if(r.err===404||/no longer available|not found|not supported/i.test(r.text)){COOL['dead|'+m]=1;continue}
+    COOL[id]=Date.now()+20000}
+   const wait=Math.min(...Object.values(COOL).filter(v=>v>Date.now()&&v<Date.now()+864e5).map(v=>v-Date.now()),Infinity);
+   if(round===0&&isFinite(wait)&&wait<=35000){onText('<alerta>Muita demanda agora, tentando de novo em '+Math.ceil(wait/1000)+'s…</alerta>');await new Promise(r=>setTimeout(r,wait));tries=0}else break}
+  throw new Error(last?friendly(last.err,last.text)+(keys.length<2?' Dica: adicione chaves extras em Configurações ou ative o faturamento da chave para não ter limite.':''):'Não consegui conectar ao modelo.')}finally{busy(-1)}}
 function busy(d){BUSY=Math.max(0,BUSY+d);$('#orb').classList.toggle('busy',BUSY>0)}
 
 // ---------- render ----------
@@ -332,7 +337,7 @@ document.addEventListener('click',async e=>{const t=e.target;
 // ---------- config ----------
 let MODELS=[];
 async function availableModels(){if(MODELS.length)return MODELS;try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',{headers:{'x-goog-api-key':CFG.key}});const j=await r.json();if(j.error)throw new Error(j.error.message);
- const ms=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')&&/^models\/gemini-\d/.test(m.name)&&/flash/.test(m.name)&&!/embedding|image|tts|live|audio|vision|robotics|computer|lite/.test(m.name)).map(m=>m.name.replace('models/',''));
+ const ms=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')&&/^models\/gemini-\d/.test(m.name)&&/flash/.test(m.name)&&!/embedding|image|tts|live|audio|vision|robotics|computer/.test(m.name)).map(m=>m.name.replace('models/',''));
  const ver=n=>parseFloat((n.match(/gemini-(\d+(\.\d+)?)/)||[0,0])[1]);const rank=n=>(/flash-lite/.test(n)?1:/flash/.test(n)?0:2)+(/preview|exp|latest/.test(n)?3:0);
  ms.sort((a,b)=>rank(a)-rank(b)||ver(b)-ver(a));MODELS=ms;return ms}catch(e){toast('Chave inválida: '+e.message);return[]}}
 async function testModel(m){try{const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':CFG.key},body:JSON.stringify({contents:[{role:'user',parts:[{text:'Responda apenas: ok'}]}],generationConfig:{maxOutputTokens:20}})});return r.ok}catch(e){return false}}
@@ -382,13 +387,13 @@ const drop=$('#drop');drop.onclick=()=>$('#fileIn').click();$('#fileIn').onchang
 drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};drop.ondragleave=()=>drop.classList.remove('over');drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');handleFiles(e.dataTransfer.files)};
 $('#btnExport').onclick=async()=>{const data={v:2,exported:new Date().toISOString(),protos:PROTOS,mem:MEM,docs:DOCS.map(({chunks,...d})=>d)};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download='eva-atendimento-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
 $('#impFile').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());for(const m of d.mem||[])await DB.put('mem',m);if(d.protos){PROTOS=d.protos;await saveProtos()}for(const doc of d.docs||[])await DB.put('docs',{...doc,chunks:chunk(doc.text)});await refresh();toast('Backup importado ✓')}catch(err){toast('Arquivo inválido')}};
-$('#btnSaveCfg').onclick=()=>{CFG.key=$('#cfgKey').value.trim();CFG.model=$('#cfgModel').value||CFG.model;CFG.name=$('#cfgName').value.trim();CFG.style=$('#cfgStyle').value.trim();saveCfg()};
+$('#btnSaveCfg').onclick=()=>{CFG.key=$('#cfgKey').value.trim();CFG.keys=$('#cfgKeys').value.split(/\s+/).map(x=>x.trim()).filter(x=>x&&x!==CFG.key);CFG.model=$('#cfgModel').value||CFG.model;CFG.name=$('#cfgName').value.trim();CFG.style=$('#cfgStyle').value.trim();saveCfg()};
 $('#cfgModel').onchange=()=>{CFG.model=$('#cfgModel').value;saveCfg(false);toast('Modelo: '+CFG.model)};
 $('#btnModels').onclick=async()=>{toast('Verificando modelos...');if(await listModels(true))toast('Modelo em uso: '+CFG.model)};
 $('#btnWipe').onclick=async()=>{if(!sure($('#btnWipe'),'Tem certeza? Clique de novo para apagar tudo'))return;localStorage.removeItem('eva-theme');await DB.clear('docs');await DB.clear('mem');await DB.clear('kv');location.reload()};
 $('#ovSave').onclick=async()=>{CFG.key=$('#ovKey').value.trim();if(!CFG.key)return;$('#ov').classList.remove('on');$('#cfgKey').value=CFG.key;await saveCfg()};
-(async()=>{await DB.open();const c=await DB.get('kv','cfg');if(c)CFG={...CFG,...c};if(/gemini-(1|2)\.|gemini-3\.8|argon|omni/.test(CFG.model))CFG.model=DEFAULT_MODEL;$('#cfgKey').value=CFG.key;$('#cfgName').value=CFG.name;$('#cfgStyle').value=CFG.style;fillModels([]);const pr=await DB.get('kv','protos');if(pr)Object.keys(PROTOS).forEach(k=>{if(pr[k])PROTOS[k]=pr[k]});renderProtos();await refresh();
- if(!CFG.key)openOv();else listModels();
+(async()=>{await DB.open();const c=await DB.get('kv','cfg');if(c)CFG={...CFG,...c};if(/gemini-(1|2)\.|gemini-3\.8|argon|omni/.test(CFG.model))CFG.model=DEFAULT_MODEL;$('#cfgKey').value=CFG.key;$('#cfgKeys').value=(CFG.keys||[]).join('\n');$('#cfgName').value=CFG.name;$('#cfgStyle').value=CFG.style;fillModels([]);const pr=await DB.get('kv','protos');if(pr)Object.keys(PROTOS).forEach(k=>{if(pr[k])PROTOS[k]=pr[k]});renderProtos();await refresh();
+ if(!CFG.key)openOv();else availableModels().then(ms=>fillModels(ms));
  addBub('eva',md(`Oi${CFG.name?', '+CFG.name:''}! Eu sou a **E.V.A.** 💙\nCole um atendimento na aba Atendimento, ou me pergunte qualquer coisa do material.`))})();
 </script>
 </body>
