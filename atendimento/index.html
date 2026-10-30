@@ -92,6 +92,14 @@ label{font-size:13px;color:#344054;font-weight:500;display:block;margin:14px 0 6
 .overlay{position:fixed;inset:0;background:rgba(16,24,40,.45);display:none;align-items:center;justify-content:center;z-index:8}.overlay.on{display:flex}
 .modal{width:min(520px,92vw)}
 /* ===== v7 ===== */
+.tr{border:1px solid var(--line);border-radius:12px;margin-top:14px;overflow:hidden;background:var(--card)}
+.trh{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card2);border-bottom:1px solid var(--line);font-size:12.5px;color:var(--mut);flex-wrap:wrap}.trh b{color:var(--tx);font-size:13px}.trh .n{font-weight:700;color:var(--pri)}
+.trb{display:grid;grid-template-columns:1fr 1.4fr}@media(max-width:900px){.trb{grid-template-columns:1fr}}
+.trb>div{padding:12px 14px;min-width:0}.trb>div+div{border-left:1px solid var(--line)}
+.trl{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);margin-bottom:6px;font-weight:600}
+.trp{white-space:pre-wrap;font-size:13.5px;max-height:220px;overflow:auto;line-height:1.5}.trr{font-size:13.5px;max-height:340px;overflow:auto}
+mark{background:#fde68a;color:#111;border-radius:3px;padding:0 2px}
+
 .chathead{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--card);flex-wrap:wrap}.chathead small{color:var(--mut);font-size:12px}
 .tgl{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--mut);margin:0;cursor:pointer}.tgl input{width:auto;margin:0}
 .chips{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px 0;background:var(--card)}.chips button{all:unset;cursor:pointer;font-size:12.5px;padding:6px 11px;border:1px solid var(--line);border-radius:99px;color:var(--tx);background:var(--card2)}.chips button:hover{border-color:var(--pri);color:var(--pri)}
@@ -232,6 +240,7 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
   <button class="nav" data-v="material"><i>🗂️</i><span>Arquivos<em>Auxílio, planilhas e slides organizados</em></span></button>
   <div class="navh">E.V.A.</div>
   <button class="nav" data-v="chat"><i>💬</i><span>Conversar com a E.V.A.<em>Papo livre, dúvidas e comandos</em></span></button>
+  <button class="nav" data-v="transf"><i>📋</i><span>Área de transferência<em>Últimas 10 perguntas e respostas</em></span></button>
   <button class="nav" data-v="aprender"><i>🧠</i><span>Memória<em>O que ela lembra e textos para ensinar</em></span></button>
   <div class="navh">Sistema</div>
   <button class="nav" data-v="privacidade"><i>🛡️</i><span>Privacidade e LGPD<em>Como seus dados ficam protegidos</em></span></button>
@@ -367,6 +376,15 @@ pre.sent{white-space:pre-wrap;font-size:12px;background:var(--card2);border:1px 
       <div class="row"><button class="btn ghost sm" id="btnProtoRules">Salvar regras</button></div>
       <div class="list" id="protoList"></div>
     </div>
+  </div>
+</section>
+
+<section class="view" id="v-transf">
+  <div class="ph"><div class="phi">📋</div><div><h2>Área de transferência E.V.A.</h2><p class="sub">As últimas 10 coisas que você pediu e o que ela respondeu, com dia e horário. Copie de novo ou consulte quando quiser.</p></div></div>
+  <div class="card">
+    <div class="row" style="margin-top:0;gap:10px;align-items:center"><input id="trQ" placeholder="🔎 Buscar por palavra-chave (ex.: boleto, reembolso, 102)..." style="flex:1;margin:0"><button class="btn ghost sm" id="trClear">Limpar tudo</button></div>
+    <div class="segs" id="trSeg" style="margin-top:10px"><button class="on" data-tf="">Tudo</button><button data-tf="Atendimento">Atendimento</button><button data-tf="Melhorar mensagem">Melhorar</button><button data-tf="Protocolo">Protocolos</button><button data-tf="Conversa">Conversa</button></div>
+    <div id="trList"></div>
   </div>
 </section>
 
@@ -602,10 +620,10 @@ function srcLine(src){return src.length?`<div class="src">Fontes consultadas: ${
 async function analisar(){const conv=$('#conv').value.trim();if(!conv)return toast('Cole a conversa primeiro');const out=$('#outAtend');out.innerHTML=typing;
  const c=context(conv.slice(-3000)+' '+$('#convNote').value);
  const p=`${c.text}\n\n<CONVERSA_DO_ATENDIMENTO>\n${conv}\n</CONVERSA_DO_ATENDIMENTO>\n${$('#convNote').value?'\nNota do atendente: '+$('#convNote').value:''}\n\nAnalise como uma supervisora experiente e responda exatamente nesta estrutura:\n### Situação\n(1-2 linhas: o que o cliente quer e em que ponto o atendimento está)\n### Como o cliente está\n(sentimento e cuidado necessário, 1 linha)\n### O que fazer agora\n(passos objetivos baseados no material; cite o documento)\n<msg>melhor próxima mensagem para enviar agora</msg>\n<msg>alternativa mais curta</msg>\n### Atenção\n(o que evitar, informação faltando, ou <alerta> se não encontrou no material)`;
- try{await gemini(p,t=>out.innerHTML=md(t));out.innerHTML+=srcLine(c.src)+colSug(conv.slice(-1500)+' '+$('#convNote').value)}catch(e){out.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}}
+ try{const r=await gemini(p,t=>out.innerHTML=md(t));clipLog('Atendimento',conv+($('#convNote').value?'\n\nNota: '+$('#convNote').value:''),r);out.innerHTML+=srcLine(c.src)+colSug(conv.slice(-1500)+' '+$('#convNote').value)}catch(e){out.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}}
 async function melhorar(){const d=$('#draft').value.trim();if(!d)return toast('Escreva o rascunho');const out=$('#outMelhorar');out.innerHTML=typing;const c=context(d+' '+$('#draftCtx').value);
  const p=`${c.text}\n\n${$('#draftCtx').value?'<CONTEXTO>\n'+$('#draftCtx').value+'\n</CONTEXTO>\n':''}Rascunho do atendente:\n"""${d}"""\n\nReescreva como mensagem final ao cliente: acolhedora, educada, clara, mantendo o sentido. Se algo do rascunho contradizer o material, avise em <alerta>. Responda só com:\n<msg>versão principal</msg>\n<msg>versão mais curta</msg>`;
- try{await gemini(p,t=>out.innerHTML=md(t))}catch(e){out.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}}
+ try{const r=await gemini(p,t=>out.innerHTML=md(t));clipLog('Melhorar mensagem',d,r)}catch(e){out.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}}
 let HIST=[],CHATLOG=[];
 const CHAT_SYS=()=>`Você é a E.V.A., colega de trabalho e assistente pessoal de ${CFG.name||'um atendente'}, que trabalha no SAC por chat de um plano de saúde (Unimed). Esta é a aba de conversa livre: aqui você NÃO está falando com cliente, está conversando com ele.
 PERSONALIDADE: inteligente, simpática, bem-humorada na medida, curiosa e natural, como uma colega esperta. Converse sobre qualquer assunto (o dia, a pausa, curiosidades, filmes, música, jogos, estudos, ideias, desabafo leve). Respostas curtas e humanas (2 a 5 frases), português do Brasil informal e educado. Faça perguntas de volta quando fizer sentido, lembre do que ele já contou e use isso. Não fique repetindo que é uma IA. Se ele estiver estressado, acolha primeiro.
@@ -650,9 +668,25 @@ async function chat(hidden){const q=hidden||$('#chatIn').value.trim();if(!q)retu
  const b=addBub('eva',typing);$('#chatSub').textContent='digitando…';const recent=CHATLOG.slice(-6).map(m=>m.t).join(' ');const c=context(q+' '+recent);
  const hist=CHATLOG.slice(hidden?-16:-17,hidden?undefined:-1).map(m=>({role:m.r==='me'?'user':'model',parts:[{text:stripAct(m.t)}]}));
  const p=`${c.text}\n\n<AGORA>${new Date().toLocaleString('pt-BR',{weekday:'long',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'})}. Próxima pausa: ${nextPause()}.</AGORA>\n\n${hidden?'[Instrução interna, não mostre]: '+hidden:'Mensagem dele: '+q}`;
- try{const a=await gemini(p,t=>{b.innerHTML=md(stripAct(t));$('#chatlog').scrollTop=1e9},hist,CHAT_SYS);const acts=await runActs(a);const at=Date.now();
+ try{const a=await gemini(p,t=>{b.innerHTML=md(stripAct(t));$('#chatlog').scrollTop=1e9},hist,CHAT_SYS);const acts=await runActs(a);const at=Date.now();if(!hidden)clipLog('Conversa',q,a);
   b.innerHTML=md(stripAct(a))+actHtml(acts)+`<span class="when">${fmtH(at)}</span>`;CHATLOG.push({r:'eva',t:a,at,acts});saveChat();$('#chatlog').scrollTop=1e9}
  catch(e){b.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}finally{$('#chatSub').textContent='online'}}
+
+// ---------- área de transferência ----------
+let TRANSF=[],TRF='';
+const plainResp=t=>stripAct(String(t)).replace(/<\/?(msg|doc|alerta)>/g,'').replace(/^#{1,4} /gm,'').replace(/\*\*/g,'').trim();
+async function clipLog(tipo,pedido,resposta){if(!resposta)return;TRANSF.unshift({id:Date.now(),tipo,pedido:String(pedido).slice(0,8000),resposta:stripAct(resposta)});TRANSF=TRANSF.slice(0,10);try{await DB.put('kv',TRANSF,'transf')}catch(e){}if($('#v-transf').classList.contains('on'))renderTransf()}
+function hlq(html,q){if(!q)return html;const w=q.trim().split(/\s+/).filter(x=>x.length>1).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));if(!w.length)return html;const re=new RegExp('('+w.join('|')+')','gi');return html.split(/(<[^>]+>)/).map(p=>p.startsWith('<')?p:p.replace(re,'<mark>$1</mark>')).join('')}
+function renderTransf(){const q=$('#trQ').value.trim();const nq=norm(q);const L=$('#trList');
+ const items=TRANSF.filter(x=>(!TRF||x.tipo===TRF)&&(!nq||nq.split(/\s+/).every(w=>norm(x.pedido+' '+x.resposta+' '+x.tipo).includes(w))));
+ L.innerHTML=items.length?items.map(x=>{const d=new Date(x.id);const i=TRANSF.indexOf(x)+1;return `<div class="tr"><div class="trh"><span class="n">#${i}</span><span class="mtag">${esc(x.tipo)}</span><b>${d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'})}</b><span>às ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</span><span style="flex:1"></span><button class="btn ghost sm" data-trdel="${x.id}">Apagar</button></div>
+ <div class="trb"><div><div class="trl">Você enviou <button class="btn ghost sm" data-trc="p${x.id}">Copiar</button></div><div class="trp">${hlq(esc(x.pedido),q)}</div></div>
+ <div><div class="trl">E.V.A. respondeu <button class="btn ghost sm" data-trc="r${x.id}">Copiar tudo</button></div><div class="trr">${hlq(md(x.resposta),q)}</div></div></div></div>`}).join(''):`<div class="empty">${TRANSF.length?'Nada encontrado com essa busca.':'Ainda vazio. Tudo o que você pedir para a E.V.A. aparece aqui (até 10).'}</div>`}
+document.addEventListener('click',async e=>{const t=e.target;
+ if(t.dataset.trc){const id=+t.dataset.trc.slice(1);const x=TRANSF.find(y=>y.id===id);if(!x)return;navigator.clipboard.writeText(t.dataset.trc[0]==='p'?x.pedido:plainResp(x.resposta)).then(()=>{t.textContent='Copiado ✓';setTimeout(()=>t.textContent=t.dataset.trc[0]==='p'?'Copiar':'Copiar tudo',1500)})}
+ if(t.dataset.trdel){TRANSF=TRANSF.filter(y=>y.id!==+t.dataset.trdel);await DB.put('kv',TRANSF,'transf');renderTransf()}
+ if(t.id==='trClear'&&sure(t,'Clique de novo para limpar')){TRANSF=[];await DB.put('kv',TRANSF,'transf');renderTransf()}
+ if(t.dataset.tf!==undefined&&t.closest('#trSeg')){TRF=t.dataset.tf;document.querySelectorAll('#trSeg button').forEach(b=>b.classList.toggle('on',b===t));renderTransf()}});
 
 // ---------- memória: colar textos ----------
 let MEMF='',MEMPREV=[];
@@ -787,7 +821,7 @@ async function gerarProto(){const info=$('#protoInfo').value.trim();if(!info)ret
  out.innerHTML=typing;
  const exs=p.ex.slice(-6).map((e,i)=>`<EXEMPLO_${i+1}>\n${e.text}\n</EXEMPLO_${i+1}>`).join('\n\n');
  const prompt=`Tarefa: escrever um protocolo do tipo "${PNAMES[PT]}".\n\nEXEMPLOS DE FORMATO (servem SOMENTE como modelo de estrutura, campos, ordem, rótulos, pontuação, tom e tamanho):\n${exs}\n\n${p.rules?'REGRAS FIXAS DESTE TIPO: '+p.rules+'\n\n':''}INFORMAÇÕES REAIS DESTE ATENDIMENTO (use apenas estas):\n"""${info}"""\n${$('#protoConv').value.trim()?'\nCONVERSA DO ATENDIMENTO:\n"""'+$('#protoConv').value.trim()+'"""\n':''}\nRegras:\n- Reproduza fielmente a estrutura e os rótulos dos exemplos, preenchendo cada campo com as informações reais acima.\n- NUNCA reaproveite dados dos exemplos (nomes, números, tickets, datas, métricas, situações). Tudo vem das informações reais.\n- Se faltar informação para um campo, escreva [PREENCHER] nesse campo.\n- Escreva a descrição geral do atendimento de forma clara, objetiva e profissional.\n- Responda com o protocolo inteiro entre <doc> e </doc>. Depois, se houver campos [PREENCHER], liste-os em uma linha começando com "Faltou:".`;
- try{await gemini(prompt,t=>out.innerHTML=md(t))}catch(e){out.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}}
+ try{const r=await gemini(prompt,t=>out.innerHTML=md(t));clipLog('Protocolo',PNAMES[PT]+'\n'+info,r)}catch(e){out.innerHTML=`<div class="alert">Erro: ${esc(e.message)}</div>`}}
 document.querySelectorAll('#protoChips .chip').forEach(c=>c.onclick=()=>{document.querySelectorAll('#protoChips .chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');PT=c.dataset.pt;$('#outProto').innerHTML='';renderProtos()});
 $('#btnProtoEx').onclick=async()=>{const t=$('#protoEx').value.trim();if(!t)return toast('Cole um exemplo');PROTOS[PT].ex.push({id:Date.now(),text:t});$('#protoEx').value='';await saveProtos();toast('Exemplo de '+PNAMES[PT]+' guardado ✓')};
 $('#btnProtoRules').onclick=async()=>{PROTOS[PT].rules=$('#protoRules').value.trim();await saveProtos();toast('Regras salvas ✓')};
@@ -946,7 +980,7 @@ $('#themeBtn').onclick=()=>{const t=document.documentElement.dataset.theme==='da
 
 // ---------- wire ----------
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)document.querySelector('.nav[data-v="'+g.dataset.go+'"]').click()});
-document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$('#v-'+b.dataset.v).classList.add('on');if(b.dataset.v==='privacidade')renderPriv();if(b.dataset.v==='inicio')renderHome();document.querySelector('main').scrollTop=0});
+document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$('#v-'+b.dataset.v).classList.add('on');if(b.dataset.v==='privacidade')renderPriv();if(b.dataset.v==='inicio')renderHome();if(b.dataset.v==='transf')renderTransf();document.querySelector('main').scrollTop=0});
 $('#btnAnalisar').onclick=analisar;$('#btnMelhorar').onclick=melhorar;$('#btnChat').onclick=()=>chat();
 $('#btnNovo').onclick=()=>{$('#conv').value='';$('#convNote').value='';$('#outAtend').innerHTML='<div class="empty"><div class="orb"></div>Pronta para o próximo atendimento.</div>';$('#conv').focus()};
 $('#btnChatClear').onclick=async()=>{if(!sure($('#btnChatClear'),'Apagar o histórico?'))return;CHATLOG=[];await saveChat();renderChat()};
@@ -976,7 +1010,7 @@ $('#btnWipe').onclick=async()=>{if(!sure($('#btnWipe'),'Tem certeza? Clique de n
 $('#ovSave').addEventListener('click',()=>setTimeout(maybeSplash,300));$('#ovSave').onclick=async()=>{CFG.key=$('#ovKey').value.trim();if(!CFG.key)return;$('#ov').classList.remove('on');$('#cfgKey').value=CFG.key;await saveCfg()};
 (async()=>{await DB.open();const c=await DB.get('kv','cfg');if(c)CFG={...CFG,...c};if(/gemini-(1|2)\.|gemini-3\.8|argon|omni/.test(CFG.model))CFG.model=DEFAULT_MODEL;$('#cfgKey').value=CFG.key;$('#cfgKeys').value=(CFG.keys||[]).join('\n');$('#cfgGroq').value=CFG.groq||'';$('#cfgName').value=CFG.name;$('#cfgStyle').value=CFG.style;fillModels([]);const pr=await DB.get('kv','protos');if(pr)Object.keys(PROTOS).forEach(k=>{if(pr[k])PROTOS[k]=pr[k]});renderProtos();await refresh();
  COL=(await DB.get('kv','colinha'))||[];renderCol();const tu=await DB.get('kv','turno');if(tu)TURNO={...TURNO,...tu};fillTurno();tick();
- FICHAS=(await DB.get('kv','fichas'))||[];renderF();CHATLOG=(await DB.get('kv','chatlog'))||[];$('#autoMem').checked=CFG.automem!==false;renderChat();buildIndex();renderHome();setInterval(()=>{if($('#v-inicio').classList.contains('on'))renderHome()},30000);if(sessionStorage.getItem('eva-ok')==='1'&&(CFG.key||CFG.groq))maybeSplash();
+ FICHAS=(await DB.get('kv','fichas'))||[];renderF();CHATLOG=(await DB.get('kv','chatlog'))||[];TRANSF=(await DB.get('kv','transf'))||[];$('#trQ').addEventListener('input',renderTransf);$('#autoMem').checked=CFG.automem!==false;renderChat();buildIndex();renderHome();setInterval(()=>{if($('#v-inicio').classList.contains('on'))renderHome()},30000);if(sessionStorage.getItem('eva-ok')==='1'&&(CFG.key||CFG.groq))maybeSplash();
  PLOG=(await DB.get('kv','plog'))||[];$('#cfgMask').checked=CFG.mask!==false;clockTick();if(CFG.name)$('#termName').textContent=CFG.name;
  if(!CFG.key&&!CFG.groq){if(sessionStorage.getItem('eva-ok')==='1')openOv()}else availableModels().then(ms=>fillModels(ms));
  addBub('eva',md(`Oi${CFG.name?', '+CFG.name:''}! Eu sou a **E.V.A.** 💙\nCole um atendimento na aba Atendimento, ou me pergunte qualquer coisa do material.`))})();
